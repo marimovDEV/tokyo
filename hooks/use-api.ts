@@ -159,6 +159,7 @@ export function useReviews() {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
+            'Cache-Control': 'max-age=300', // 5 daqiqa cache
           },
           credentials: 'include',
         });
@@ -214,6 +215,7 @@ export function useRestaurantInfo() {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
+            'Cache-Control': 'max-age=3600', // 1 soat cache
           },
           credentials: 'include',
         });
@@ -258,6 +260,7 @@ export function useTextContent(contentType?: string) {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
+            'Cache-Control': 'max-age=1800', // 30 daqiqa cache
           },
           credentials: 'include',
         });
@@ -298,6 +301,7 @@ export function useSiteSettings() {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
+            'Cache-Control': 'max-age=3600', // 1 soat cache
           },
           credentials: 'include',
         });
@@ -337,6 +341,7 @@ export function useCategories() {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
+            'Cache-Control': 'max-age=1800', // 30 daqiqa cache
           },
           credentials: 'include',
         });
@@ -374,6 +379,7 @@ export function useMenuItems() {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
+            'Cache-Control': 'max-age=900', // 15 daqiqa cache
           },
           credentials: 'include',
         });
@@ -439,6 +445,7 @@ export function usePromotions() {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
+            'Cache-Control': 'max-age=600', // 10 daqiqa cache
           },
           credentials: 'include',
         });

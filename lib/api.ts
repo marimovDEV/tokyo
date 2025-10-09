@@ -247,7 +247,7 @@ export class ApiClient {
     return '';
   }
 
-  private async request<T>(endpoint: string, options: RequestInit = {}, parseJson: boolean = true): Promise<T> {
+  private async request<T>(endpoint: string, options: RequestInit = {}, parseJson: boolean = true, retries: number = 2): Promise<T> {
     const url = `${this.baseUrl}${endpoint}`;
     
     // Get CSRF token for POST/PUT/DELETE requests
@@ -256,37 +256,66 @@ export class ApiClient {
       csrfToken = await this.getCsrfToken();
     }
     
-    const response = await fetch(url, {
-      headers: {
-        // Only set Content-Type for JSON requests, not for FormData
-        // For FormData, let browser set multipart/form-data with boundary
-        ...(options.body instanceof FormData ? {} : { 'Content-Type': 'application/json' }),
-        ...(csrfToken && { 'X-CSRFToken': csrfToken }),
-        ...options.headers,
-      },
-      credentials: 'include', // Include cookies for session management
-      ...options,
-    });
+    // Create AbortController for timeout
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+    
+    try {
+      const response = await fetch(url, {
+        headers: {
+          // Only set Content-Type for JSON requests, not for FormData
+          // For FormData, let browser set multipart/form-data with boundary
+          ...(options.body instanceof FormData ? {} : { 'Content-Type': 'application/json' }),
+          ...(csrfToken && { 'X-CSRFToken': csrfToken }),
+          'Cache-Control': 'max-age=300', // 5 daqiqa cache
+          ...options.headers,
+        },
+        credentials: 'include', // Include cookies for session management
+        signal: controller.signal,
+        ...options,
+      });
+      
+      clearTimeout(timeoutId);
 
-    if (!response.ok) {
-      let errorMessage = `API request failed: ${response.status} ${response.statusText}`;
-      try {
-        const errorData = await response.text();
-        if (errorData) {
-          errorMessage += ` - ${errorData}`;
+      if (!response.ok) {
+        let errorMessage = `API request failed: ${response.status} ${response.statusText}`;
+        try {
+          const errorData = await response.text();
+          if (errorData) {
+            errorMessage += ` - ${errorData}`;
+          }
+        } catch (e) {
+          // Ignore parsing errors for error message
         }
-      } catch (e) {
-        // Ignore parsing errors for error message
+        
+        // Retry for server errors (5xx) or network issues
+        if (retries > 0 && (response.status >= 500 || response.status === 0)) {
+          console.warn(`Retrying request to ${endpoint}, attempts left: ${retries}`);
+          await new Promise(resolve => setTimeout(resolve, 1000 * (3 - retries))); // Exponential backoff
+          return this.request<T>(endpoint, options, parseJson, retries - 1);
+        }
+        
+        throw new Error(errorMessage);
       }
-      throw new Error(errorMessage);
-    }
 
-    // Don't try to parse JSON for DELETE requests that return 204 No Content
-    if (!parseJson || response.status === 204) {
-      return undefined as T;
-    }
+      // Don't try to parse JSON for DELETE requests that return 204 No Content
+      if (!parseJson || response.status === 204) {
+        return undefined as T;
+      }
 
-    return response.json();
+      return response.json();
+    } catch (error) {
+      clearTimeout(timeoutId);
+      
+      // Retry for network errors or timeouts
+      if (retries > 0 && (error.name === 'AbortError' || error.name === 'TypeError')) {
+        console.warn(`Retrying request to ${endpoint}, attempts left: ${retries}`);
+        await new Promise(resolve => setTimeout(resolve, 1000 * (3 - retries))); // Exponential backoff
+        return this.request<T>(endpoint, options, parseJson, retries - 1);
+      }
+      
+      throw error;
+    }
   }
 
   // Categories

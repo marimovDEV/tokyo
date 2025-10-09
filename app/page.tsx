@@ -27,12 +27,12 @@ export default function HomePage() {
   
   const { textContent, loading: textContentLoading, error: textContentError } = useTextContent('homepage')
   
-  // Smart refresh - only refresh reviews every 5 minutes, not every 30 seconds
+  // Smart refresh - only refresh reviews every 10 minutes to reduce server load
   useEffect(() => {
     const refreshInterval = setInterval(() => {
       // Faqat sharhlarni yangilaymiz, sahifani emas
       window.dispatchEvent(new CustomEvent('refreshReviews'))
-    }, 300000) // 5 daqiqa - juda kam, faqat kerak bo'lganda
+    }, 600000) // 10 daqiqa - server yukini kamaytirish uchun
     
     // Cleanup function to clear interval on component unmount
     return () => clearInterval(refreshInterval)
