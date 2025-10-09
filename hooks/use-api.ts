@@ -147,36 +147,40 @@ export function useApiClient() {
 
 // Reviews hook
 export function useReviews() {
-  const { get } = useApiClient();
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
-  const [lastFetch, setLastFetch] = useState<number>(0);
-
-  const fetchReviews = useCallback(async () => {
-    // Throttle requests - only fetch if last fetch was more than 5 seconds ago
-    const now = Date.now();
-    if (now - lastFetch < 5000) {
-      return;
-    }
-    
-    try {
-      setLoading(true);
-      const response = await get<{ results: any[] }>('/reviews/');
-      // Filter only approved and not deleted reviews
-      const approvedReviews = (response.results || []).filter(
-        (review: any) => review.approved && !review.deleted
-      );
-      setReviews(approvedReviews);
-      setLastFetch(now);
-    } catch (err) {
-      setError(err as Error);
-    } finally {
-      setLoading(false);
-    }
-  }, [get, lastFetch]);
 
   useEffect(() => {
+    const fetchReviews = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api'}/reviews/`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          credentials: 'include',
+        });
+        
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        
+        const data = await response.json();
+        // Filter only approved and not deleted reviews
+        const approvedReviews = (data.results || []).filter(
+          (review: any) => review.approved && !review.deleted
+        );
+        setReviews(approvedReviews);
+      } catch (err) {
+        setError(err as Error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    // Fetch only once on mount
     fetchReviews();
     
     // Listen for custom refresh event
@@ -190,7 +194,7 @@ export function useReviews() {
     return () => {
       window.removeEventListener('refreshReviews', handleRefresh);
     };
-  }, [fetchReviews]);
+  }, []); // Empty dependency to prevent infinite loop
 
   return { reviews, loading, error };
 }
@@ -321,56 +325,74 @@ export function useSiteSettings() {
 
 // Categories hook
 export function useCategories() {
-  const { get } = useApiClient();
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
-  const fetchCategories = useCallback(async () => {
-    try {
-      setLoading(true);
-      const response = await get<{ results: any[] }>('/categories/');
-      setCategories(response.results || []);
-    } catch (err) {
-      setError(err as Error);
-    } finally {
-      setLoading(false);
-    }
-  }, [get]);
-
   useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api'}/categories/`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          credentials: 'include',
+        });
+        
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        
+        const data = await response.json();
+        setCategories(data.results || []);
+      } catch (err) {
+        setError(err as Error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
     fetchCategories();
-    
-    // No automatic refresh - data will be fetched on component mount only
-  }, []); // Remove fetchCategories dependency to prevent infinite loop
+  }, []); // Empty dependency to prevent infinite loop
 
   return { categories, loading, error };
 }
 
 // Menu Items hook
 export function useMenuItems() {
-  const { get } = useApiClient();
   const [menuItems, setMenuItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
-  const fetchMenuItems = useCallback(async () => {
-    try {
-      setLoading(true);
-      const response = await get<{ results: any[] }>('/menu-items/');
-      setMenuItems(response.results || []);
-    } catch (err) {
-      setError(err as Error);
-    } finally {
-      setLoading(false);
-    }
-  }, [get]);
-
   useEffect(() => {
+    const fetchMenuItems = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api'}/menu-items/`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          credentials: 'include',
+        });
+        
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        
+        const data = await response.json();
+        setMenuItems(data.results || []);
+      } catch (err) {
+        setError(err as Error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
     fetchMenuItems();
-    
-    // No automatic refresh - data will be fetched on component mount only
-  }, []); // Remove fetchMenuItems dependency to prevent infinite loop
+  }, []); // Empty dependency to prevent infinite loop
 
   return { menuItems, loading, error };
 }
@@ -405,28 +427,37 @@ export function useMenuItem(id: string | number) {
 
 // Promotions hook
 export function usePromotions() {
-  const { get } = useApiClient();
   const [promotions, setPromotions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
-  const fetchPromotions = useCallback(async () => {
-    try {
-      setLoading(true);
-      const response = await get<{ results: any[] }>('/promotions/');
-      setPromotions(response.results || []);
-    } catch (err) {
-      setError(err as Error);
-    } finally {
-      setLoading(false);
-    }
-  }, [get]);
-
   useEffect(() => {
+    const fetchPromotions = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api'}/promotions/`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          credentials: 'include',
+        });
+        
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        
+        const data = await response.json();
+        setPromotions(data.results || []);
+      } catch (err) {
+        setError(err as Error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
     fetchPromotions();
-    
-    // No automatic refresh - data will be fetched on component mount only
-  }, []); // Remove fetchPromotions dependency to prevent infinite loop
+  }, []); // Empty dependency to prevent infinite loop
 
   return { promotions, loading, error };
 }
