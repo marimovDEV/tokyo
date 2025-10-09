@@ -37,9 +37,7 @@ const nextConfig = {
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
   },
   // Performance optimizatsiyalari
-  experimental: {
-    optimizePackageImports: ['lucide-react', '@radix-ui/react-icons'],
-  },
+  swcMinify: true,
   // Static files uchun qo'shimcha sozlamalar
   async rewrites() {
     return [

@@ -9,6 +9,7 @@ import { ToastProvider } from "@/components/ui/toast"
 import "./globals.css"
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://tokyo-eight-mu.vercel.app'),
   title: "Tokyo Restaurant - O'zbek Milliy Oshxonasi",
   description: "Tokyo restorani - O'zbek milliy oshxonasining eng mazali taomlarini tatib ko'ring. Shahardagi eng yaxshi restoran.",
   keywords: "restoran, o'zbek oshxonasi, tokyo, taom, ovqat, tashkent",
