@@ -30,3 +30,4 @@ Make sure backend allows these origins:
 - https://www.tokyokafe.uz
 - https://tokyo-eight-mu.vercel.app
 
+

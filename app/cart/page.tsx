@@ -19,8 +19,9 @@ export default function CartPage() {
   const [languageDropdownOpen, setLanguageDropdownOpen] = useState(false)
 
   useEffect(() => {
+    // Only load cart once on component mount
     loadCart()
-  }, [])
+  }, []) // Empty dependency array - only run once
 
   const loadCart = async () => {
     try {
@@ -36,15 +37,30 @@ export default function CartPage() {
   }
 
   const updateCartQuantity = async (itemId: number, newQuantity: number) => {
-    if (newQuantity <= 0) {
-      await removeFromCart(itemId)
-    } else {
-      try {
+    // Find the cart item
+    const cartItem = cart?.items.find((ci) => ci.id === itemId)
+    if (!cartItem) {
+      console.error("Cart item not found:", itemId)
+      return
+    }
+
+    try {
+      if (newQuantity <= 0) {
+        await removeFromCart(itemId)
+      } else {
         const updatedCart = await apiClient.updateCartItem(itemId, { quantity: newQuantity })
         setCart(updatedCart)
-      } catch (error) {
-        console.error("Error updating cart item:", error)
       }
+    } catch (error) {
+      console.error("Error updating cart item:", error)
+      addToast({
+        type: "error",
+        description: language === "uz"
+          ? "Savatchani yangilashda xatolik"
+          : language === "ru"
+            ? "Ошибка при обновлении корзины"
+            : "Error updating cart",
+      })
     }
   }
 
@@ -254,7 +270,17 @@ export default function CartPage() {
                 >
                   <ArrowLeft className="h-5 w-5" />
                 </Button>
-                <h1 className="text-xl font-bold">{t.cart}</h1>
+                <div className="flex items-center gap-2">
+                  <img
+                    src="/logo.png"
+                    alt="Tokyo Logo"
+                    width="32"
+                    height="32"
+                    className="w-8 h-8 object-cover rounded-full"
+                    loading="eager"
+                  />
+                  <h1 className="text-xl font-bold">{t.cart}</h1>
+                </div>
               </div>
               <DropdownMenu open={languageDropdownOpen} onOpenChange={setLanguageDropdownOpen}>
                 <DropdownMenuTrigger asChild>
@@ -328,21 +354,31 @@ export default function CartPage() {
     <div className="min-h-screen bg-gradient-to-b from-green-50 to-white">
       <header className="bg-gradient-to-r from-green-700 to-green-600 text-white shadow-md sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => (window.location.href = "/menu")}
-                className="hover:bg-white/20 text-white"
-              >
-                <ArrowLeft className="h-5 w-5" />
-              </Button>
-              <h1 className="text-xl font-bold">{t.cart}</h1>
-              <div className="bg-white/20 px-3 py-1 rounded-full text-sm font-semibold">
-                {cart.total_items} {t.items}
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => (window.location.href = "/menu")}
+                  className="hover:bg-white/20 text-white"
+                >
+                  <ArrowLeft className="h-5 w-5" />
+                </Button>
+                <div className="flex items-center gap-2">
+                  <img
+                    src="/logo.png"
+                    alt="Tokyo Logo"
+                    width="32"
+                    height="32"
+                    className="w-8 h-8 object-cover rounded-full"
+                    loading="eager"
+                  />
+                  <h1 className="text-xl font-bold">{t.cart}</h1>
+                </div>
+                <div className="bg-white/20 px-3 py-1 rounded-full text-sm font-semibold">
+                  {cart.total_items} {t.items}
+                </div>
               </div>
-            </div>
             <DropdownMenu open={languageDropdownOpen} onOpenChange={setLanguageDropdownOpen}>
               <DropdownMenuTrigger asChild>
                 <Button

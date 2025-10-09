@@ -208,13 +208,13 @@ export default function MenuPage() {
 
   useEffect(() => {
     // Language is already managed by LanguageContext, no need to set it here
-    // Load cart with delay to ensure backend is ready
+    // Load cart with delay to ensure backend is ready - only once on mount
     const timer = setTimeout(() => {
       loadCart()
     }, 500)
     
     return () => clearTimeout(timer)
-  }, [])
+  }, []) // Empty dependency array - only run once
 
   // Handle openDish query parameter
   useEffect(() => {
@@ -364,11 +364,25 @@ export default function MenuPage() {
     
     setIsAddingToCart(true)
     try {
-      const result = await apiClient.addToCart({
-        menu_item_id: item.id,
-        quantity,
-        notes
-      })
+      // Check if item already exists in cart
+      const existingCartItem = cart.items.find((cartItem) => cartItem.menu_item === item.id)
+      
+      if (existingCartItem) {
+        // Update existing item quantity
+        const newQuantity = existingCartItem.quantity + quantity
+        await apiClient.updateCartItem(existingCartItem.id, { 
+          quantity: newQuantity,
+          notes: notes || existingCartItem.notes
+        })
+      } else {
+        // Add new item to cart
+        await apiClient.addToCart({
+          menu_item_id: item.id,
+          quantity,
+          notes
+        })
+      }
+      
       await loadCart() // Reload cart data
       
       addToast({
@@ -435,28 +449,34 @@ export default function MenuPage() {
   }
 
   const updateCartQuantity = async (itemId: number, newQuantity: number) => {
-    if (newQuantity <= 0) {
-      // Find the cart item and remove it
-      const cartItem = cart.items.find((ci) => ci.menu_item === itemId)
-      if (cartItem) {
-        try {
-          await apiClient.removeFromCart(cartItem.id)
-          await loadCart()
-        } catch (error) {
-          console.error("Error removing from cart:", error)
-        }
+    // Find the cart item
+    const cartItem = cart.items.find((ci) => ci.menu_item === itemId)
+    if (!cartItem) {
+      console.error("Cart item not found:", itemId)
+      return
+    }
+
+    try {
+      if (newQuantity <= 0) {
+        // Remove the item completely
+        await apiClient.removeFromCart(cartItem.id)
+      } else {
+        // Update quantity
+        await apiClient.updateCartItem(cartItem.id, { quantity: newQuantity })
       }
-    } else {
-      // Find the cart item and update its quantity
-      const cartItem = cart.items.find((ci) => ci.menu_item === itemId)
-      if (cartItem) {
-        try {
-          await apiClient.updateCartItem(cartItem.id, { quantity: newQuantity })
-          await loadCart()
-        } catch (error) {
-          console.error("Error updating cart item:", error)
-        }
-      }
+      
+      // Reload cart data
+      await loadCart()
+    } catch (error) {
+      console.error("Error updating cart item:", error)
+      addToast({
+        type: "error",
+        description: language === "uz"
+          ? "Savatchani yangilashda xatolik"
+          : language === "ru"
+            ? "Ошибка при обновлении корзины"
+            : "Error updating cart",
+      })
     }
   }
 
