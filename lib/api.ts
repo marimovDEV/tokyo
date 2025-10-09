@@ -267,7 +267,6 @@ export class ApiClient {
           // For FormData, let browser set multipart/form-data with boundary
           ...(options.body instanceof FormData ? {} : { 'Content-Type': 'application/json' }),
           ...(csrfToken && { 'X-CSRFToken': csrfToken }),
-          'Cache-Control': 'max-age=300', // 5 daqiqa cache
           ...options.headers,
         },
         credentials: 'include', // Include cookies for session management
