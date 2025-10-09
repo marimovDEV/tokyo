@@ -1,10 +1,13 @@
 {
-  "buildCommand": "pnpm install --ignore-scripts && pnpm run build",
+  "buildCommand": "pnpm install && pnpm run build",
   "framework": "nextjs",
   "installCommand": "pnpm install",
   "regions": ["iad1"],
   "env": {
     "NEXT_TELEMETRY_DISABLED": "1"
+  },
+  "github": {
+    "silent": true
   }
 }
 
