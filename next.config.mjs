@@ -38,7 +38,6 @@ const nextConfig = {
   },
   // Performance optimizatsiyalari
   experimental: {
-    optimizeCss: true,
     optimizePackageImports: ['lucide-react', '@radix-ui/react-icons'],
   },
   // Static files uchun qo'shimcha sozlamalar
@@ -55,9 +54,6 @@ const nextConfig = {
       },
     ];
   },
-  // Static export uchun sozlamalar
-  trailingSlash: false,
-  output: 'standalone',
   // Compression
   compress: true,
   // Cache headers
