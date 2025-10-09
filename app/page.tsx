@@ -27,17 +27,6 @@ export default function HomePage() {
   
   const { textContent, loading: textContentLoading, error: textContentError } = useTextContent('homepage')
   
-  // Smart refresh - only refresh reviews every 10 minutes to reduce server load
-  useEffect(() => {
-    const refreshInterval = setInterval(() => {
-      // Faqat sharhlarni yangilaymiz, sahifani emas
-      window.dispatchEvent(new CustomEvent('refreshReviews'))
-    }, 600000) // 10 daqiqa - server yukini kamaytirish uchun
-    
-    // Cleanup function to clear interval on component unmount
-    return () => clearInterval(refreshInterval)
-  }, [])
-  
           // Debug text content (removed to prevent console spam)
           // console.log('[DEBUG] Text Content State:', {
           //   loading: textContentLoading,
@@ -247,6 +236,9 @@ export default function HomePage() {
               src={restaurantInfo?.hero_image ? getImageUrl(restaurantInfo.hero_image) : getImageUrl("/logo.png")}
               alt={getSiteContent('site_name', "Tokyo Restaurant")}
               className="w-64 h-64 object-contain rounded-full"
+              loading="eager"
+              width="256"
+              height="256"
             />
           </div>
           <h1 className="text-5xl md:text-7xl font-bold mb-4 bg-gradient-to-r from-green-600 via-emerald-600 to-green-700 bg-clip-text text-transparent">
@@ -343,6 +335,8 @@ export default function HomePage() {
                 alt={t.aboutTitle}
                 className="max-w-full max-h-96 w-auto h-auto object-contain rounded-2xl shadow-lg"
                 style={{ aspectRatio: 'auto' }}
+                loading="lazy"
+                decoding="async"
               />
             </div>
           )}

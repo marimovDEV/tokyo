@@ -4,6 +4,7 @@ import type React from "react"
 
 import { useState, useEffect, useRef } from "react"
 import { useRouter } from "next/navigation"
+import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -726,7 +727,10 @@ export default function MenuPage() {
                   <img
                     src="/logo.png"
                     alt="Tokyo Logo"
+                    width="48"
+                    height="48"
                     className="w-12 h-12 object-cover rounded-full"
+                    loading="eager"
                   />
                 </div>
                 <div>
@@ -823,6 +827,7 @@ export default function MenuPage() {
                         src={getPromotionImage(promotion)}
                         alt={getPromotionText(promotion, "title")}
                         className="w-full h-full object-cover"
+                        loading="eager"
                       />
                       <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/40 to-transparent" />
                       <div className="absolute inset-0 flex flex-col justify-center px-6 md:px-12 lg:px-16">
@@ -913,6 +918,8 @@ export default function MenuPage() {
                     src={getCategoryImage(category)}
                     alt={getCategoryName(category)}
                     className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                    loading="lazy"
+                    decoding="async"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
                   <div className="absolute inset-0 flex flex-col items-center justify-center text-white">
@@ -997,6 +1004,8 @@ export default function MenuPage() {
                         src={getMenuItemImage(item)}
                         alt={getLocalizedName(item)}
                         className="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
+                        loading="lazy"
+                        decoding="async"
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
                       <div className="absolute top-4 right-4 flex flex-col gap-2">
@@ -1170,6 +1179,7 @@ export default function MenuPage() {
                     src={getMenuItemImage(modalDish)}
                     alt={getLocalizedName(modalDish)}
                     className="w-full h-full object-cover"
+                    loading="eager"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
                   <div className="absolute top-4 right-4">

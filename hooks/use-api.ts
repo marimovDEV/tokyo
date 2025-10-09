@@ -183,18 +183,6 @@ export function useReviews() {
 
     // Fetch only once on mount
     fetchReviews();
-    
-    // Listen for custom refresh event
-    const handleRefresh = () => {
-      fetchReviews();
-    };
-    
-    window.addEventListener('refreshReviews', handleRefresh);
-    
-    // Cleanup
-    return () => {
-      window.removeEventListener('refreshReviews', handleRefresh);
-    };
   }, []); // Empty dependency to prevent infinite loop
 
   return { reviews, loading, error };
