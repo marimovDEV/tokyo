@@ -271,14 +271,16 @@ export default function CartPage() {
                   <ArrowLeft className="h-5 w-5" />
                 </Button>
                 <div className="flex items-center gap-2">
-                  <img
-                    src="/logo.png"
-                    alt="Tokyo Logo"
-                    width="32"
-                    height="32"
-                    className="w-8 h-8 object-cover rounded-full"
-                    loading="eager"
-                  />
+                  <div className="flex items-center justify-center w-10 h-10 bg-white/20 rounded-full shadow-md">
+                    <img
+                      src="/logo.png"
+                      alt="Tokyo Logo"
+                      width="32"
+                      height="32"
+                      className="w-8 h-8 object-contain rounded-full"
+                      loading="eager"
+                    />
+                  </div>
                   <h1 className="text-xl font-bold">{t.cart}</h1>
                 </div>
               </div>
@@ -365,14 +367,16 @@ export default function CartPage() {
                   <ArrowLeft className="h-5 w-5" />
                 </Button>
                 <div className="flex items-center gap-2">
-                  <img
-                    src="/logo.png"
-                    alt="Tokyo Logo"
-                    width="32"
-                    height="32"
-                    className="w-8 h-8 object-cover rounded-full"
-                    loading="eager"
-                  />
+                  <div className="flex items-center justify-center w-10 h-10 bg-white/20 rounded-full shadow-md">
+                    <img
+                      src="/logo.png"
+                      alt="Tokyo Logo"
+                      width="32"
+                      height="32"
+                      className="w-8 h-8 object-contain rounded-full"
+                      loading="eager"
+                    />
+                  </div>
                   <h1 className="text-xl font-bold">{t.cart}</h1>
                 </div>
                 <div className="bg-white/20 px-3 py-1 rounded-full text-sm font-semibold">

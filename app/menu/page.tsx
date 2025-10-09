@@ -244,11 +244,16 @@ export default function MenuPage() {
       console.log("Loading cart...")
       const cartData = await apiClient.getCart()
       console.log("Cart loaded:", cartData)
-      setCart({
+      
+      // Force state update by creating new object
+      const newCartState = {
         total_items: cartData.total_items || 0,
         total_price: cartData.total_price || 0,
         items: cartData.items || []
-      })
+      }
+      
+      console.log("Setting cart state:", newCartState)
+      setCart(newCartState)
     } catch (error) {
       console.error("Error loading cart:", error)
       // Set empty cart on error
@@ -385,14 +390,17 @@ export default function MenuPage() {
       
       await loadCart() // Reload cart data
       
-      addToast({
-        type: "success",
-        description: language === "uz"
-          ? "Mahsulot savatchaga qo'shildi!"
-          : language === "ru"
-            ? "Товар добавлен в корзину!"
-            : "Item added to cart!",
-      })
+      // Don't show toast for quantity updates, only for new items
+      if (!existingCartItem) {
+        addToast({
+          type: "success",
+          description: language === "uz"
+            ? "Mahsulot savatchaga qo'shildi!"
+            : language === "ru"
+              ? "Товар добавлен в корзину!"
+              : "Item added to cart!",
+        })
+      }
     } catch (error) {
       console.error("Error adding to cart:", error)
       addToast({
@@ -742,14 +750,14 @@ export default function MenuPage() {
               >
                 <ArrowLeft className="h-5 w-5" />
               </Button>
-              <div className="flex items-center gap-2">
-                <div className="flex items-center justify-center w-14 h-14 bg-white/20 rounded-full shadow-md">
+              <div className="flex items-center gap-3">
+                <div className="flex items-center justify-center w-12 h-12 bg-white/20 rounded-full shadow-md">
                   <img
                     src="/logo.png"
                     alt="Tokyo Logo"
-                    width="48"
-                    height="48"
-                    className="w-12 h-12 object-cover rounded-full"
+                    width="40"
+                    height="40"
+                    className="w-10 h-10 object-contain rounded-full"
                     loading="eager"
                   />
                 </div>
@@ -811,9 +819,9 @@ export default function MenuPage() {
                 onClick={() => router.push("/cart")}
               >
                 <ShoppingCart className="h-4 w-4" />
-                {getCartItemCount() > 0 && (
-                  <Badge className="absolute -top-2 -right-2 h-5 w-5 rounded-full p-0 text-xs bg-green-500 text-white animate-pulse">
-                    {getCartItemCount()}
+                {cart.total_items > 0 && (
+                  <Badge className="absolute -top-2 -right-2 h-5 w-5 rounded-full p-0 text-xs bg-green-500 text-white animate-pulse flex items-center justify-center">
+                    {cart.total_items}
                   </Badge>
                 )}
               </Button>
@@ -1156,7 +1164,7 @@ export default function MenuPage() {
       {cart.total_items >= 1 && (
         <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[60] flex flex-col items-center gap-2">
           <div className="bg-white text-green-700 px-6 py-2 rounded-full shadow-xl text-base font-bold border-2 border-green-600">
-            {formatPrice(getCartTotal())}
+            {formatPrice(cart.total_price)}
           </div>
           <Button
             onClick={() => router.push("/cart")}
@@ -1164,7 +1172,7 @@ export default function MenuPage() {
           >
             <ShoppingCart className="h-6 w-6" />
             <Badge className="absolute -top-1 -right-1 h-6 w-6 rounded-full p-0 text-xs bg-green-500 text-white animate-pulse flex items-center justify-center border-2 border-white">
-              {getCartItemCount()}
+              {cart.total_items}
             </Badge>
           </Button>
         </div>
