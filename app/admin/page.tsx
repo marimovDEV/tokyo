@@ -204,9 +204,9 @@ export default function AdminPage() {
         if (!menuResponse.ok || !categoriesResponse.ok || !promotionsResponse.ok) {
           console.log("show_all parameter not supported, trying without it")
           ;[menuResponse, categoriesResponse, promotionsResponse] = await Promise.all([
-            fetch("http://localhost:8000/api/menu-items/"),
-            fetch("http://localhost:8000/api/categories/"),
-            fetch("http://localhost:8000/api/promotions/")
+            fetch("${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api'}/menu-items/"),
+            fetch("${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api'}/categories/"),
+            fetch("${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api'}/promotions/")
           ])
         }
 
@@ -347,7 +347,7 @@ export default function AdminPage() {
       try {
         // Try backend first - Django will handle cascade delete automatically
         try {
-          const response = await fetch(`http://localhost:8000/api/menu-items/${itemId}/`, {
+          const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api'}/menu-items/${itemId}/`, {
             method: "DELETE",
             headers: {
               "Content-Type": "application/json",
@@ -433,7 +433,7 @@ export default function AdminPage() {
       try {
         // Try backend first - Django will handle cascade delete automatically
         try {
-          const response = await fetch(`http://localhost:8000/api/categories/${categoryId}/`, {
+          const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api'}/categories/${categoryId}/`, {
             method: "DELETE",
             headers: {
               "Content-Type": "application/json",
@@ -513,7 +513,7 @@ export default function AdminPage() {
       try {
         // Try backend first
         try {
-          const response = await fetch(`http://localhost:8000/api/promotions/${promotionId}/`, {
+          const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api'}/promotions/${promotionId}/`, {
             method: "DELETE",
           })
 
@@ -642,13 +642,13 @@ export default function AdminPage() {
     setLoadingMenuItems(true)
     try {
       // Try the specific category endpoint first
-      const response = await fetch(`http://localhost:8000/api/categories/${categoryId}/menu-items/`)
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api'}/categories/${categoryId}/menu-items/`)
       if (response.ok) {
         const data = await response.json()
         setCategoryMenuItems(data.results || data)
       } else {
         // Fallback to general menu-items endpoint with category filter
-        const fallbackResponse = await fetch(`http://localhost:8000/api/menu-items/?category=${categoryId}`)
+        const fallbackResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api'}/menu-items/?category=${categoryId}`)
         if (fallbackResponse.ok) {
           const data = await fallbackResponse.json()
           setCategoryMenuItems(data.results || data)
@@ -726,15 +726,15 @@ export default function AdminPage() {
         
         switch (type) {
           case 'menu':
-            endpoint = `http://localhost:8000/api/menu-items/${id}/`
+            endpoint = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api'}/menu-items/${id}/`
             data = { is_active: isActive }
             break
           case 'category':
-            endpoint = `http://localhost:8000/api/categories/${id}/`
+            endpoint = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api'}/categories/${id}/`
             data = { is_active: isActive }
             break
           case 'promotion':
-            endpoint = `http://localhost:8000/api/promotions/${id}/`
+            endpoint = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api'}/promotions/${id}/`
             data = { is_active: isActive }
             break
         }
@@ -862,13 +862,13 @@ export default function AdminPage() {
       
       switch (type) {
         case 'menu':
-          endpoint = `http://localhost:8000/api/menu-items/${id}/`
+          endpoint = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api'}/menu-items/${id}/`
           break
         case 'category':
-          endpoint = `http://localhost:8000/api/categories/${id}/`
+          endpoint = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api'}/categories/${id}/`
           break
         case 'promotion':
-          endpoint = `http://localhost:8000/api/promotions/${id}/`
+          endpoint = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api'}/promotions/${id}/`
           break
       }
 
@@ -904,7 +904,7 @@ export default function AdminPage() {
   const loadReviews = async () => {
     try {
       // Try to fetch from backend first - use admin endpoint to get all reviews
-      const response = await fetch("http://localhost:8000/api/admin/reviews/")
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api'}/admin/reviews/`)
       if (response.ok) {
         const data = await response.json()
         const allReviews: Review[] = data.results || data
@@ -930,7 +930,7 @@ export default function AdminPage() {
   const handleApproveReview = async (reviewId: string) => {
     try {
       // Try backend first
-      const response = await fetch(`http://localhost:8000/api/reviews/${reviewId}/`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api'}/reviews/${reviewId}/`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -972,7 +972,7 @@ export default function AdminPage() {
   const handleRejectReview = async (reviewId: string) => {
     try {
       // Try backend first - mark as deleted instead of actually deleting
-      const response = await fetch(`http://localhost:8000/api/reviews/${reviewId}/`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api'}/reviews/${reviewId}/`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -1025,7 +1025,7 @@ export default function AdminPage() {
       onConfirm: async () => {
         try {
           // Try backend first
-          const response = await fetch(`http://localhost:8000/api/reviews/${reviewId}/`, {
+          const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api'}/reviews/${reviewId}/`, {
             method: 'DELETE',
             headers: {
               'Content-Type': 'application/json',
@@ -1082,7 +1082,7 @@ export default function AdminPage() {
       // Try backend first
       try {
         const method = editingItem ? 'PUT' : 'POST'
-        const url = editingItem ? `http://localhost:8000/api/menu-items/${editingItem.id}/` : "http://localhost:8000/api/menu-items/"
+        const url = editingItem ? `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api'}/menu-items/${editingItem.id}/` : "${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api'}/menu-items/"
         
         // Always use FormData for menu items (needed for image uploads)
         const form = new FormData()
@@ -1248,7 +1248,7 @@ export default function AdminPage() {
 
     try {
       const method = editingCategory ? 'PUT' : 'POST'
-      const url = editingCategory ? `http://localhost:8000/api/categories/${editingCategory.id}/` : "http://localhost:8000/api/categories/"
+      const url = editingCategory ? `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api'}/categories/${editingCategory.id}/` : "${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api'}/categories/"
       
       // Always use FormData for categories (needed for image uploads)
       const form = new FormData()
@@ -1331,7 +1331,7 @@ export default function AdminPage() {
 
     try {
       const method = editingPromotion ? 'PUT' : 'POST'
-      const url = editingPromotion ? `http://localhost:8000/api/promotions/${editingPromotion.id}/` : "http://localhost:8000/api/promotions/"
+      const url = editingPromotion ? `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api'}/promotions/${editingPromotion.id}/` : "${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api'}/promotions/"
       
       // Always use FormData for promotions (needed for image uploads)
       const form = new FormData()
