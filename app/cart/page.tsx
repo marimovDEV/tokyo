@@ -41,6 +41,8 @@ export default function CartPage() {
     const cartItem = cart?.items.find((ci) => ci.id === itemId)
     if (!cartItem) {
       console.error("Cart item not found:", itemId)
+      // Refresh cart to get latest data
+      await loadCart()
       return
     }
 
@@ -53,14 +55,29 @@ export default function CartPage() {
       }
     } catch (error) {
       console.error("Error updating cart item:", error)
-      addToast({
-        type: "error",
-        description: language === "uz"
-          ? "Savatchani yangilashda xatolik"
-          : language === "ru"
-            ? "Ошибка при обновлении корзины"
-            : "Error updating cart",
-      })
+      
+      // If error is 404, refresh cart
+      if (error.message && error.message.includes('404')) {
+        console.log("Cart item not found in backend, refreshing cart...")
+        await loadCart()
+        addToast({
+          type: "warning",
+          description: language === "uz"
+            ? "Savatcha yangilandi"
+            : language === "ru"
+              ? "Корзина обновлена"
+              : "Cart refreshed",
+        })
+      } else {
+        addToast({
+          type: "error",
+          description: language === "uz"
+            ? "Savatchani yangilashda xatolik"
+            : language === "ru"
+              ? "Ошибка при обновлении корзины"
+              : "Error updating cart",
+        })
+      }
     }
   }
 
@@ -70,6 +87,29 @@ export default function CartPage() {
       setCart(updatedCart)
     } catch (error) {
       console.error("Error removing cart item:", error)
+      
+      // If error is 404, refresh cart
+      if (error.message && error.message.includes('404')) {
+        console.log("Cart item not found in backend, refreshing cart...")
+        await loadCart()
+        addToast({
+          type: "warning",
+          description: language === "uz"
+            ? "Savatcha yangilandi"
+            : language === "ru"
+              ? "Корзина обновлена"
+              : "Cart refreshed",
+        })
+      } else {
+        addToast({
+          type: "error",
+          description: language === "uz"
+            ? "Savatchadan olib tashlashda xatolik"
+            : language === "ru"
+              ? "Ошибка при удалении из корзины"
+              : "Error removing from cart",
+        })
+      }
     }
   }
 

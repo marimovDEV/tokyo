@@ -420,6 +420,8 @@ export default function MenuPage() {
     const cartItem = cart.items.find((ci) => ci.menu_item === menuItemId)
     if (!cartItem) {
       console.error("Cart item not found for menu item:", menuItemId)
+      // Refresh cart to get latest data
+      await loadCart()
       return
     }
 
@@ -436,14 +438,29 @@ export default function MenuPage() {
       })
     } catch (error) {
       console.error("Error removing from cart:", error)
-      addToast({
-        type: "error",
-        description: language === "uz"
-          ? "Savatchadan olib tashlashda xatolik"
-          : language === "ru"
-            ? "Ошибка при удалении из корзины"
-            : "Error removing from cart",
-      })
+      
+      // If error is 404, refresh cart
+      if (error.message && error.message.includes('404')) {
+        console.log("Cart item not found in backend, refreshing cart...")
+        await loadCart()
+        addToast({
+          type: "warning",
+          description: language === "uz"
+            ? "Savatcha yangilandi"
+            : language === "ru"
+              ? "Корзина обновлена"
+              : "Cart refreshed",
+        })
+      } else {
+        addToast({
+          type: "error",
+          description: language === "uz"
+            ? "Savatchadan olib tashlashda xatolik"
+            : language === "ru"
+              ? "Ошибка при удалении из корзины"
+              : "Error removing from cart",
+        })
+      }
     }
   }
 
@@ -456,13 +473,15 @@ export default function MenuPage() {
     
     if (!cartItem) {
       console.error("Cart item not found for menu item:", menuItemId)
+      // Refresh cart to get latest data
+      await loadCart()
       addToast({
         type: "error",
         description: language === "uz"
-          ? "Savatcha mahsuloti topilmadi"
+          ? "Savatcha yangilandi, qayta urinib ko'ring"
           : language === "ru"
-            ? "Товар в корзине не найден"
-            : "Cart item not found",
+            ? "Корзина обновлена, попробуйте снова"
+            : "Cart refreshed, please try again",
       })
       return
     }
@@ -482,14 +501,29 @@ export default function MenuPage() {
       await loadCart()
     } catch (error) {
       console.error("Error updating cart item:", error)
-      addToast({
-        type: "error",
-        description: language === "uz"
-          ? "Savatchani yangilashda xatolik"
-          : language === "ru"
-            ? "Ошибка при обновлении корзины"
-            : "Error updating cart",
-      })
+      
+      // If error is 404, refresh cart and try to find the item again
+      if (error.message && error.message.includes('404')) {
+        console.log("Cart item not found in backend, refreshing cart...")
+        await loadCart()
+        addToast({
+          type: "warning",
+          description: language === "uz"
+            ? "Savatcha yangilandi, qayta urinib ko'ring"
+            : language === "ru"
+              ? "Корзина обновлена, попробуйте снова"
+              : "Cart refreshed, please try again",
+        })
+      } else {
+        addToast({
+          type: "error",
+          description: language === "uz"
+            ? "Savatchani yangilashda xatolik"
+            : language === "ru"
+              ? "Ошибка при обновлении корзины"
+              : "Error updating cart",
+        })
+      }
     }
   }
 
