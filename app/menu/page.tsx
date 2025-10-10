@@ -439,17 +439,27 @@ export default function MenuPage() {
     } catch (error) {
       console.error("Error removing from cart:", error)
       
-      // If error is 404, refresh cart
+      // If error is 404, the item doesn't exist in backend - remove from local state
       if (error.message && error.message.includes('404')) {
-        console.log("Cart item not found in backend, refreshing cart...")
-        await loadCart()
+        console.log("Cart item not found in backend, removing from local state...")
+        
+        // Remove the item from local cart state immediately
+        const updatedItems = cart.items.filter(item => item.id !== cartItem.id)
+        const updatedCart = {
+          ...cart,
+          items: updatedItems,
+          total_items: updatedItems.reduce((sum, item) => sum + item.quantity, 0),
+          total_price: updatedItems.reduce((sum, item) => sum + (item.price * item.quantity), 0)
+        }
+        setCart(updatedCart)
+        
         addToast({
           type: "warning",
           description: language === "uz"
-            ? "Savatcha yangilandi"
+            ? "Mahsulot savatchadan olib tashlandi"
             : language === "ru"
-              ? "Корзина обновлена"
-              : "Cart refreshed",
+              ? "Товар удален из корзины"
+              : "Item removed from cart",
         })
       } else {
         addToast({
@@ -522,17 +532,27 @@ export default function MenuPage() {
     } catch (error) {
       console.error("Error updating cart item:", error)
       
-      // If error is 404, refresh cart and try to find the item again
+      // If error is 404, the item doesn't exist in backend - remove from local state
       if (error.message && error.message.includes('404')) {
-        console.log("Cart item not found in backend, refreshing cart...")
-        await loadCart()
+        console.log("Cart item not found in backend, removing from local state...")
+        
+        // Remove the item from local cart state immediately
+        const updatedItems = cart.items.filter(item => item.id !== cartItem.id)
+        const updatedCart = {
+          ...cart,
+          items: updatedItems,
+          total_items: updatedItems.reduce((sum, item) => sum + item.quantity, 0),
+          total_price: updatedItems.reduce((sum, item) => sum + (item.price * item.quantity), 0)
+        }
+        setCart(updatedCart)
+        
         addToast({
           type: "warning",
           description: language === "uz"
-            ? "Savatcha yangilandi, qayta urinib ko'ring"
+            ? "Mahsulot savatchadan olib tashlandi"
             : language === "ru"
-              ? "Корзина обновлена, попробуйте снова"
-              : "Cart refreshed, please try again",
+              ? "Товар удален из корзины"
+              : "Item removed from cart",
         })
       } else {
         addToast({
