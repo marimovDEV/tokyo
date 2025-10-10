@@ -489,12 +489,14 @@ export default function MenuPage() {
 
   const handleItemClick = (item: MenuItem) => {
     setModalDish(item)
+    setItemNotes("") // Clear notes when opening modal
     setIsModalOpen(true)
   }
 
   const handleCloseModal = () => {
     setIsModalOpen(false)
     setModalDish(null)
+    setItemNotes("") // Clear notes when closing modal
   }
 
   const handlePromotionClick = (promotion: any) => {
@@ -1223,6 +1225,19 @@ export default function MenuPage() {
                     {getLocalizedDescription(modalDish)}
                   </p>
 
+                  {/* Special Notes */}
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-muted-foreground">
+                      {language === "uz" ? "Qo'shimcha izoh (ixtiyoriy)" : language === "ru" ? "Особые пожелания (необязательно)" : "Special notes (optional)"}
+                    </label>
+                    <Input
+                      placeholder={language === "uz" ? "Masalan: achchiq bo'lmasin, tuzni kam qo'ying..." : language === "ru" ? "Например: не острое, меньше соли..." : "e.g., no spicy, less salt..."}
+                      value={itemNotes}
+                      onChange={(e) => setItemNotes(e.target.value)}
+                      className="w-full"
+                    />
+                  </div>
+
                   {/* Price and Add to Cart */}
                   <div className="flex items-center justify-between pt-4 border-t">
                     <div className="text-3xl font-bold text-green-600">
@@ -1263,7 +1278,8 @@ export default function MenuPage() {
                           <Button
                             onClick={async (e) => {
                               e.stopPropagation()
-                              await addToCart(modalDish)
+                              await addToCart(modalDish, 1, itemNotes)
+                              setItemNotes("") // Clear notes after adding
                             }}
                             className="bg-gradient-to-r from-green-700 to-green-600 text-white hover:from-green-800 hover:to-green-700 px-6 py-2 rounded-full font-semibold"
                           >

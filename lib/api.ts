@@ -715,13 +715,19 @@ export const getImageUrl = (imagePath: string | null | undefined): string => {
   
   // If it's a relative path, prepend the backend URL
   const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
-  const backendUrl = apiUrl.replace('/api', '');
+  let backendUrl = apiUrl.replace('/api', '');
+  
+  // Fix for production - ensure we use the correct domain
+  if (backendUrl.includes('localhost')) {
+    backendUrl = 'https://api.tokyokafe.uz';
+  }
   
   // Ensure imagePath starts with /
   if (!imagePath.startsWith('/')) {
     imagePath = '/' + imagePath;
   }
   
+  console.log('Image URL constructed:', `${backendUrl}${imagePath}`);
   return `${backendUrl}${imagePath}`;
 };
 
