@@ -713,22 +713,17 @@ export const getImageUrl = (imagePath: string | null | undefined): string => {
     return imagePath;
   }
   
-  // If it's a relative path, prepend the backend URL
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
-  let backendUrl = apiUrl.replace('/api', '');
-  
-  // Fix for production - ensure we use the correct domain
-  if (backendUrl.includes('localhost')) {
-    backendUrl = 'https://api.tokyokafe.uz';
-  }
+  // For production, always use the correct backend URL
+  const backendUrl = 'https://api.tokyokafe.uz';
   
   // Ensure imagePath starts with /
   if (!imagePath.startsWith('/')) {
     imagePath = '/' + imagePath;
   }
   
-  console.log('Image URL constructed:', `${backendUrl}${imagePath}`);
-  return `${backendUrl}${imagePath}`;
+  const fullUrl = `${backendUrl}${imagePath}`;
+  console.log('Image URL constructed:', fullUrl);
+  return fullUrl;
 };
 
 // Local storage helpers for cart (frontend only)

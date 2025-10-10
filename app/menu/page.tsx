@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect, useRef, useCallback } from "react"
 import { useRouter } from "next/navigation"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
@@ -239,7 +239,7 @@ export default function MenuPage() {
 
 
 
-  const loadCart = async () => {
+  const loadCart = useCallback(async () => {
     try {
       console.log("Loading cart...")
       const cartData = await apiClient.getCart()
@@ -263,7 +263,7 @@ export default function MenuPage() {
         items: []
       })
     }
-  }
+  }, [])
 
 
   useEffect(() => {

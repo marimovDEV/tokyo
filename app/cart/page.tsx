@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { ArrowLeft, Plus, Minus, Trash2, ShoppingBag, ChevronDown } from "lucide-react"
@@ -21,9 +21,9 @@ export default function CartPage() {
   useEffect(() => {
     // Only load cart once on component mount
     loadCart()
-  }, []) // Empty dependency array - only run once
+  }, [loadCart]) // Add loadCart as dependency
 
-  const loadCart = async () => {
+  const loadCart = useCallback(async () => {
     try {
       setIsLoading(true)
       const cartData = await apiClient.getCart()
@@ -34,7 +34,7 @@ export default function CartPage() {
     } finally {
       setIsLoading(false)
     }
-  }
+  }, [])
 
   const updateCartQuantity = async (itemId: number, newQuantity: number) => {
     // Find the cart item
