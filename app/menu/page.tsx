@@ -376,11 +376,12 @@ export default function MenuPage() {
       const existingCartItem = cart.items.find((cartItem) => cartItem.menu_item === item.id)
       console.log("Existing cart item:", existingCartItem)
       
+      let updatedCart
       if (existingCartItem) {
         // Update existing item quantity
         const newQuantity = existingCartItem.quantity + quantity
         console.log("Updating cart item:", existingCartItem.id, "to quantity:", newQuantity)
-        await apiClient.updateCartItem(existingCartItem.id, { 
+        updatedCart = await apiClient.updateCartItem(existingCartItem.id, { 
           quantity: newQuantity,
           notes: notes || existingCartItem.notes
         })
@@ -388,7 +389,7 @@ export default function MenuPage() {
       } else {
         // Add new item to cart
         console.log("Adding new item to cart:", item.id)
-        await apiClient.addToCart({
+        updatedCart = await apiClient.addToCart({
           menu_item_id: item.id,
           quantity,
           notes
@@ -396,10 +397,14 @@ export default function MenuPage() {
         console.log("New item added successfully")
       }
       
-      // Reload cart data
-      console.log("Reloading cart...")
-      await loadCart()
-      console.log("Cart reloaded")
+      // Update cart state with backend response
+      console.log("Updating cart state from backend response")
+      setCart({
+        ...updatedCart,
+        total_items: updatedCart.total_items || updatedCart.items.reduce((sum, item) => sum + item.quantity, 0),
+        total_price: updatedCart.total_price || updatedCart.items.reduce((sum, item) => sum + (item.price * item.quantity), 0)
+      })
+      console.log("Cart updated")
       
       // Don't show toast for quantity updates, only for new items
       if (!existingCartItem) {
@@ -528,6 +533,19 @@ export default function MenuPage() {
       return
     }
 
+    // Optimistic update - update UI immediately
+    const updatedItems = cart.items.map(item => 
+      item.id === cartItem.id ? { ...item, quantity: newQuantity } : item
+    ).filter(item => item.quantity > 0)
+    
+    const updatedCart = {
+      ...cart,
+      items: updatedItems,
+      total_items: updatedItems.reduce((sum, item) => sum + item.quantity, 0),
+      total_price: updatedItems.reduce((sum, item) => sum + (item.price * item.quantity), 0)
+    }
+    setCart(updatedCart)
+    
     try {
       if (newQuantity <= 0) {
         // Remove the item completely
@@ -536,11 +554,14 @@ export default function MenuPage() {
       } else {
         // Update quantity
         console.log("Updating cart item quantity:", cartItem.id, "to", newQuantity)
-        await apiClient.updateCartItem(cartItem.id, { quantity: newQuantity })
+        const backendCart = await apiClient.updateCartItem(cartItem.id, { quantity: newQuantity })
+        // Update with backend response
+        setCart({
+          ...backendCart,
+          total_items: backendCart.total_items || backendCart.items.reduce((sum, item) => sum + item.quantity, 0),
+          total_price: backendCart.total_price || backendCart.items.reduce((sum, item) => sum + (item.price * item.quantity), 0)
+        })
       }
-      
-      // Reload cart data
-      await loadCart()
     } catch (error) {
       console.error("Error updating cart item:", error)
       
