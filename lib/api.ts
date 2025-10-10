@@ -752,6 +752,11 @@ export const getImageUrl = (imagePath: string | null | undefined): string => {
     imagePath = '/' + imagePath;
   }
   
+  // Special handling for logo.png - try backend first, then fallback to Vercel
+  if (imagePath === '/logo.png') {
+    return `${backendUrl}/static/logo.png`;
+  }
+  
   const fullUrl = `${backendUrl}${imagePath}`;
   console.log('Image URL constructed:', fullUrl);
   return fullUrl;

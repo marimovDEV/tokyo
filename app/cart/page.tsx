@@ -315,7 +315,8 @@ export default function CartPage() {
                     <img
                       src={getImageUrl("/logo.png")}
                     onError={(e) => {
-                      e.currentTarget.src = '/logo.png'
+                      e.currentTarget.src = '/placeholder.svg'
+                      e.currentTarget.alt = 'Logo not found'
                     }}
                       alt="Tokyo Logo"
                       width="32"
@@ -414,7 +415,8 @@ export default function CartPage() {
                     <img
                       src={getImageUrl("/logo.png")}
                     onError={(e) => {
-                      e.currentTarget.src = '/logo.png'
+                      e.currentTarget.src = '/placeholder.svg'
+                      e.currentTarget.alt = 'Logo not found'
                     }}
                       alt="Tokyo Logo"
                       width="32"

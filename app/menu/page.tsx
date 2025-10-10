@@ -821,7 +821,8 @@ export default function MenuPage() {
                     className="w-10 h-10 object-contain rounded-full"
                     loading="eager"
                     onError={(e) => {
-                      e.currentTarget.src = '/logo.png'
+                      e.currentTarget.src = '/placeholder.svg'
+                      e.currentTarget.alt = 'Logo not found'
                     }}
                   />
                 </div>
