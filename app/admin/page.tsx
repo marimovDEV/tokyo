@@ -355,9 +355,20 @@ export default function AdminPage() {
           })
 
           if (response.ok) {
-            console.log('✅ Menu item deleted successfully, refreshing data...')
-            await fetchData() // Refresh data from backend
-            console.log('✅ Data refreshed. Current promotions:', promotions.length)
+            console.log('✅ Menu item deleted successfully from backend')
+            
+            // Update local state instead of refreshing all data
+            // 1. Remove related promotions
+            setPromotions((prev) => prev.filter((promo) => {
+              if (typeof promo.linked_dish === 'object' && promo.linked_dish !== null) {
+                return promo.linked_dish.id !== itemId
+              }
+              return promo.linked_dish !== itemId
+            }))
+            
+            // 2. Remove menu item
+            setMenuItems((prev) => prev.filter((item) => item.id !== itemId))
+            
             addToast({
               type: "success",
               description: language === "uz"
@@ -441,9 +452,25 @@ export default function AdminPage() {
           })
 
           if (response.ok) {
-            console.log('✅ Category deleted successfully, refreshing data...')
-            await fetchData() // Refresh data from backend
-            console.log('✅ Data refreshed. Current menu items:', menuItems.length, 'Current promotions:', promotions.length)
+            console.log('✅ Category deleted successfully from backend')
+            
+            // Update local state instead of refreshing all data
+            // 1. Remove related promotions
+            setPromotions((prev) => prev.filter((promo) => 
+              !relatedMenuItems.some(item => {
+                if (typeof promo.linked_dish === 'object' && promo.linked_dish !== null) {
+                  return item.id === promo.linked_dish.id
+                }
+                return item.id === promo.linked_dish
+              })
+            ))
+            
+            // 2. Remove related menu items
+            setMenuItems((prev) => prev.filter((item) => item.category.id !== categoryId))
+            
+            // 3. Remove category
+            setCategories((prev) => prev.filter((cat) => cat.id !== categoryId))
+            
             addToast({
               type: "success",
               description: language === "uz"
@@ -518,6 +545,11 @@ export default function AdminPage() {
           })
 
           if (response.ok) {
+            console.log('✅ Promotion deleted successfully from backend')
+            
+            // Update local state instead of refreshing all data
+            setPromotions((prev) => prev.filter((promo) => promo.id !== promotionId))
+            
             addToast({
               type: "success",
               description: language === "uz"
@@ -526,7 +558,6 @@ export default function AdminPage() {
                   ? "Акция успешно удалена!"
                   : "Promotion deleted successfully!",
             })
-            fetchData() // Refresh data
             return
           }
         } catch (backendError) {
