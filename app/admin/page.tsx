@@ -763,6 +763,31 @@ export default function AdminPage() {
         }
 
         if (response.ok) {
+          // Update local state instead of refreshing all data
+          switch (type) {
+            case 'menu':
+              setMenuItems(prev => prev.map(item => 
+                item.id === id ? { ...item, is_active: isActive } : item
+              ))
+              break
+            case 'category':
+              setCategories(prev => prev.map(cat => 
+                cat.id === id ? { ...cat, is_active: isActive } : cat
+              ))
+              // If category is deactivated, deactivate all items in that category
+              if (!isActive) {
+                setMenuItems(prev => prev.map(item => 
+                  item.category && item.category.id === id ? { ...item, is_active: false } : item
+                ))
+              }
+              break
+            case 'promotion':
+              setPromotions(prev => prev.map(promo => 
+                promo.id === id ? { ...promo, is_active: isActive } : promo
+              ))
+              break
+          }
+          
           addToast({
             type: "success",
             description: language === "uz"
@@ -771,7 +796,6 @@ export default function AdminPage() {
                 ? `${type === 'menu' ? 'Блюдо' : type === 'category' ? 'Категория' : 'Акция'} ${isActive ? 'активировано' : 'деактивировано'}`
                 : `${type === 'menu' ? 'Dish' : type === 'category' ? 'Category' : 'Promotion'} ${isActive ? 'activated' : 'deactivated'}`,
           })
-          fetchData() // Refresh data from backend
           return
         } else {
           console.error('Backend error:', response.status, response.statusText)
