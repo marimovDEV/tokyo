@@ -364,31 +364,42 @@ export default function MenuPage() {
 
   const addToCart = async (item: MenuItem, quantity = 1, notes?: string) => {
     if (isAddingToCart) {
+      console.log("Already adding to cart, skipping...")
       return
     }
     
+    console.log("Adding to cart:", item.name, "quantity:", quantity)
     setIsAddingToCart(true)
+    
     try {
       // Check if item already exists in cart
       const existingCartItem = cart.items.find((cartItem) => cartItem.menu_item === item.id)
+      console.log("Existing cart item:", existingCartItem)
       
       if (existingCartItem) {
         // Update existing item quantity
         const newQuantity = existingCartItem.quantity + quantity
+        console.log("Updating cart item:", existingCartItem.id, "to quantity:", newQuantity)
         await apiClient.updateCartItem(existingCartItem.id, { 
           quantity: newQuantity,
           notes: notes || existingCartItem.notes
         })
+        console.log("Cart item updated successfully")
       } else {
         // Add new item to cart
+        console.log("Adding new item to cart:", item.id)
         await apiClient.addToCart({
           menu_item_id: item.id,
           quantity,
           notes
         })
+        console.log("New item added successfully")
       }
       
-      await loadCart() // Reload cart data
+      // Reload cart data
+      console.log("Reloading cart...")
+      await loadCart()
+      console.log("Cart reloaded")
       
       // Don't show toast for quantity updates, only for new items
       if (!existingCartItem) {
@@ -412,6 +423,7 @@ export default function MenuPage() {
             : "Error adding to cart",
       })
     } finally {
+      console.log("Resetting isAddingToCart to false")
       setIsAddingToCart(false)
     }
   }
