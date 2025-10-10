@@ -25,7 +25,7 @@ import {
   X,
 } from "lucide-react"
 import { useCategories, useMenuItems, usePromotions, useTextContent } from "@/hooks/use-api"
-import { formatPrice, apiClient, getImageUrl, type CartItem, type MenuItem } from "@/lib/api"
+import { formatPrice, apiClient, getImageUrl, clearSessionData, type CartItem, type MenuItem } from "@/lib/api"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { useLanguage } from "@/contexts/LanguageContext"
 import { useToast } from "@/components/ui/toast"
@@ -467,11 +467,18 @@ export default function MenuPage() {
   const updateCartQuantity = async (menuItemId: number, newQuantity: number) => {
     console.log("updateCartQuantity called:", { menuItemId, newQuantity, cartItems: cart.items })
     
+    // Validate cart item ID
+    if (!cart.items || cart.items.length === 0) {
+      console.warn("Cart is empty, refreshing...")
+      await loadCart()
+      return
+    }
+    
     // Find the cart item by menu_item ID
     const cartItem = cart.items.find((ci) => ci.menu_item === menuItemId)
     console.log("Found cart item:", cartItem)
     
-    if (!cartItem) {
+    if (!cartItem || !cartItem.id) {
       console.error("Cart item not found for menu item:", menuItemId)
       // Refresh cart to get latest data
       await loadCart()

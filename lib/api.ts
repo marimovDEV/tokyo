@@ -644,7 +644,28 @@ export class ApiClient {
 
   // Cart
   async getCart(): Promise<Cart> {
-    return this.request<Cart>('/cart/');
+    try {
+      const response = await this.request<Cart>('/cart/');
+      return response;
+    } catch (error) {
+      console.error('Error fetching cart:', error);
+      // If cart not found, return empty cart
+      if (error.message && error.message.includes('404')) {
+        return {
+          id: 0,
+          session_key: '',
+          table_number: null,
+          customer_name: null,
+          notes: null,
+          total_items: 0,
+          total_price: 0,
+          items: [],
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        };
+      }
+      throw error;
+    }
   }
 
   async addToCart(data: {
@@ -662,16 +683,26 @@ export class ApiClient {
     quantity?: number;
     notes?: string;
   }): Promise<Cart> {
-    return this.request<Cart>(`/cart/items/${itemId}/`, {
-      method: 'PATCH',
-      body: JSON.stringify(data),
-    });
+    try {
+      return await this.request<Cart>(`/cart/items/${itemId}/`, {
+        method: 'PATCH',
+        body: JSON.stringify(data),
+      });
+    } catch (error) {
+      console.error(`Error updating cart item ${itemId}:`, error);
+      throw error;
+    }
   }
 
   async removeFromCart(itemId: number): Promise<Cart> {
-    return this.request<Cart>(`/cart/items/${itemId}/`, {
-      method: 'DELETE',
-    });
+    try {
+      return await this.request<Cart>(`/cart/items/${itemId}/`, {
+        method: 'DELETE',
+      });
+    } catch (error) {
+      console.error(`Error removing cart item ${itemId}:`, error);
+      throw error;
+    }
   }
 
   async clearCart(): Promise<{ message: string }> {
@@ -736,6 +767,23 @@ export const getStoredCart = (): CartItem[] => {
 export const saveCart = (cart: CartItem[]) => {
   if (typeof window === "undefined") return;
   localStorage.setItem("restaurant-cart", JSON.stringify(cart));
+};
+
+// Clear all session data (useful for debugging cart issues)
+export const clearSessionData = () => {
+  if (typeof window === "undefined") return;
+  
+  // Clear localStorage
+  localStorage.removeItem("restaurant-cart");
+  localStorage.removeItem("restaurant-language");
+  
+  // Clear sessionStorage
+  sessionStorage.clear();
+  
+  console.log("Session data cleared - page will refresh to get new session");
+  
+  // Refresh page to get new session
+  window.location.reload();
 };
 
 export const clearCart = () => {
