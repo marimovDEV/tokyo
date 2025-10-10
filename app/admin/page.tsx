@@ -194,19 +194,22 @@ export default function AdminPage() {
       try {
         // First try with show_all parameter
         const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
+        // Add cache-busting timestamp to prevent stale data
+        const timestamp = new Date().getTime();
         let [menuResponse, categoriesResponse, promotionsResponse] = await Promise.all([
-          fetch(`${apiUrl}/menu-items/?show_all=true`),
-          fetch(`${apiUrl}/categories/?show_all=true`),
-          fetch(`${apiUrl}/promotions/?show_all=true`)
+          fetch(`${apiUrl}/menu-items/?show_all=true&t=${timestamp}`, { cache: 'no-cache' }),
+          fetch(`${apiUrl}/categories/?show_all=true&t=${timestamp}`, { cache: 'no-cache' }),
+          fetch(`${apiUrl}/promotions/?show_all=true&t=${timestamp}`, { cache: 'no-cache' })
         ])
 
         // If show_all doesn't work, try without it
         if (!menuResponse.ok || !categoriesResponse.ok || !promotionsResponse.ok) {
           console.log("show_all parameter not supported, trying without it")
+          const retryTimestamp = new Date().getTime();
           ;[menuResponse, categoriesResponse, promotionsResponse] = await Promise.all([
-            fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api'}/menu-items/`),
-            fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api'}/categories/`),
-            fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api'}/promotions/`)
+            fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api'}/menu-items/?t=${retryTimestamp}`, { cache: 'no-cache' }),
+            fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api'}/categories/?t=${retryTimestamp}`, { cache: 'no-cache' }),
+            fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api'}/promotions/?t=${retryTimestamp}`, { cache: 'no-cache' })
           ])
         }
 
