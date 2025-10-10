@@ -416,51 +416,42 @@ export default function MenuPage() {
     }
   }
 
-  const removeFromCart = async (itemId: number) => {
-    const cartItem = cart.items.find((ci) => ci.menu_item === itemId)
-    if (cartItem) {
-      const newQuantity = cartItem.quantity - 1
-      if (newQuantity <= 0) {
-        // Remove the item completely
-        try {
-          await apiClient.removeFromCart(cartItem.id)
-          await loadCart()
-          addToast({
-            type: "success",
-            description: language === "uz"
-              ? "Mahsulot savatchadan olib tashlandi"
-              : language === "ru"
-                ? "Товар удален из корзины"
-                : "Item removed from cart",
-          })
-        } catch (error) {
-          console.error("Error removing from cart:", error)
-          addToast({
-            type: "error",
-            description: language === "uz"
-              ? "Savatchadan olib tashlashda xatolik"
-              : language === "ru"
-                ? "Ошибка при удалении из корзины"
-                : "Error removing from cart",
-          })
-        }
-      } else {
-        // Update quantity
-        try {
-          await apiClient.updateCartItem(cartItem.id, { quantity: newQuantity })
-          await loadCart()
-        } catch (error) {
-          console.error("Error updating cart item:", error)
-        }
-      }
+  const removeFromCart = async (menuItemId: number) => {
+    const cartItem = cart.items.find((ci) => ci.menu_item === menuItemId)
+    if (!cartItem) {
+      console.error("Cart item not found for menu item:", menuItemId)
+      return
+    }
+
+    try {
+      await apiClient.removeFromCart(cartItem.id)
+      await loadCart()
+      addToast({
+        type: "success",
+        description: language === "uz"
+          ? "Mahsulot savatchadan olib tashlandi"
+          : language === "ru"
+            ? "Товар удален из корзины"
+            : "Item removed from cart",
+      })
+    } catch (error) {
+      console.error("Error removing from cart:", error)
+      addToast({
+        type: "error",
+        description: language === "uz"
+          ? "Savatchadan olib tashlashda xatolik"
+          : language === "ru"
+            ? "Ошибка при удалении из корзины"
+            : "Error removing from cart",
+      })
     }
   }
 
-  const updateCartQuantity = async (itemId: number, newQuantity: number) => {
-    // Find the cart item
-    const cartItem = cart.items.find((ci) => ci.menu_item === itemId)
+  const updateCartQuantity = async (menuItemId: number, newQuantity: number) => {
+    // Find the cart item by menu_item ID
+    const cartItem = cart.items.find((ci) => ci.menu_item === menuItemId)
     if (!cartItem) {
-      console.error("Cart item not found:", itemId)
+      console.error("Cart item not found for menu item:", menuItemId)
       return
     }
 
@@ -1089,58 +1080,55 @@ export default function MenuPage() {
                         <div className="text-2xl font-bold text-green-600">{formatPrice(item.price)}</div>
                       </div>
                       <div className="flex items-center gap-2">
-                        {cart.items.find((cartItem) => cartItem.menu_item === item.id) ? (
-                          <div className="flex items-center gap-3 bg-muted rounded-2xl p-1">
-                            <Button
-                              size="sm"
-                              variant="ghost"
-                              onClick={async (e) => {
-                                e.stopPropagation()
-                                const cartItem = cart.items.find((ci) => ci.menu_item === item.id)
-                                if (cartItem) {
+                        {(() => {
+                          const cartItem = cart.items.find((ci) => ci.menu_item === item.id)
+                          return cartItem ? (
+                            <div className="flex items-center gap-3 bg-muted rounded-2xl p-1">
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                onClick={async (e) => {
+                                  e.stopPropagation()
                                   await updateCartQuantity(item.id, cartItem.quantity - 1)
-                                }
-                              }}
-                              className="h-8 w-8 rounded-xl hover:bg-destructive hover:text-destructive-foreground"
-                            >
-                              <Minus className="h-4 w-4" />
-                            </Button>
-                            <span className="font-bold text-lg min-w-[24px] text-center text-primary">
-                              {cart.items.find((cartItem) => cartItem.menu_item === item.id)?.quantity || 0}
-                            </span>
+                                }}
+                                className="h-8 w-8 rounded-xl hover:bg-destructive hover:text-destructive-foreground"
+                              >
+                                <Minus className="h-4 w-4" />
+                              </Button>
+                              <span className="font-bold text-lg min-w-[24px] text-center text-primary">
+                                {cartItem.quantity}
+                              </span>
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                onClick={async (e) => {
+                                  e.stopPropagation()
+                                  await updateCartQuantity(item.id, cartItem.quantity + 1)
+                                }}
+                                className="h-8 w-8 rounded-xl hover:bg-primary hover:text-primary-foreground"
+                              >
+                                <Plus className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          ) : (
                             <Button
-                              size="sm"
-                              variant="ghost"
+                              size="lg"
                               onClick={async (e) => {
                                 e.stopPropagation()
-                                const cartItem = cart.items.find((ci) => ci.menu_item === item.id)
-                                if (cartItem) {
-                                  await updateCartQuantity(item.id, cartItem.quantity + 1)
-                                }
+                                await addToCart(item)
                               }}
-                              className="h-8 w-8 rounded-xl hover:bg-primary hover:text-primary-foreground"
+                              disabled={isAddingToCart}
+                              className="rounded-2xl px-6 py-2 bg-primary hover:bg-primary/90 shadow-lg font-semibold"
                             >
-                              <Plus className="h-4 w-4" />
+                              {isAddingToCart ? (
+                                <div className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
+                              ) : (
+                                <Plus className="h-4 w-4 mr-2" />
+                              )}
+                              {isAddingToCart ? (language === "uz" ? "Qo'shilmoqda..." : language === "ru" ? "Добавление..." : "Adding...") : t.add}
                             </Button>
-                          </div>
-                        ) : (
-                          <Button
-                            size="lg"
-                            onClick={async (e) => {
-                              e.stopPropagation()
-                              await addToCart(item)
-                            }}
-                            disabled={isAddingToCart}
-                            className="rounded-2xl px-6 py-2 bg-primary hover:bg-primary/90 shadow-lg font-semibold"
-                          >
-                            {isAddingToCart ? (
-                              <div className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
-                            ) : (
-                              <Plus className="h-4 w-4 mr-2" />
-                            )}
-                            {isAddingToCart ? (language === "uz" ? "Qo'shilmoqda..." : language === "ru" ? "Добавление..." : "Adding...") : t.add}
-                          </Button>
-                        )}
+                          )
+                        })()}
                       </div>
                     </div>
                   </CardContent>
@@ -1241,46 +1229,49 @@ export default function MenuPage() {
                       {formatPrice(modalDish.price)}
                     </div>
                     <div className="flex items-center gap-3">
-                      {cart.items.find((cartItem) => cartItem.menu_item === modalDish.id) ? (
-                        <div className="flex items-center gap-3 bg-muted rounded-2xl p-2">
+                      {(() => {
+                        const modalCartItem = cart.items.find((cartItem) => cartItem.menu_item === modalDish.id)
+                        return modalCartItem ? (
+                          <div className="flex items-center gap-3 bg-muted rounded-2xl p-2">
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={async (e) => {
+                                e.stopPropagation()
+                                await updateCartQuantity(modalDish.id, modalCartItem.quantity - 1)
+                              }}
+                              className="h-8 w-8 p-0 rounded-full hover:bg-background"
+                            >
+                              <Minus className="h-4 w-4" />
+                            </Button>
+                            <span className="text-lg font-semibold min-w-[2rem] text-center">
+                              {modalCartItem.quantity}
+                            </span>
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={async (e) => {
+                                e.stopPropagation()
+                                await updateCartQuantity(modalDish.id, modalCartItem.quantity + 1)
+                              }}
+                              className="h-8 w-8 p-0 rounded-full hover:bg-background"
+                            >
+                              <Plus className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        ) : (
                           <Button
-                            size="sm"
-                            variant="ghost"
-                            onClick={async (e) => {
-                              e.stopPropagation()
-                              await removeFromCart(modalDish.id)
-                            }}
-                            className="h-8 w-8 p-0 rounded-full hover:bg-background"
-                          >
-                            <Minus className="h-4 w-4" />
-                          </Button>
-                          <span className="text-lg font-semibold min-w-[2rem] text-center">
-                            {cart.items.find((cartItem) => cartItem.menu_item === modalDish.id)?.quantity || 0}
-                          </span>
-                          <Button
-                            size="sm"
-                            variant="ghost"
                             onClick={async (e) => {
                               e.stopPropagation()
                               await addToCart(modalDish)
                             }}
-                            className="h-8 w-8 p-0 rounded-full hover:bg-background"
+                            className="bg-gradient-to-r from-green-700 to-green-600 text-white hover:from-green-800 hover:to-green-700 px-6 py-2 rounded-full font-semibold"
                           >
-                            <Plus className="h-4 w-4" />
+                            <Plus className="h-4 w-4 mr-2" />
+                            {language === "uz" ? "Savatchaga qo'shish" : language === "ru" ? "Добавить в корзину" : "Add to Cart"}
                           </Button>
-                        </div>
-                      ) : (
-                        <Button
-                          onClick={async (e) => {
-                            e.stopPropagation()
-                            await addToCart(modalDish)
-                          }}
-                          className="bg-gradient-to-r from-green-700 to-green-600 text-white hover:from-green-800 hover:to-green-700 px-6 py-2 rounded-full font-semibold"
-                        >
-                          <Plus className="h-4 w-4 mr-2" />
-                          {language === "uz" ? "Savatchaga qo'shish" : language === "ru" ? "Добавить в корзину" : "Add to Cart"}
-                        </Button>
-                      )}
+                        )
+                      })()}
                     </div>
                   </div>
                 </div>
