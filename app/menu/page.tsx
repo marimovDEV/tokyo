@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useState, useEffect, useRef, useCallback } from "react"
+import { useState, useEffect, useRef } from "react"
 import { useRouter } from "next/navigation"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
@@ -239,7 +239,7 @@ export default function MenuPage() {
 
 
 
-  const loadCart = useCallback(async () => {
+  const loadCart = async () => {
     try {
       console.log("Loading cart...")
       const cartData = await apiClient.getCart()
@@ -263,7 +263,7 @@ export default function MenuPage() {
         items: []
       })
     }
-  }, [])
+  }
 
 
   useEffect(() => {
@@ -448,19 +448,33 @@ export default function MenuPage() {
   }
 
   const updateCartQuantity = async (menuItemId: number, newQuantity: number) => {
+    console.log("updateCartQuantity called:", { menuItemId, newQuantity, cartItems: cart.items })
+    
     // Find the cart item by menu_item ID
     const cartItem = cart.items.find((ci) => ci.menu_item === menuItemId)
+    console.log("Found cart item:", cartItem)
+    
     if (!cartItem) {
       console.error("Cart item not found for menu item:", menuItemId)
+      addToast({
+        type: "error",
+        description: language === "uz"
+          ? "Savatcha mahsuloti topilmadi"
+          : language === "ru"
+            ? "Товар в корзине не найден"
+            : "Cart item not found",
+      })
       return
     }
 
     try {
       if (newQuantity <= 0) {
         // Remove the item completely
+        console.log("Removing cart item:", cartItem.id)
         await apiClient.removeFromCart(cartItem.id)
       } else {
         // Update quantity
+        console.log("Updating cart item quantity:", cartItem.id, "to", newQuantity)
         await apiClient.updateCartItem(cartItem.id, { quantity: newQuantity })
       }
       
