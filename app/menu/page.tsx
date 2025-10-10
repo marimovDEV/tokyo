@@ -465,9 +465,15 @@ export default function MenuPage() {
   }
 
   const updateCartQuantity = async (menuItemId: number, newQuantity: number) => {
-    console.log("updateCartQuantity called:", { menuItemId, newQuantity, cartItems: cart.items })
+    console.log("updateCartQuantity called:", { 
+      menuItemId, 
+      newQuantity, 
+      cartItems: cart.items,
+      cartId: cart.id,
+      sessionKey: cart.session_key 
+    })
     
-    // Validate cart item ID
+    // Validate cart state
     if (!cart.items || cart.items.length === 0) {
       console.warn("Cart is empty, refreshing...")
       await loadCart()
@@ -490,6 +496,13 @@ export default function MenuPage() {
             ? "Корзина обновлена, попробуйте снова"
             : "Cart refreshed, please try again",
       })
+      return
+    }
+    
+    // Additional validation: check if cart item ID is valid
+    if (cartItem.id <= 0) {
+      console.error("Invalid cart item ID:", cartItem.id)
+      await loadCart()
       return
     }
 
@@ -801,12 +814,15 @@ export default function MenuPage() {
               <div className="flex items-center gap-3">
                 <div className="flex items-center justify-center w-12 h-12 bg-white/20 rounded-full shadow-md">
                   <img
-                    src="/logo.png"
+                    src={getImageUrl("/logo.png")}
                     alt="Tokyo Logo"
                     width="40"
                     height="40"
                     className="w-10 h-10 object-contain rounded-full"
                     loading="eager"
+                    onError={(e) => {
+                      e.currentTarget.src = '/logo.png'
+                    }}
                   />
                 </div>
                 <div>

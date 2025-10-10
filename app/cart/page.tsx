@@ -313,7 +313,10 @@ export default function CartPage() {
                 <div className="flex items-center gap-2">
                   <div className="flex items-center justify-center w-10 h-10 bg-white/20 rounded-full shadow-md">
                     <img
-                      src="/logo.png"
+                      src={getImageUrl("/logo.png")}
+                    onError={(e) => {
+                      e.currentTarget.src = '/logo.png'
+                    }}
                       alt="Tokyo Logo"
                       width="32"
                       height="32"
@@ -409,7 +412,10 @@ export default function CartPage() {
                 <div className="flex items-center gap-2">
                   <div className="flex items-center justify-center w-10 h-10 bg-white/20 rounded-full shadow-md">
                     <img
-                      src="/logo.png"
+                      src={getImageUrl("/logo.png")}
+                    onError={(e) => {
+                      e.currentTarget.src = '/logo.png'
+                    }}
                       alt="Tokyo Logo"
                       width="32"
                       height="32"
