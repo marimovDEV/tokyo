@@ -1547,6 +1547,8 @@ export default function AdminPage() {
                     id="price"
                     type="number"
                     min="0"
+                    max="99999999.99"
+                    step="0.01"
                     value={newItem.price === 0 ? "" : newItem.price}
                     onChange={(e) => {
                       const parsed = parseFloat(e.target.value)
@@ -1554,7 +1556,7 @@ export default function AdminPage() {
                       const safe = isNaN(parsed) ? 0 : Math.max(0, Math.min(parsed, 99999999.99))
                       setNewItem({ ...newItem, price: safe })
                     }}
-                    placeholder={language === "uz" ? "Narx" : language === "ru" ? "Цена" : "Price"}
+                    placeholder={language === "uz" ? "Narx (maks: 99999999.99)" : language === "ru" ? "Цена (макс: 99999999.99)" : "Price (max: 99999999.99)"}
                   />
                 </div>
                 <div>
