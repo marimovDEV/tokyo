@@ -1550,7 +1550,8 @@ export default function AdminPage() {
                     value={newItem.price === 0 ? "" : newItem.price}
                     onChange={(e) => {
                       const parsed = parseFloat(e.target.value)
-                      const safe = isNaN(parsed) ? 0 : Math.max(0, parsed)
+                      // Backend allows max 10 digits total (8 before decimal, 2 after)
+                      const safe = isNaN(parsed) ? 0 : Math.max(0, Math.min(parsed, 99999999.99))
                       setNewItem({ ...newItem, price: safe })
                     }}
                     placeholder={language === "uz" ? "Narx" : language === "ru" ? "Цена" : "Price"}
