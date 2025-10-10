@@ -204,9 +204,9 @@ export default function AdminPage() {
         if (!menuResponse.ok || !categoriesResponse.ok || !promotionsResponse.ok) {
           console.log("show_all parameter not supported, trying without it")
           ;[menuResponse, categoriesResponse, promotionsResponse] = await Promise.all([
-            fetch("${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api'}/menu-items/"),
-            fetch("${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api'}/categories/"),
-            fetch("${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api'}/promotions/")
+            fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api'}/menu-items/`),
+            fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api'}/categories/`),
+            fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api'}/promotions/`)
           ])
         }
 
@@ -1082,7 +1082,7 @@ export default function AdminPage() {
       // Try backend first
       try {
         const method = editingItem ? 'PUT' : 'POST'
-        const url = editingItem ? `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api'}/menu-items/${editingItem.id}/` : "${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api'}/menu-items/"
+        const url = editingItem ? `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api'}/menu-items/${editingItem.id}/` : `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api'}/menu-items/`
         
         // Always use FormData for menu items (needed for image uploads)
         const form = new FormData()
@@ -1248,7 +1248,7 @@ export default function AdminPage() {
 
     try {
       const method = editingCategory ? 'PUT' : 'POST'
-      const url = editingCategory ? `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api'}/categories/${editingCategory.id}/` : "${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api'}/categories/"
+      const url = editingCategory ? `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api'}/categories/${editingCategory.id}/` : `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api'}/categories/`
       
       // Always use FormData for categories (needed for image uploads)
       const form = new FormData()
@@ -1331,7 +1331,7 @@ export default function AdminPage() {
 
     try {
       const method = editingPromotion ? 'PUT' : 'POST'
-      const url = editingPromotion ? `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api'}/promotions/${editingPromotion.id}/` : "${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api'}/promotions/"
+      const url = editingPromotion ? `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api'}/promotions/${editingPromotion.id}/` : `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api'}/promotions/`
       
       // Always use FormData for promotions (needed for image uploads)
       const form = new FormData()
