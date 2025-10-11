@@ -198,12 +198,15 @@ export function useRestaurantInfo() {
       try {
         setLoading(true);
         
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api'}/restaurant-info/`, {
+        // Add cache-busting to always get fresh data
+        const timestamp = new Date().getTime();
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api'}/restaurant-info/?t=${timestamp}`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
           },
           credentials: 'include',
+          cache: 'no-cache',
         });
         
         if (!response.ok) {
@@ -242,12 +245,16 @@ export function useTextContent(contentType?: string) {
           ? `/text-content/type/${contentType}/`
           : '/text-content/';
         
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api'}${endpoint}`, {
+        // Add cache-busting to always get fresh data
+        const timestamp = new Date().getTime();
+        const cacheBustedEndpoint = endpoint.includes('?') ? `${endpoint}&t=${timestamp}` : `${endpoint}?t=${timestamp}`;
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api'}${cacheBustedEndpoint}`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
           },
           credentials: 'include',
+          cache: 'no-cache',
         });
         
         if (!response.ok) {
@@ -282,12 +289,15 @@ export function useSiteSettings() {
       try {
         setLoading(true);
         
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api'}/site-settings/`, {
+        // Add cache-busting to always get fresh data
+        const timestamp = new Date().getTime();
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api'}/site-settings/?t=${timestamp}`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
           },
           credentials: 'include',
+          cache: 'no-cache',
         });
         
         if (!response.ok) {
