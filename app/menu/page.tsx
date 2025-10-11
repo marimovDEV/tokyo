@@ -44,6 +44,7 @@ export default function MenuPage() {
   const { addToast } = useToast()
   const [languageDropdownOpen, setLanguageDropdownOpen] = useState(false)
   const [isAddingToCart, setIsAddingToCart] = useState(false)
+  const [updatingCartItemId, setUpdatingCartItemId] = useState<number | null>(null)
   
   // Reset isAddingToCart state on component mount
   useEffect(() => {
@@ -492,6 +493,12 @@ export default function MenuPage() {
   }
 
   const updateCartQuantity = async (menuItemId: number, newQuantity: number) => {
+    // Prevent double-click
+    if (updatingCartItemId !== null) {
+      console.log("Already updating a cart item, skipping...")
+      return
+    }
+    
     console.log("updateCartQuantity called:", { 
       menuItemId, 
       newQuantity, 
@@ -532,6 +539,9 @@ export default function MenuPage() {
       await loadCart()
       return
     }
+    
+    // Set loading state
+    setUpdatingCartItemId(menuItemId)
 
     // Optimistic update - update UI immediately
     const updatedItems = cart.items.map(item => 
@@ -597,6 +607,9 @@ export default function MenuPage() {
               : "Error updating cart",
         })
       }
+    } finally {
+      // Reset loading state
+      setUpdatingCartItemId(null)
     }
   }
 
@@ -1218,12 +1231,17 @@ export default function MenuPage() {
                                   e.stopPropagation()
                                   await updateCartQuantity(item.id, cartItem.quantity - 1)
                                 }}
-                                className="h-8 w-8 rounded-xl hover:bg-destructive hover:text-destructive-foreground"
+                                disabled={updatingCartItemId === item.id}
+                                className="h-8 w-8 rounded-xl hover:bg-destructive hover:text-destructive-foreground disabled:opacity-50"
                               >
                                 <Minus className="h-4 w-4" />
                               </Button>
                               <span className="font-bold text-lg min-w-[24px] text-center text-primary">
-                                {cartItem.quantity}
+                                {updatingCartItemId === item.id ? (
+                                  <div className="h-4 w-4 border-2 border-primary border-t-transparent rounded-full animate-spin mx-auto" />
+                                ) : (
+                                  cartItem.quantity
+                                )}
                               </span>
                               <Button
                                 size="sm"
@@ -1232,7 +1250,8 @@ export default function MenuPage() {
                                   e.stopPropagation()
                                   await updateCartQuantity(item.id, cartItem.quantity + 1)
                                 }}
-                                className="h-8 w-8 rounded-xl hover:bg-primary hover:text-primary-foreground"
+                                disabled={updatingCartItemId === item.id}
+                                className="h-8 w-8 rounded-xl hover:bg-primary hover:text-primary-foreground disabled:opacity-50"
                               >
                                 <Plus className="h-4 w-4" />
                               </Button>
