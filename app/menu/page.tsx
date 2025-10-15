@@ -59,57 +59,57 @@ export default function MenuPage() {
     <div className="min-h-screen bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 pb-24">
       <div className="fixed inset-0 bg-[url('/tokyo-restaurant-night.png')] bg-cover bg-center bg-fixed opacity-10 pointer-events-none" />
 
-      <div className="relative z-10 container mx-auto px-4 py-8">
+      <div className="relative z-10 container mx-auto px-3 md:px-4 py-4 md:py-8">
         {/* Header */}
-        <div className="flex items-center justify-between gap-4 mb-8">
-          <div className="flex items-center gap-4">
+        <div className="flex items-center justify-between gap-2 md:gap-4 mb-6 md:mb-8">
+          <div className="flex items-center gap-2 md:gap-4">
             <Link
               href="/"
-              className="w-12 h-12 rounded-full bg-white/20 backdrop-blur-xl flex items-center justify-center hover:bg-white/30 transition-all border border-white/30"
+              className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-white/20 backdrop-blur-xl flex items-center justify-center hover:bg-white/30 transition-all border border-white/30"
             >
-              <ArrowLeft className="w-6 h-6 text-white" />
+              <ArrowLeft className="w-4 h-4 md:w-6 md:h-6 text-white" />
             </Link>
-            <h1 className="text-3xl md:text-4xl font-bold text-white">Menu</h1>
+            <h1 className="text-xl md:text-3xl lg:text-4xl font-bold text-white">Menu</h1>
           </div>
 
-          <div className="flex gap-1 bg-white/10 backdrop-blur-xl rounded-full p-1 border border-white/20">
+          <div className="flex gap-1 md:gap-1 bg-white/10 backdrop-blur-xl rounded-full p-1 border border-white/20">
             {(["uz", "ru", "en"] as Language[]).map((lang) => (
               <button
                 key={lang}
                 onClick={() => setLanguage(lang)}
-                className={`px-3 py-1.5 rounded-full text-sm font-medium transition-all ${
+                className={`px-2 md:px-3 py-1 md:py-1.5 rounded-full text-xs md:text-sm font-medium transition-all ${
                   language === lang ? "bg-white text-slate-900" : "text-white/70 hover:text-white"
                 }`}
               >
                 {lang.toUpperCase()}
               </button>
-            ))}
-          </div>
-        </div>
+                ))}
+              </div>
+            </div>
 
         <PromotionsCarousel language={language} />
 
         {/* Search */}
-        <div className="mb-8">
+        <div className="mb-6 md:mb-8 px-2 md:px-0">
           <div className="relative">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/60" />
+            <Search className="absolute left-3 md:left-4 top-1/2 -translate-y-1/2 w-4 h-4 md:w-5 md:h-5 text-white/60" />
             <Input
               placeholder={
                 language === "uz" ? "Taom qidirish..." : language === "ru" ? "Поиск блюд..." : "Search dishes..."
               }
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-12 bg-white/10 backdrop-blur-xl border-white/30 text-white placeholder:text-white/60 h-14 rounded-2xl"
+              className="pl-10 md:pl-12 bg-white/10 backdrop-blur-xl border-white/30 text-white placeholder:text-white/60 h-12 md:h-14 rounded-xl md:rounded-2xl text-sm md:text-base"
             />
           </div>
         </div>
 
         {/* Category Filter */}
-        <div className="mb-8 flex gap-3 overflow-x-auto pb-2 scrollbar-thin">
+        <div className="mb-6 md:mb-8 flex gap-2 md:gap-3 overflow-x-auto pb-2 scrollbar-thin px-2 md:px-0">
           <Button
             onClick={() => setSelectedCategory(null)}
             variant={selectedCategory === null ? "default" : "outline"}
-            className={`rounded-full whitespace-nowrap ${
+            className={`rounded-full whitespace-nowrap text-xs md:text-sm px-3 md:px-4 py-2 md:py-2.5 ${
               selectedCategory === null
                 ? "bg-gradient-to-r from-amber-500 to-amber-600 text-white"
                 : "bg-white/10 backdrop-blur-xl border-white/30 text-white hover:bg-white/20"
@@ -123,30 +123,30 @@ export default function MenuPage() {
                 key={category.id}
                 onClick={() => setSelectedCategory(category.id)}
                 variant={selectedCategory === category.id ? "default" : "outline"}
-                className={`rounded-full whitespace-nowrap ${
+                className={`rounded-full whitespace-nowrap text-xs md:text-sm px-3 md:px-4 py-2 md:py-2.5 ${
                   selectedCategory === category.id
                     ? "bg-gradient-to-r from-amber-500 to-amber-600 text-white"
                     : "bg-white/10 backdrop-blur-xl border-white/30 text-white hover:bg-white/20"
                 }`}
               >
-                {language === "uz" ? category.nameUz : language === "ru" ? category.nameRu : category.name}
+                {language === "uz" ? category.name_uz : language === "ru" ? category.name_ru : category.name}
               </Button>
             ))}
-        </div>
+          </div>
 
         {/* Menu Items Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredItems.map((item) => (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 px-2 md:px-0">
+              {filteredItems.map((item) => (
             <MenuItemCard key={item.id} item={item} language={language} />
-          ))}
-        </div>
+              ))}
+            </div>
 
-        {filteredItems.length === 0 && (
-          <div className="text-center py-16">
+                {filteredItems.length === 0 && (
+                  <div className="text-center py-16">
             <p className="text-white/60 text-lg">
               {language === "uz" ? "Hech narsa topilmadi" : language === "ru" ? "Ничего не найдено" : "No items found"}
             </p>
-          </div>
+                  </div>
         )}
       </div>
 

@@ -65,10 +65,6 @@ export function HeroSection() {
       </header>
 
       <div className="relative z-10 w-full max-w-2xl mx-auto flex flex-col items-center animate-fade-up">
-        <div className="w-24 h-24 md:w-40 md:h-40 rounded-full bg-black/80 backdrop-blur-md flex items-center justify-center mb-4 md:mb-6 shadow-2xl border-4 border-amber-400/50">
-          <div className="text-amber-400 text-4xl md:text-6xl font-bold">T</div>
-        </div>
-
         <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold text-white mb-6 md:mb-8 text-balance drop-shadow-2xl tracking-wide">
           {t.title}
         </h1>
