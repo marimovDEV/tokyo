@@ -6,23 +6,7 @@ import { CategoriesTab } from "@/components/admin/categories-tab"
 import { MenuItemsTab } from "@/components/admin/menu-items-tab"
 import { PromotionsTab } from "@/components/admin/promotions-tab"
 import { FeedbackTab } from "@/components/admin/feedback-tab"
-import dynamic from "next/dynamic"
 import { toast } from "sonner"
-
-const AuthGuard = dynamic(() => import("@/components/admin/auth-guard").then(mod => ({ default: mod.AuthGuard })), {
-  ssr: false,
-  loading: () => (
-    <div className="min-h-screen bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center">
-      <div className="fixed inset-0 bg-[url('/tokyo-restaurant-night.png')] bg-cover bg-center bg-fixed opacity-10 pointer-events-none" />
-      <div className="relative z-10 text-center">
-        <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-r from-amber-500 to-amber-600 rounded-full flex items-center justify-center animate-pulse">
-          <div className="w-8 h-8 border-2 border-white border-t-transparent rounded-full animate-spin" />
-        </div>
-        <p className="text-white/70">Yuklanmoqda...</p>
-      </div>
-    </div>
-  )
-})
 
 export default function AdminPage() {
   const handleLogout = () => {
@@ -33,10 +17,9 @@ export default function AdminPage() {
     window.location.href = "/admin/login"
   }
   return (
-    <AuthGuard>
-      <div className="min-h-screen bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900">
-        <div className="fixed inset-0 bg-[url('/tokyo-restaurant-night.png')] bg-cover bg-center bg-fixed opacity-10 pointer-events-none" />
-        <div className="relative z-10 container mx-auto px-3 md:px-4 py-4 md:py-8">
+    <div className="min-h-screen bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900">
+      <div className="fixed inset-0 bg-[url('/tokyo-restaurant-night.png')] bg-cover bg-center bg-fixed opacity-10 pointer-events-none" />
+      <div className="relative z-10 container mx-auto px-3 md:px-4 py-4 md:py-8">
         {/* Header */}
         <div className="flex items-center justify-between gap-2 md:gap-4 mb-6 md:mb-8">
           <div className="flex items-center gap-2 md:gap-4">
@@ -111,8 +94,7 @@ export default function AdminPage() {
             </TabsContent>
           </Tabs>
         </div>
-        </div>
       </div>
-    </AuthGuard>
+    </div>
   )
 }
