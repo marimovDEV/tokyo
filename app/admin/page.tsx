@@ -11,7 +11,9 @@ import { toast } from "sonner"
 
 export default function AdminPage() {
   const handleLogout = () => {
-    localStorage.removeItem("adminAuth")
+    if (typeof window !== "undefined") {
+      localStorage.removeItem("adminAuth")
+    }
     toast.success("Chiqish muvaffaqiyatli!")
     window.location.href = "/admin/login"
   }

@@ -10,15 +10,19 @@ interface AuthGuardProps {
 export function AuthGuard({ children }: AuthGuardProps) {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
+  const [isMounted, setIsMounted] = useState(false)
   const router = useRouter()
 
   useEffect(() => {
+    setIsMounted(true)
     const checkAuth = () => {
-      const auth = localStorage.getItem("adminAuth")
-      if (auth === "true") {
-        setIsAuthenticated(true)
-      } else {
-        router.push("/admin/login")
+      if (typeof window !== "undefined") {
+        const auth = localStorage.getItem("adminAuth")
+        if (auth === "true") {
+          setIsAuthenticated(true)
+        } else {
+          router.push("/admin/login")
+        }
       }
       setIsLoading(false)
     }
@@ -26,7 +30,8 @@ export function AuthGuard({ children }: AuthGuardProps) {
     checkAuth()
   }, [router])
 
-  if (isLoading) {
+  // SSR uchun loading state
+  if (!isMounted || isLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center">
         <div className="fixed inset-0 bg-[url('/tokyo-restaurant-night.png')] bg-cover bg-center bg-fixed opacity-10 pointer-events-none" />

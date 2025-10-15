@@ -25,7 +25,9 @@ export default function AdminLoginPage() {
     if (formData.username === "admin" && formData.password === "admin123") {
       toast.success("Kirish muvaffaqiyatli!")
       // Save auth state
-      localStorage.setItem("adminAuth", "true")
+      if (typeof window !== "undefined") {
+        localStorage.setItem("adminAuth", "true")
+      }
       router.push("/admin")
     } else {
       toast.error("Login yoki parol noto'g'ri!")
