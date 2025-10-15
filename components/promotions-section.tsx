@@ -8,15 +8,21 @@ import { Button } from "@/components/ui/button"
 import type { Language } from "@/lib/types"
 
 export function PromotionsSection() {
-  const { promotions } = useMenu()
+  const { promotions, loading } = useMenu()
   const [language, setLanguage] = useState<Language>("uz")
   const [currentIndex, setCurrentIndex] = useState(0)
+
+  // Loading yoki promotions yo'q bo'lsa
+  if (loading || !promotions || !Array.isArray(promotions)) return null
 
   const activePromotions = promotions.filter((promo) => promo.active)
 
   if (activePromotions.length === 0) return null
 
   const currentPromotion = activePromotions[currentIndex]
+  
+  // Agar currentPromotion yo'q bo'lsa
+  if (!currentPromotion) return null
 
   const nextPromotion = () => {
     setCurrentIndex((prev) => (prev + 1) % activePromotions.length)
