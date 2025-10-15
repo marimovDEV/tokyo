@@ -34,10 +34,10 @@ export default function CartPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900">
-      <div className="relative">
-        <div className="absolute inset-0 bg-[url('/tokyo-restaurant-night.png')] bg-cover bg-center opacity-10" />
+      <div className="fixed inset-0 bg-[url('/tokyo-restaurant-night.png')] bg-cover bg-center bg-fixed opacity-10 pointer-events-none" />
+      <div className="relative z-10">
 
-        <div className="relative z-10 container mx-auto px-4 py-8 max-w-4xl">
+        <div className="container mx-auto px-4 py-8 max-w-4xl">
           {/* Header */}
           <div className="flex items-center justify-between gap-4 mb-8">
             <div className="flex items-center gap-4">
