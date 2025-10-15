@@ -22,7 +22,7 @@ export default function AdminLoginPage() {
     setLoading(true)
 
     // Simple authentication (in real app, use proper auth)
-    if (formData.username === "admin" && formData.password === "tokyo2024") {
+    if (formData.username === "admin" && formData.password === "admin123") {
       toast.success("Kirish muvaffaqiyatli!")
       // Save auth state
       localStorage.setItem("adminAuth", "true")
@@ -130,7 +130,7 @@ export default function AdminLoginPage() {
             <p className="text-white/60 text-sm text-center mb-2">Demo ma'lumotlar:</p>
             <div className="text-center text-white/80 text-sm">
               <p><strong>Login:</strong> admin</p>
-              <p><strong>Parol:</strong> tokyo2024</p>
+              <p><strong>Parol:</strong> admin123</p>
             </div>
           </div>
         </div>
