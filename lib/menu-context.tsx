@@ -135,38 +135,31 @@ export function MenuProvider({ children }: { children: React.ReactNode }) {
   const { menuItems: apiMenuItems, loading: menuItemsLoading, error: menuItemsError } = useMenuItems()
   const { promotions: apiPromotions, loading: promotionsLoading, error: promotionsError } = usePromotions()
 
-  const [categories, setCategories] = useState<Category[]>([])
-  const [menuItems, setMenuItems] = useState<MenuItem[]>([])
-  const [promotions, setPromotions] = useState<Promotion[]>([])
+  const [categories, setCategories] = useState<Category[]>(sampleCategories)
+  const [menuItems, setMenuItems] = useState<MenuItem[]>(sampleMenuItems)
+  const [promotions, setPromotions] = useState<Promotion[]>(samplePromotions)
 
   const loading = categoriesLoading || menuItemsLoading || promotionsLoading
   const error = categoriesError || menuItemsError || promotionsError
 
   // API dan kelgan ma'lumotlarni saqlash
   useEffect(() => {
-    if (apiCategories && apiCategories.length > 0) {
+    if (apiCategories && Array.isArray(apiCategories) && apiCategories.length > 0) {
       setCategories(apiCategories as any)
-    } else if (!categoriesLoading && apiCategories) {
-      // Agar API bo'sh qaytarsa, sample data ishlatish
-      setCategories(sampleCategories)
     }
-  }, [apiCategories, categoriesLoading])
+  }, [apiCategories])
 
   useEffect(() => {
-    if (apiMenuItems && apiMenuItems.length > 0) {
+    if (apiMenuItems && Array.isArray(apiMenuItems) && apiMenuItems.length > 0) {
       setMenuItems(apiMenuItems as any)
-    } else if (!menuItemsLoading && apiMenuItems) {
-      setMenuItems(sampleMenuItems)
     }
-  }, [apiMenuItems, menuItemsLoading])
+  }, [apiMenuItems])
 
   useEffect(() => {
-    if (apiPromotions && apiPromotions.length > 0) {
+    if (apiPromotions && Array.isArray(apiPromotions) && apiPromotions.length > 0) {
       setPromotions(apiPromotions as any)
-    } else if (!promotionsLoading && apiPromotions) {
-      setPromotions(samplePromotions)
     }
-  }, [apiPromotions, promotionsLoading])
+  }, [apiPromotions])
 
   const addCategory = (category: Category) => {
     setCategories((prev) => [...prev, category])
