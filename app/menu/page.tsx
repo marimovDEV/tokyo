@@ -118,7 +118,6 @@ export default function MenuPage() {
             {language === "uz" ? "Hammasi" : language === "ru" ? "Все" : "All"}
           </Button>
           {categories && Array.isArray(categories) && categories
-            .sort((a, b) => a.order - b.order)
             .map((category) => (
               <Button
                 key={category.id}
