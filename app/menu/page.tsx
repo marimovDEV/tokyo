@@ -17,10 +17,15 @@ export default function MenuPage() {
   const { language, setLanguage } = useLanguage()
   const [searchQuery, setSearchQuery] = useState("")
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
-  const { categories, menuItems } = useMenu()
+  const { categories, menuItems, loading } = useMenu()
   const { getTotalItems } = useCart()
 
   const filteredItems = useMemo(() => {
+    // Agar loading yoki menuItems yo'q bo'lsa, bo'sh array qaytarish
+    if (loading || !menuItems || !Array.isArray(menuItems)) {
+      return []
+    }
+
     let items = menuItems
 
     if (selectedCategory) {
@@ -37,9 +42,18 @@ export default function MenuPage() {
     }
 
     return items
-  }, [menuItems, selectedCategory, searchQuery])
+  }, [menuItems, selectedCategory, searchQuery, loading])
 
   const totalCartItems = getTotalItems()
+
+  // Loading holati
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center">
+        <p className="text-white text-xl">Loading...</p>
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 pb-24">
@@ -103,7 +117,7 @@ export default function MenuPage() {
           >
             {language === "uz" ? "Hammasi" : language === "ru" ? "Все" : "All"}
           </Button>
-          {categories
+          {categories && Array.isArray(categories) && categories
             .sort((a, b) => a.order - b.order)
             .map((category) => (
               <Button
