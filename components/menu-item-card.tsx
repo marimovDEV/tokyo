@@ -28,9 +28,9 @@ export function MenuItemCard({ item, language }: MenuItemCardProps) {
   }
 
   const getIngredients = () => {
-    if (language === "uz") return item.ingredientsUz
-    if (language === "ru") return item.ingredientsRu
-    return item.ingredients
+    if (language === "uz") return item.ingredientsUz || []
+    if (language === "ru") return item.ingredientsRu || []
+    return item.ingredients || []
   }
 
   const handleAddToCart = () => {
@@ -77,7 +77,7 @@ export function MenuItemCard({ item, language }: MenuItemCardProps) {
             {language === "uz" ? "Tarkibi:" : language === "ru" ? "Состав:" : "Ingredients:"}
           </p>
           <div className="flex flex-wrap gap-1.5 sm:gap-2">
-            {getIngredients()
+            {Array.isArray(getIngredients()) && getIngredients()
               .slice(0, 4)
               .map((ingredient, index) => (
                 <span
