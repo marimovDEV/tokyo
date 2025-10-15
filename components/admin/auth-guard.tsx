@@ -7,7 +7,7 @@ interface AuthGuardProps {
   children: React.ReactNode
 }
 
-export function AuthGuard({ children }: AuthGuardProps) {
+function AuthGuard({ children }: AuthGuardProps) {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
   const [isMounted, setIsMounted] = useState(false)
@@ -51,3 +51,6 @@ export function AuthGuard({ children }: AuthGuardProps) {
 
   return <>{children}</>
 }
+
+export { AuthGuard }
+export default AuthGuard
