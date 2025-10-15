@@ -102,6 +102,7 @@ export function HeroSection() {
           <Link
             href="/menu"
             className="w-full flex items-center gap-3 md:gap-4 px-4 md:px-8 py-3 md:py-5 rounded-2xl md:rounded-3xl bg-white/20 backdrop-blur-xl hover:bg-white/30 transition-all hover:scale-[1.02] shadow-xl border border-white/30 group"
+            onClick={() => window.location.href = '/menu'}
           >
             <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-white/30 flex items-center justify-center group-hover:bg-white/40 transition-all">
               <UtensilsCrossed className="w-5 h-5 md:w-6 md:h-6 text-white" />
