@@ -7,18 +7,25 @@ import { Plus, Pencil, Trash2 } from "lucide-react"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Switch } from "@/components/ui/switch"
 import { useMenu } from "@/lib/menu-context"
+import { useApiClient } from "@/hooks/use-api"
+import { usePromotions } from "@/hooks/use-api"
 import type { Promotion } from "@/lib/types"
 import { toast } from "sonner"
 
 export function PromotionsTab() {
   const { promotions, addPromotion, updatePromotion, deletePromotion } = useMenu()
+  const { refetch: refetchPromotions } = usePromotions()
+  const api = useApiClient()
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [editingPromotion, setEditingPromotion] = useState<Promotion | null>(null)
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+  const [promotionToDelete, setPromotionToDelete] = useState<Promotion | null>(null)
   const [formData, setFormData] = useState({
     title: "",
     titleUz: "",
@@ -44,23 +51,28 @@ export function PromotionsTab() {
     }
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    if (editingPromotion) {
-      updatePromotion(editingPromotion.id, formData)
-      toast.success("Aksiya yangilandi")
-    } else {
-      const newPromotion: Promotion = {
-        id: Date.now().toString(),
-        ...formData,
+    try {
+      if (editingPromotion) {
+        const promotionId = parseInt(editingPromotion.id)
+        const updatedPromotion = await api.patch(`/promotions/${promotionId}/`, formData)
+        updatePromotion(editingPromotion.id, updatedPromotion)
+        toast.success("Aksiya yangilandi")
+      } else {
+        const newPromotion = await api.post('/promotions/', formData)
+        addPromotion(newPromotion)
+        toast.success("Aksiya qo'shildi")
       }
-      addPromotion(newPromotion)
-      toast.success("Aksiya qo'shildi")
+      
+      refetchPromotions() // Refetch to ensure data is updated
+      setIsDialogOpen(false)
+      resetForm()
+    } catch (error) {
+      console.error('Error saving promotion:', error)
+      toast.error("Xatolik yuz berdi. Qaytadan urinib ko'ring.")
     }
-
-    setIsDialogOpen(false)
-    resetForm()
   }
 
   const handleEdit = (promotion: Promotion) => {
@@ -81,11 +93,31 @@ export function PromotionsTab() {
     setIsDialogOpen(true)
   }
 
-  const handleDelete = (id: string) => {
-    if (confirm("Aksiyani o'chirishni xohlaysizmi?")) {
-      deletePromotion(id)
-      toast.success("Aksiya o'chirildi")
+  const handleDeleteClick = (promotion: Promotion) => {
+    setPromotionToDelete(promotion)
+    setDeleteDialogOpen(true)
+  }
+
+  const handleDeleteConfirm = async () => {
+    if (promotionToDelete) {
+      try {
+        const promotionId = parseInt(promotionToDelete.id)
+        await api.delete(`/promotions/${promotionId}/`)
+        deletePromotion(promotionToDelete.id)
+        refetchPromotions() // Refetch to ensure data is updated
+        toast.success("Aksiya o'chirildi")
+        setDeleteDialogOpen(false)
+        setPromotionToDelete(null)
+      } catch (error) {
+        console.error('Error deleting promotion:', error)
+        toast.error("Xatolik yuz berdi. Qaytadan urinib ko'ring.")
+      }
     }
+  }
+
+  const handleDeleteCancel = () => {
+    setDeleteDialogOpen(false)
+    setPromotionToDelete(null)
   }
 
   const resetForm = () => {
@@ -328,7 +360,7 @@ export function PromotionsTab() {
                   <Button
                     size="icon"
                     variant="ghost"
-                    onClick={() => handleDelete(promotion.id)}
+                    onClick={() => handleDeleteClick(promotion)}
                     className="text-red-400 hover:text-red-300 hover:bg-red-500/20 rounded-full h-8 w-8"
                   >
                     <Trash2 className="w-4 h-4" />
@@ -339,6 +371,36 @@ export function PromotionsTab() {
           </div>
         ))}
       </div>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent className="bg-slate-800 border-slate-700 text-white max-w-md mx-4">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-white text-lg">Aksiyani o'chirish</AlertDialogTitle>
+            <AlertDialogDescription className="text-gray-300">
+              Siz haqiqatan ham <strong>"{promotionToDelete?.titleUz}"</strong> aksiyasini o'chirishni xohlaysizmi?
+              <br />
+              <span className="text-red-400 text-sm mt-2 block">
+                ⚠️ Bu amalni qaytarib bo'lmaydi!
+              </span>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="flex gap-2">
+            <AlertDialogCancel 
+              onClick={handleDeleteCancel}
+              className="bg-gray-600 hover:bg-gray-700 text-white border-gray-600"
+            >
+              Bekor qilish
+            </AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={handleDeleteConfirm}
+              className="bg-red-600 hover:bg-red-700 text-white"
+            >
+              O'chirish
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }
