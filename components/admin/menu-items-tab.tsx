@@ -407,7 +407,7 @@ export function MenuItemsTab() {
                     value={formData.prep_time}
                     onChange={(e) => {
                       const value = e.target.value;
-                      // Allow range format like "15-20" or single number
+                      // Allow only numbers and dash for range format like "15-20"
                       const rangePattern = /^\d+(-\d+)?$/;
                       if (value === '' || rangePattern.test(value)) {
                         setFormData({ ...formData, prep_time: value });
