@@ -20,8 +20,8 @@ import type { MenuItem } from "@/lib/types"
 import { toast } from "sonner"
 
 export function MenuItemsTab() {
-  const { categories, menuItems, addMenuItem, updateMenuItem, deleteMenuItem } = useMenu()
-  const { refetch: refetchMenuItems } = useMenuItems()
+  const { categories, addMenuItem, updateMenuItem, deleteMenuItem } = useMenu()
+  const { menuItems, refetch: refetchMenuItems, loading: menuItemsLoading } = useMenuItems()
   const api = useApiClient()
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [editingItem, setEditingItem] = useState<MenuItem | null>(null)
@@ -504,7 +504,17 @@ export function MenuItemsTab() {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
-        {menuItems.map((item) => (
+        {menuItemsLoading ? (
+          <div className="col-span-full flex justify-center items-center py-8">
+            <Loader2 className="w-6 h-6 animate-spin text-white" />
+            <span className="ml-2 text-white">Yuklanmoqda...</span>
+          </div>
+        ) : menuItems.length === 0 ? (
+          <div className="col-span-full text-center py-8">
+            <p className="text-white/60">Hozircha taomlar yo'q</p>
+          </div>
+        ) : (
+          menuItems.map((item) => (
           <div
             key={item.id}
             className="bg-white/10 backdrop-blur-xl rounded-2xl overflow-hidden border border-white/20 shadow-xl"
@@ -541,7 +551,8 @@ export function MenuItemsTab() {
               </div>
             </div>
           </div>
-        ))}
+        ))
+        )}
       </div>
 
       {/* Delete Confirmation Dialog */}
