@@ -35,11 +35,15 @@ export function PromotionsTab() {
     descriptionRu: "",
     image: "",
     imageFile: null as File | null,
-    discount: 0,
+    discount_percentage: 0,
+    discount_amount: 0,
     active: true,
     is_active: true,
-    startDate: "",
-    endDate: "",
+    start_date: "",
+    end_date: "",
+    link: "",
+    category: "",
+    linked_dish: "",
   })
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -65,11 +69,15 @@ export function PromotionsTab() {
       formDataToSend.append('description', formData.description)
       formDataToSend.append('description_uz', formData.descriptionUz)
       formDataToSend.append('description_ru', formData.descriptionRu)
-      formDataToSend.append('discount', formData.discount.toString())
+      formDataToSend.append('discount_percentage', formData.discount_percentage.toString())
+      formDataToSend.append('discount_amount', formData.discount_amount.toString())
       formDataToSend.append('active', formData.active.toString())
       formDataToSend.append('is_active', formData.is_active.toString())
-      formDataToSend.append('start_date', formData.startDate)
-      formDataToSend.append('end_date', formData.endDate)
+      formDataToSend.append('start_date', formData.start_date)
+      formDataToSend.append('end_date', formData.end_date)
+      formDataToSend.append('link', formData.link)
+      if (formData.category) formDataToSend.append('category', formData.category)
+      if (formData.linked_dish) formDataToSend.append('linked_dish', formData.linked_dish)
       
       if (formData.imageFile) {
         formDataToSend.append('image', formData.imageFile)
@@ -106,11 +114,15 @@ export function PromotionsTab() {
       descriptionRu: promotion.descriptionRu,
       image: promotion.image,
       imageFile: null,
-      discount: promotion.discount,
+      discount_percentage: promotion.discount_percentage || 0,
+      discount_amount: promotion.discount_amount || 0,
       active: promotion.active,
       is_active: promotion.is_active !== false,
-      startDate: promotion.startDate,
-      endDate: promotion.endDate,
+      start_date: promotion.start_date || "",
+      end_date: promotion.end_date || "",
+      link: promotion.link || "",
+      category: promotion.category?.toString() || "",
+      linked_dish: promotion.linked_dish?.toString() || "",
     })
     setIsDialogOpen(true)
   }
@@ -153,11 +165,15 @@ export function PromotionsTab() {
       descriptionRu: "",
       image: "",
       imageFile: null,
-      discount: 0,
+      discount_percentage: 0,
+      discount_amount: 0,
       active: true,
       is_active: true,
-      startDate: "",
-      endDate: "",
+      start_date: "",
+      end_date: "",
+      link: "",
+      category: "",
+      linked_dish: "",
     })
   }
 
@@ -275,16 +291,32 @@ export function PromotionsTab() {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="discount" className="text-white text-sm">
+                  <Label htmlFor="discount_percentage" className="text-white text-sm">
                     Chegirma (%)
                   </Label>
                   <Input
-                    id="discount"
+                    id="discount_percentage"
                     type="number"
-                    value={formData.discount}
-                    onChange={(e) => setFormData({ ...formData, discount: Number.parseInt(e.target.value) })}
+                    min="0"
+                    max="100"
+                    value={formData.discount_percentage}
+                    onChange={(e) => setFormData({ ...formData, discount_percentage: Number.parseInt(e.target.value) || 0 })}
                     className="bg-white/10 border-white/20 text-white text-sm"
-                    required
+                    placeholder="20"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="discount_amount" className="text-white text-sm">
+                    Chegirma Miqdori (so'm)
+                  </Label>
+                  <Input
+                    id="discount_amount"
+                    type="number"
+                    min="0"
+                    value={formData.discount_amount}
+                    onChange={(e) => setFormData({ ...formData, discount_amount: Number.parseInt(e.target.value) || 0 })}
+                    className="bg-white/10 border-white/20 text-white text-sm"
+                    placeholder="5000"
                   />
                 </div>
               </div>
@@ -348,6 +380,49 @@ export function PromotionsTab() {
                 </div>
               </div>
 
+              {/* Date Fields */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="start_date" className="text-white text-sm">
+                    Boshlanish Sanasi
+                  </Label>
+                  <Input
+                    id="start_date"
+                    type="datetime-local"
+                    value={formData.start_date}
+                    onChange={(e) => setFormData({ ...formData, start_date: e.target.value })}
+                    className="bg-white/10 border-white/20 text-white text-sm"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="end_date" className="text-white text-sm">
+                    Tugash Sanasi
+                  </Label>
+                  <Input
+                    id="end_date"
+                    type="datetime-local"
+                    value={formData.end_date}
+                    onChange={(e) => setFormData({ ...formData, end_date: e.target.value })}
+                    className="bg-white/10 border-white/20 text-white text-sm"
+                  />
+                </div>
+              </div>
+
+              {/* Link Field */}
+              <div>
+                <Label htmlFor="link" className="text-white text-sm">
+                  Havola (Link)
+                </Label>
+                <Input
+                  id="link"
+                  type="url"
+                  value={formData.link}
+                  onChange={(e) => setFormData({ ...formData, link: e.target.value })}
+                  className="bg-white/10 border-white/20 text-white text-sm"
+                  placeholder="https://example.com"
+                />
+              </div>
+
               <Button
                 type="submit"
                 className="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white"
@@ -393,7 +468,17 @@ export function PromotionsTab() {
                 <div>
                   <h3 className="text-lg font-bold text-white">{promotion.titleUz}</h3>
                   <p className="text-sm text-white/60 mb-2">{promotion.descriptionUz}</p>
-                  <p className="text-amber-400 font-bold text-xl">{promotion.discount}% chegirma</p>
+                  <div className="text-amber-400 font-bold text-lg">
+                    {promotion.discount_percentage > 0 && (
+                      <p>{promotion.discount_percentage}% chegirma</p>
+                    )}
+                    {promotion.discount_amount > 0 && (
+                      <p>{promotion.discount_amount.toLocaleString()} so'm chegirma</p>
+                    )}
+                    {promotion.discount_percentage === 0 && promotion.discount_amount === 0 && (
+                      <p>Chegirma yo'q</p>
+                    )}
+                  </div>
                 </div>
                 <div className="flex gap-2">
                   <Button

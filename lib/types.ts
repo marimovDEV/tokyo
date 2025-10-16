@@ -42,10 +42,15 @@ export interface Promotion {
   descriptionUz: string
   descriptionRu: string
   image: string
-  discount: number // percentage
+  discount_percentage: number // percentage
+  discount_amount: number // amount in so'm
+  start_date: string
+  end_date: string
   active: boolean
-  startDate: string
-  endDate: string
+  is_active: boolean
+  link?: string
+  category?: number
+  linked_dish?: number
 }
 
 export interface Feedback {
