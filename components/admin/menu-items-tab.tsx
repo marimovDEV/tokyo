@@ -124,7 +124,7 @@ export function MenuItemsTab() {
       ingredients_ru: Array.isArray(item.ingredients_ru) ? item.ingredients_ru.join(", ") : (item.ingredients_ru || ""),
       rating: item.rating || 5,
       prep_time: item.prep_time || 15,
-      category: item.category || "",
+      category: item.category ? item.category.toString() : "",
       available: item.available !== false,
     })
     setIsDialogOpen(true)
@@ -286,7 +286,7 @@ export function MenuItemsTab() {
                     Kategoriya
                   </Label>
                   <Select
-                    value={formData.category}
+                    value={formData.category.toString()}
                     onValueChange={(value) => setFormData({ ...formData, category: value })}
                   >
                     <SelectTrigger className="bg-white/10 border-white/20 text-white">
@@ -294,7 +294,7 @@ export function MenuItemsTab() {
                     </SelectTrigger>
                     <SelectContent className="bg-slate-900 border-white/20">
                       {categories.map((cat) => (
-                        <SelectItem key={cat.id} value={cat.id} className="text-white">
+                        <SelectItem key={cat.id} value={cat.id.toString()} className="text-white">
                           {cat.name_uz || cat.name}
                         </SelectItem>
                       ))}
