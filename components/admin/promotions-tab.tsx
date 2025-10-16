@@ -20,7 +20,7 @@ import { toast } from "sonner"
 
 export function PromotionsTab() {
   const { promotions, addPromotion, updatePromotion, deletePromotion } = useMenu()
-  const { refetch: refetchPromotions } = usePromotions()
+  const { refetch: refetchPromotions, loading: promotionsLoading } = usePromotions()
   const api = useApiClient()
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [editingPromotion, setEditingPromotion] = useState<Promotion | null>(null)
@@ -323,7 +323,17 @@ export function PromotionsTab() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {promotions.map((promotion) => (
+        {promotionsLoading ? (
+          <div className="col-span-full flex justify-center items-center py-8">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
+            <span className="ml-2 text-white">Yuklanmoqda...</span>
+          </div>
+        ) : promotions.length === 0 ? (
+          <div className="col-span-full text-center py-8">
+            <p className="text-white/60">Hozircha aksiyalar yo'q</p>
+          </div>
+        ) : (
+          promotions.map((promotion) => (
           <div
             key={promotion.id}
             className="bg-white/10 backdrop-blur-xl rounded-2xl overflow-hidden border border-white/20 shadow-xl"
@@ -369,7 +379,8 @@ export function PromotionsTab() {
               </div>
             </div>
           </div>
-        ))}
+        ))
+        )}
       </div>
 
       {/* Delete Confirmation Dialog */}

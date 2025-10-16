@@ -11,12 +11,14 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useMenu } from "@/lib/menu-context"
 import { useApiClient } from "@/hooks/use-api"
+import { useCategories } from "@/hooks/use-api"
 import type { Category } from "@/lib/types"
 import { toast } from "sonner"
 import Image from "next/image"
 
 export function CategoriesTab() {
   const { categories, addCategory, updateCategory, deleteCategory } = useMenu()
+  const { refetch: refetchCategories, loading: categoriesLoading } = useCategories()
   const api = useApiClient()
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [editingCategory, setEditingCategory] = useState<Category | null>(null)
@@ -64,11 +66,13 @@ export function CategoriesTab() {
         const categoryId = parseInt(editingCategory.id)
         const updatedCategory = await api.patchFormData(`/categories/${categoryId}/`, formDataToSend)
         updateCategory(editingCategory.id, updatedCategory)
+        refetchCategories() // Refetch to ensure data is updated
         toast.success("Kategoriya yangilandi")
       } else {
         // Create new category
         const newCategory = await api.postFormData('/categories/', formDataToSend)
         addCategory(newCategory)
+        refetchCategories() // Refetch to ensure data is updated
         toast.success("Kategoriya qo'shildi")
       }
 
@@ -108,6 +112,7 @@ export function CategoriesTab() {
         const categoryId = parseInt(categoryToDelete.id)
         await api.delete(`/categories/${categoryId}/`)
         deleteCategory(categoryToDelete.id)
+        refetchCategories() // Refetch to ensure data is updated
         toast.success("Kategoriya o'chirildi")
         setDeleteDialogOpen(false)
         setCategoryToDelete(null)
@@ -258,9 +263,19 @@ export function CategoriesTab() {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
-        {categories
-          .sort((a, b) => (a.order || 0) - (b.order || 0))
-          .map((category) => (
+        {categoriesLoading ? (
+          <div className="col-span-full flex justify-center items-center py-8">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
+            <span className="ml-2 text-white">Yuklanmoqda...</span>
+          </div>
+        ) : categories.length === 0 ? (
+          <div className="col-span-full text-center py-8">
+            <p className="text-white/60">Hozircha kategoriyalar yo'q</p>
+          </div>
+        ) : (
+          categories
+            .sort((a, b) => (a.order || 0) - (b.order || 0))
+            .map((category) => (
             <div
               key={category.id}
               className="bg-white/10 backdrop-blur-xl rounded-2xl p-3 sm:p-4 border border-white/20 shadow-xl"
@@ -292,7 +307,8 @@ export function CategoriesTab() {
                 </div>
               </div>
             </div>
-          ))}
+          ))
+        )}
       </div>
 
       {/* Delete Confirmation Dialog */}

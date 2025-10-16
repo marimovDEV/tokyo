@@ -1,17 +1,26 @@
 "use client"
 
 import { useFeedback } from "@/lib/feedback-context"
+import { useApiClient } from "@/hooks/use-api"
 import { Trash2, Mail, Phone, MessageSquare } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { toast } from "sonner"
 
 export function FeedbackTab() {
   const { feedbacks, deleteFeedback } = useFeedback()
+  const api = useApiClient()
 
-  const handleDelete = (id: string) => {
+  const handleDelete = async (id: string) => {
     if (confirm("Ushbu fikrni o'chirmoqchimisiz?")) {
-      deleteFeedback(id)
-      toast.success("Fikr o'chirildi")
+      try {
+        const feedbackId = parseInt(id)
+        await api.delete(`/feedback/${feedbackId}/`)
+        deleteFeedback(id)
+        toast.success("Fikr o'chirildi")
+      } catch (error) {
+        console.error('Error deleting feedback:', error)
+        toast.error("Xatolik yuz berdi. Qaytadan urinib ko'ring.")
+      }
     }
   }
 
