@@ -1,11 +1,12 @@
 "use client"
-import { ArrowLeft, Package, Tag, Megaphone, MessageSquare, LogOut } from "lucide-react"
+import { ArrowLeft, Package, Tag, Megaphone, MessageSquare, LogOut, FileText } from "lucide-react"
 import Link from "next/link"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { CategoriesTab } from "@/components/admin/categories-tab"
 import { MenuItemsTab } from "@/components/admin/menu-items-tab"
 import { PromotionsTab } from "@/components/admin/promotions-tab"
 import { FeedbackTab } from "@/components/admin/feedback-tab"
+import { TextContentTab } from "@/components/admin/text-content-tab"
 import { toast } from "sonner"
 import { useState } from "react"
 
@@ -89,6 +90,18 @@ export default function AdminPage() {
             </button>
             
             <button
+              onClick={() => setActiveTab("text-content")}
+              className={`flex items-center gap-2 px-4 py-2.5 rounded-full whitespace-nowrap transition-all ${
+                activeTab === "text-content"
+                  ? "bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-lg"
+                  : "bg-white/10 text-white/70 hover:bg-white/20"
+              }`}
+            >
+              <FileText className="w-4 h-4" />
+              <span className="text-sm font-medium">Matnlar</span>
+            </button>
+            
+            <button
               onClick={() => setActiveTab("feedback")}
               className={`flex items-center gap-2 px-4 py-2.5 rounded-full whitespace-nowrap transition-all ${
                 activeTab === "feedback"
@@ -116,6 +129,10 @@ export default function AdminPage() {
 
             <TabsContent value="promotions">
               <PromotionsTab />
+            </TabsContent>
+
+            <TabsContent value="text-content">
+              <TextContentTab />
             </TabsContent>
 
             <TabsContent value="feedback">
