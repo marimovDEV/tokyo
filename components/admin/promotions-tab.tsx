@@ -37,6 +37,7 @@ export function PromotionsTab() {
     imageFile: null as File | null,
     discount: 0,
     active: true,
+    is_active: true,
     startDate: "",
     endDate: "",
   })
@@ -66,6 +67,7 @@ export function PromotionsTab() {
       formDataToSend.append('description_ru', formData.descriptionRu)
       formDataToSend.append('discount', formData.discount.toString())
       formDataToSend.append('active', formData.active.toString())
+      formDataToSend.append('is_active', formData.is_active.toString())
       formDataToSend.append('start_date', formData.startDate)
       formDataToSend.append('end_date', formData.endDate)
       
@@ -106,6 +108,7 @@ export function PromotionsTab() {
       imageFile: null,
       discount: promotion.discount,
       active: promotion.active,
+      is_active: promotion.is_active !== false,
       startDate: promotion.startDate,
       endDate: promotion.endDate,
     })
@@ -152,6 +155,7 @@ export function PromotionsTab() {
       imageFile: null,
       discount: 0,
       active: true,
+      is_active: true,
       startDate: "",
       endDate: "",
     })
@@ -320,15 +324,28 @@ export function PromotionsTab() {
                 </div>
               </div>
 
-              <div className="flex items-center gap-3">
-                <Switch
-                  id="active"
-                  checked={formData.active}
-                  onCheckedChange={(checked) => setFormData({ ...formData, active: checked })}
-                />
-                <Label htmlFor="active" className="text-white text-sm">
-                  Faol
-                </Label>
+              <div className="flex items-center gap-6">
+                <div className="flex items-center gap-3">
+                  <Switch
+                    id="active"
+                    checked={formData.active}
+                    onCheckedChange={(checked) => setFormData({ ...formData, active: checked })}
+                  />
+                  <Label htmlFor="active" className="text-white text-sm">
+                    Faol
+                  </Label>
+                </div>
+                
+                <div className="flex items-center gap-3">
+                  <Switch
+                    id="is_active"
+                    checked={formData.is_active}
+                    onCheckedChange={(checked) => setFormData({ ...formData, is_active: checked })}
+                  />
+                  <Label htmlFor="is_active" className="text-white text-sm">
+                    Ko'rinadi
+                  </Label>
+                </div>
               </div>
 
               <Button

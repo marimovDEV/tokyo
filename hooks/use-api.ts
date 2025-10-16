@@ -444,7 +444,7 @@ export function usePromotions() {
     try {
       setLoading(true);
       setError(null);
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api'}/promotions/`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api'}/promotions/?show_all=true`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
