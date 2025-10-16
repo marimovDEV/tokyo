@@ -374,7 +374,7 @@ export function useMenuItems() {
     try {
       setLoading(true);
       setError(null);
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api'}/menu-items/`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api'}/menu-items/?show_all=true`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',

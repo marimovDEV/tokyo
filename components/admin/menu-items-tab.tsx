@@ -46,6 +46,7 @@ export function MenuItemsTab() {
     prep_time: "15", // String for range format like "15-20"
     category: "",
     available: true,
+    is_active: true,
   })
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -81,6 +82,7 @@ export function MenuItemsTab() {
       formDataToSend.append('prep_time', formData.prep_time) // Already string
       formDataToSend.append('category', formData.category.toString())
       formDataToSend.append('available', formData.available.toString())
+      formDataToSend.append('is_active', formData.is_active.toString())
       
       if (formData.image) {
         formDataToSend.append('image', formData.image)
@@ -130,6 +132,7 @@ export function MenuItemsTab() {
       prep_time: item.prep_time || "15", // String for range format
       category: item.category ? item.category.toString() : "",
       available: item.available !== false,
+      is_active: item.is_active !== false,
     })
     setIsDialogOpen(true)
   }
@@ -184,6 +187,7 @@ export function MenuItemsTab() {
       prep_time: "15", // String for range format
       category: "",
       available: true,
+      is_active: true,
     })
   }
 
@@ -473,15 +477,27 @@ export function MenuItemsTab() {
                 </div>
               </div>
 
-              <div className="flex items-center gap-3 mb-4">
-                <Switch
-                  id="available"
-                  checked={formData.available}
-                  onCheckedChange={(checked) => setFormData({ ...formData, available: checked })}
-                />
-                <Label htmlFor="available" className="text-white text-sm">
-                  Mavjud
-                </Label>
+              <div className="flex items-center gap-6 mb-4">
+                <div className="flex items-center gap-3">
+                  <Switch
+                    id="available"
+                    checked={formData.available}
+                    onCheckedChange={(checked) => setFormData({ ...formData, available: checked })}
+                  />
+                  <Label htmlFor="available" className="text-white text-sm">
+                    Mavjud
+                  </Label>
+                </div>
+                <div className="flex items-center gap-3">
+                  <Switch
+                    id="is_active"
+                    checked={formData.is_active}
+                    onCheckedChange={(checked) => setFormData({ ...formData, is_active: checked })}
+                  />
+                  <Label htmlFor="is_active" className="text-white text-sm">
+                    Faol
+                  </Label>
+                </div>
               </div>
 
               <Button
