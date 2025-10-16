@@ -66,7 +66,7 @@ export function MenuItemsTab() {
       formDataToSend.append('description_uz', formData.description_uz)
       formDataToSend.append('description_ru', formData.description_ru)
       formDataToSend.append('price', formData.price.toString())
-      formDataToSend.append('weight', formData.weight.toString())
+      formDataToSend.append('weight', formData.weight > 0 ? formData.weight.toString() : '')
       // Convert comma-separated strings to JSON arrays
       const ingredientsArray = formData.ingredients ? formData.ingredients.split(',').map(item => item.trim()).filter(item => item) : []
       const ingredientsUzArray = formData.ingredients_uz ? formData.ingredients_uz.split(',').map(item => item.trim()).filter(item => item) : []
