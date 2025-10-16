@@ -56,7 +56,8 @@ export function CategoriesTab() {
 
       if (editingCategory) {
         // Update existing category
-        const updatedCategory = await api.patchFormData(`/categories/${editingCategory.id}/`, formDataToSend)
+        const categoryId = parseInt(editingCategory.id)
+        const updatedCategory = await api.patchFormData(`/categories/${categoryId}/`, formDataToSend)
         updateCategory(editingCategory.id, updatedCategory)
         toast.success("Kategoriya yangilandi")
       } else {
@@ -97,7 +98,9 @@ export function CategoriesTab() {
     if (categoryToDelete) {
       setIsDeleting(true)
       try {
-        await api.delete(`/categories/${categoryToDelete.id}/`)
+        // Ensure ID is treated as integer for backend
+        const categoryId = parseInt(categoryToDelete.id)
+        await api.delete(`/categories/${categoryId}/`)
         deleteCategory(categoryToDelete.id)
         toast.success("Kategoriya o'chirildi")
         setDeleteDialogOpen(false)

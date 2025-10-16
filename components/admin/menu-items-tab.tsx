@@ -72,7 +72,7 @@ export function MenuItemsTab() {
       formDataToSend.append('ingredients_ru', formData.ingredients_ru)
       formDataToSend.append('rating', formData.rating.toString())
       formDataToSend.append('prep_time', formData.prep_time.toString())
-      formDataToSend.append('category', formData.category)
+      formDataToSend.append('category', formData.category.toString())
       formDataToSend.append('available', formData.available.toString())
       
       if (formData.image) {
@@ -81,7 +81,8 @@ export function MenuItemsTab() {
 
       if (editingItem) {
         // Update existing item
-        const updatedItem = await api.patchFormData(`/menu-items/${editingItem.id}/`, formDataToSend)
+        const itemId = parseInt(editingItem.id)
+        const updatedItem = await api.patchFormData(`/menu-items/${itemId}/`, formDataToSend)
         updateMenuItem(editingItem.id, updatedItem)
         toast.success("Taom yangilandi")
       } else {
@@ -133,7 +134,9 @@ export function MenuItemsTab() {
     if (itemToDelete) {
       setIsDeleting(true)
       try {
-        await api.delete(`/menu-items/${itemToDelete.id}/`)
+        // Ensure ID is treated as integer for backend
+        const itemId = parseInt(itemToDelete.id)
+        await api.delete(`/menu-items/${itemId}/`)
         deleteMenuItem(itemToDelete.id)
         toast.success("Taom o'chirildi")
         setDeleteDialogOpen(false)
