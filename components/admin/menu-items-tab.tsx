@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useState, useCallback, useEffect } from "react"
 import { Plus, Pencil, Trash2, AlertTriangle, Loader2 } from "lucide-react"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
@@ -41,7 +41,7 @@ export function MenuItemsTab() {
     ingredients_uz: "",
     ingredients_ru: "",
     rating: 5,
-    prep_time: 15,
+    prep_time: "15", // String for range format like "15-20"
     category: "",
     available: true,
   })
@@ -76,7 +76,7 @@ export function MenuItemsTab() {
       formDataToSend.append('ingredients_uz', JSON.stringify(ingredientsUzArray))
       formDataToSend.append('ingredients_ru', JSON.stringify(ingredientsRuArray))
       formDataToSend.append('rating', formData.rating.toString())
-      formDataToSend.append('prep_time', formData.prep_time.toString())
+      formDataToSend.append('prep_time', formData.prep_time) // Already string
       formDataToSend.append('category', formData.category.toString())
       formDataToSend.append('available', formData.available.toString())
       
@@ -123,7 +123,7 @@ export function MenuItemsTab() {
       ingredients_uz: Array.isArray(item.ingredients_uz) ? item.ingredients_uz.join(", ") : (item.ingredients_uz || ""),
       ingredients_ru: Array.isArray(item.ingredients_ru) ? item.ingredients_ru.join(", ") : (item.ingredients_ru || ""),
       rating: item.rating || 5,
-      prep_time: item.prep_time || 15,
+      prep_time: item.prep_time || "15", // String for range format
       category: item.category ? item.category.toString() : "",
       available: item.available !== false,
     })
@@ -176,7 +176,7 @@ export function MenuItemsTab() {
       ingredients_uz: "",
       ingredients_ru: "",
       rating: 5,
-      prep_time: 15,
+      prep_time: "15", // String for range format
       category: "",
       available: true,
     })
@@ -358,13 +358,13 @@ export function MenuItemsTab() {
                     type="number"
                     step="0.1"
                     min="0"
-                    value={formData.weight}
+                    value={formData.weight === 0 ? '' : formData.weight}
                     onChange={(e) => {
                       const value = Number.parseFloat(e.target.value);
-                      // Only allow positive numbers and 0, prevent NaN
-                      if (!isNaN(value) && value >= 0) {
+                      // Only allow positive numbers, prevent NaN
+                      if (!isNaN(value) && value > 0) {
                         setFormData({ ...formData, weight: value });
-                      } else if (e.target.value === '' || e.target.value === '0') {
+                      } else if (e.target.value === '') {
                         setFormData({ ...formData, weight: 0 });
                       }
                     }}
@@ -403,19 +403,18 @@ export function MenuItemsTab() {
                   </Label>
                   <Input
                     id="prep_time"
-                    type="number"
-                    min="0"
+                    type="text"
                     value={formData.prep_time}
                     onChange={(e) => {
-                      const value = Number.parseInt(e.target.value);
-                      // Only allow positive numbers and 0, prevent NaN
-                      if (!isNaN(value) && value >= 0) {
+                      const value = e.target.value;
+                      // Allow range format like "15-20" or single number
+                      const rangePattern = /^\d+(-\d+)?$/;
+                      if (value === '' || rangePattern.test(value)) {
                         setFormData({ ...formData, prep_time: value });
-                      } else if (e.target.value === '' || e.target.value === '0') {
-                        setFormData({ ...formData, prep_time: 0 });
                       }
                     }}
                     className="bg-white/10 border-white/20 text-white text-sm"
+                    placeholder="15-20"
                     required
                   />
                 </div>

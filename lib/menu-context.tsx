@@ -172,10 +172,14 @@ export function MenuProvider({ children }: { children: React.ReactNode }) {
 
   const addCategory = (category: Category) => {
     setCategories((prev) => [...prev, category])
+    // Refetch from API to ensure consistency
+    refetchCategories()
   }
 
   const updateCategory = (id: string, updates: Partial<Category>) => {
     setCategories((prev) => prev.map((cat) => (cat.id === id ? { ...cat, ...updates } : cat)))
+    // Refetch from API to ensure consistency
+    refetchCategories()
   }
 
   const deleteCategory = (id: string) => {
@@ -186,10 +190,14 @@ export function MenuProvider({ children }: { children: React.ReactNode }) {
 
   const addMenuItem = (item: MenuItem) => {
     setMenuItems((prev) => [...prev, item])
+    // Refetch from API to ensure consistency
+    refetchMenuItems()
   }
 
   const updateMenuItem = (id: string, updates: Partial<MenuItem>) => {
     setMenuItems((prev) => prev.map((item) => (item.id === id ? { ...item, ...updates } : item)))
+    // Refetch from API to ensure consistency
+    refetchMenuItems()
   }
 
   const deleteMenuItem = (id: string) => {
@@ -200,10 +208,14 @@ export function MenuProvider({ children }: { children: React.ReactNode }) {
 
   const addPromotion = (promotion: Promotion) => {
     setPromotions((prev) => [...prev, promotion])
+    // Refetch from API to ensure consistency
+    refetchPromotions()
   }
 
   const updatePromotion = (id: string, updates: Partial<Promotion>) => {
     setPromotions((prev) => prev.map((promo) => (promo.id === id ? { ...promo, ...updates } : promo)))
+    // Refetch from API to ensure consistency
+    refetchPromotions()
   }
 
   const deletePromotion = (id: string) => {
