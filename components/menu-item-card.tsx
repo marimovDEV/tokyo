@@ -48,50 +48,72 @@ export function MenuItemCard({ item, language }: MenuItemCardProps) {
   }
 
   return (
-    <div className="bg-white/10 backdrop-blur-xl rounded-3xl overflow-hidden border border-white/20 shadow-xl hover:shadow-2xl transition-all hover:scale-[1.02]">
-      <div className="relative h-40 sm:h-48 md:h-56">
-        <Image src={item.image || "/placeholder.svg"} alt={getName()} fill className="object-cover" />
-        <div className="absolute top-2 right-2 sm:top-3 sm:right-3 bg-black/60 backdrop-blur-md px-2 py-1 sm:px-3 sm:py-1.5 rounded-full flex items-center gap-1">
-          <Star className="w-3 h-3 sm:w-4 sm:h-4 fill-amber-400 text-amber-400" />
-          <span className="text-white font-semibold text-xs sm:text-sm">{item.rating}</span>
+    <div className="group bg-gradient-to-b from-white/10 to-white/5 backdrop-blur-xl rounded-[20px] overflow-hidden border border-white/20 shadow-lg hover:shadow-2xl hover:shadow-orange-500/10 transition-all duration-300 hover:scale-[1.02] hover:border-orange-500/30 h-full flex flex-col">
+      {/* Image Section - 1:1 Aspect Ratio */}
+      <div className="relative aspect-square w-full overflow-hidden">
+        <Image 
+          src={item.image || "/placeholder.svg"} 
+          alt={getName()} 
+          fill 
+          className="object-cover group-hover:scale-105 transition-transform duration-300" 
+        />
+        <div className="absolute top-3 right-3 bg-black/70 backdrop-blur-md px-2.5 py-1.5 rounded-full flex items-center gap-1">
+          <Star className="w-4 h-4 fill-orange-400 text-orange-400" />
+          <span className="text-white font-semibold text-sm">{item.rating}</span>
         </div>
       </div>
 
-      <div className="p-3 sm:p-4 md:p-6">
-        <h3 className="text-base sm:text-lg md:text-xl font-bold text-white mb-1 sm:mb-2 line-clamp-1">{getName()}</h3>
-        <p className="text-xs sm:text-sm text-white/70 mb-3 sm:mb-4 line-clamp-2">{getDescription()}</p>
+      {/* Content Section */}
+      <div className="flex-1 flex flex-col p-5">
+        {/* Title */}
+        <h3 className="text-lg font-bold text-white mb-2 line-clamp-1 group-hover:text-orange-400 transition-colors">
+          {getName()}
+        </h3>
 
-        <div className="flex flex-wrap gap-2 mb-3 sm:mb-4">
-          <div className="flex items-center gap-1 bg-white/10 px-2 py-1 sm:px-3 sm:py-1.5 rounded-full">
-            <Weight className="w-3 h-3 sm:w-4 sm:h-4 text-amber-400" />
-            <span className="text-white text-xs sm:text-sm font-medium">{item.weight}g</span>
+        {/* Description */}
+        <p className="text-sm text-gray-300 mb-4 line-clamp-2 flex-1">
+          {getDescription()}
+        </p>
+
+        {/* Info Pills - Weight and Time */}
+        <div className="flex gap-2 mb-4">
+          <div className="flex items-center gap-1.5 bg-gray-600/30 px-3 py-1.5 rounded-full">
+            <Weight className="w-4 h-4 text-gray-400" />
+            <span className="text-gray-300 text-sm font-medium">{item.weight}g</span>
           </div>
-          <div className="flex items-center gap-1 bg-white/10 px-2 py-1 sm:px-3 sm:py-1.5 rounded-full">
-            <Clock className="w-3 h-3 sm:w-4 sm:h-4 text-amber-400" />
-            <span className="text-white text-xs sm:text-sm font-medium">{item.prepTime} min</span>
+          <div className="flex items-center gap-1.5 bg-gray-600/30 px-3 py-1.5 rounded-full">
+            <Clock className="w-4 h-4 text-gray-400" />
+            <span className="text-gray-300 text-sm font-medium">{item.prepTime} min</span>
           </div>
         </div>
 
-        <div className="mb-3 sm:mb-4">
-          <p className="text-xs text-white/60 mb-1.5 sm:mb-2">
+        {/* Ingredients Section */}
+        <div className="mb-5">
+          <p className="text-xs text-gray-400 mb-2 font-medium">
             {language === "uz" ? "Tarkibi:" : language === "ru" ? "Состав:" : "Ingredients:"}
           </p>
-          <div className="flex flex-wrap gap-1.5 sm:gap-2">
+          <div className="flex flex-wrap gap-1.5">
             {Array.isArray(getIngredients()) && getIngredients()
-              .slice(0, 4)
+              .slice(0, 3)
               .map((ingredient, index) => (
                 <span
                   key={index}
-                  className="text-xs bg-white/10 text-white/80 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full whitespace-nowrap"
+                  className="text-xs bg-white/10 text-gray-300 px-2.5 py-1 rounded-full whitespace-nowrap"
                 >
                   {ingredient}
                 </span>
               ))}
+            {Array.isArray(getIngredients()) && getIngredients().length > 3 && (
+              <span className="text-xs text-gray-400 px-2.5 py-1">
+                +{getIngredients().length - 3}
+              </span>
+            )}
           </div>
         </div>
 
-        <div className="flex items-center justify-between gap-2 sm:gap-4 pt-3 sm:pt-4 border-t border-white/20">
-          <div className="text-lg sm:text-xl md:text-2xl font-bold text-amber-400 whitespace-nowrap">
+        {/* Price and Add Button - Bottom aligned */}
+        <div className="flex items-center justify-between gap-4 pt-4 border-t border-white/10 mt-auto">
+          <div className="text-xl font-bold text-orange-400">
             {item.price.toLocaleString()} so'm
           </div>
 
@@ -99,28 +121,28 @@ export function MenuItemCard({ item, language }: MenuItemCardProps) {
             <Button
               onClick={handleAddToCart}
               disabled={!item.available}
-              className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white rounded-full h-8 sm:h-10 px-4 sm:px-6 text-sm sm:text-base shadow-lg shadow-amber-500/30 whitespace-nowrap"
+              className="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white rounded-full h-11 px-6 text-base font-semibold shadow-lg shadow-orange-500/30 hover:shadow-orange-500/50 transition-all duration-200 min-w-[100px]"
             >
               {language === "uz" ? "Qo'shish" : language === "ru" ? "Добавить" : "Add"}
             </Button>
           ) : (
-            <div className="flex items-center gap-1 sm:gap-2 bg-white/10 rounded-full p-0.5 sm:p-1">
+            <div className="flex items-center gap-2 bg-white/10 rounded-full p-1">
               <Button
                 size="icon"
                 variant="ghost"
                 onClick={handleDecrement}
-                className="h-7 w-7 sm:h-8 sm:w-8 rounded-full hover:bg-white/20 text-white"
+                className="h-9 w-9 rounded-full hover:bg-white/20 text-white transition-all duration-200"
               >
-                <Minus className="w-3 h-3 sm:w-4 sm:h-4" />
+                <Minus className="w-4 h-4" />
               </Button>
-              <span className="text-white font-semibold w-6 sm:w-8 text-center text-sm sm:text-base">{quantity}</span>
+              <span className="text-white font-semibold w-8 text-center text-base">{quantity}</span>
               <Button
                 size="icon"
                 variant="ghost"
                 onClick={handleIncrement}
-                className="h-7 w-7 sm:h-8 sm:w-8 rounded-full hover:bg-white/20 text-white"
+                className="h-9 w-9 rounded-full hover:bg-white/20 text-white transition-all duration-200"
               >
-                <Plus className="w-3 h-3 sm:w-4 sm:h-4" />
+                <Plus className="w-4 h-4" />
               </Button>
             </div>
           )}

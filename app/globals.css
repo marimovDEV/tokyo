@@ -11,6 +11,70 @@
   display: none;
 }
 
+/* Line clamp utilities for better text truncation */
+.line-clamp-1 {
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Custom orange color for consistency */
+.text-orange-400 {
+  color: #FF7A00;
+}
+
+.bg-orange-500 {
+  background-color: #FF7A00;
+}
+
+.from-orange-500 {
+  --tw-gradient-from: #FF7A00;
+}
+
+.to-orange-600 {
+  --tw-gradient-to: #FF6A00;
+}
+
+.from-orange-600 {
+  --tw-gradient-from: #FF6A00;
+}
+
+.to-orange-700 {
+  --tw-gradient-to: #FF5A00;
+}
+
+.hover\:from-orange-600:hover {
+  --tw-gradient-from: #FF6A00;
+}
+
+.hover\:to-orange-700:hover {
+  --tw-gradient-to: #FF5A00;
+}
+
+.border-orange-500\/30 {
+  border-color: rgba(255, 122, 0, 0.3);
+}
+
+.shadow-orange-500\/10 {
+  box-shadow: 0 10px 15px -3px rgba(255, 122, 0, 0.1);
+}
+
+.shadow-orange-500\/30 {
+  box-shadow: 0 10px 15px -3px rgba(255, 122, 0, 0.3);
+}
+
+.hover\:shadow-orange-500\/50:hover {
+  box-shadow: 0 10px 15px -3px rgba(255, 122, 0, 0.5);
+}
+
 @custom-variant dark (&:is(.dark *));
 
 :root {
