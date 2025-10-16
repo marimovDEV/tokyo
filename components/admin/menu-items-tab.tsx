@@ -67,9 +67,14 @@ export function MenuItemsTab() {
       formDataToSend.append('description_ru', formData.description_ru)
       formDataToSend.append('price', formData.price.toString())
       formDataToSend.append('weight', formData.weight.toString())
-      formDataToSend.append('ingredients', formData.ingredients)
-      formDataToSend.append('ingredients_uz', formData.ingredients_uz)
-      formDataToSend.append('ingredients_ru', formData.ingredients_ru)
+      // Convert comma-separated strings to JSON arrays
+      const ingredientsArray = formData.ingredients ? formData.ingredients.split(',').map(item => item.trim()).filter(item => item) : []
+      const ingredientsUzArray = formData.ingredients_uz ? formData.ingredients_uz.split(',').map(item => item.trim()).filter(item => item) : []
+      const ingredientsRuArray = formData.ingredients_ru ? formData.ingredients_ru.split(',').map(item => item.trim()).filter(item => item) : []
+      
+      formDataToSend.append('ingredients', JSON.stringify(ingredientsArray))
+      formDataToSend.append('ingredients_uz', JSON.stringify(ingredientsUzArray))
+      formDataToSend.append('ingredients_ru', JSON.stringify(ingredientsRuArray))
       formDataToSend.append('rating', formData.rating.toString())
       formDataToSend.append('prep_time', formData.prep_time.toString())
       formDataToSend.append('category', formData.category.toString())
@@ -342,9 +347,11 @@ export function MenuItemsTab() {
                   <Input
                     id="weight"
                     type="number"
+                    step="0.1"
                     value={formData.weight}
-                    onChange={(e) => setFormData({ ...formData, weight: Number.parseInt(e.target.value) })}
+                    onChange={(e) => setFormData({ ...formData, weight: Number.parseFloat(e.target.value) || 0 })}
                     className="bg-white/10 border-white/20 text-white text-sm"
+                    placeholder="1.5"
                     required
                   />
                 </div>

@@ -30,6 +30,7 @@ export function CategoriesTab() {
     name_ru: "",
     image: null as File | null,
     is_active: true,
+    order: 0,
   })
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -49,6 +50,10 @@ export function CategoriesTab() {
       formDataToSend.append('name_uz', formData.name_uz)
       formDataToSend.append('name_ru', formData.name_ru)
       formDataToSend.append('is_active', formData.is_active.toString())
+      
+      // Auto-assign order if not provided
+      const order = formData.order || (categories.length + 1)
+      formDataToSend.append('order', order.toString())
       
       if (formData.image) {
         formDataToSend.append('image', formData.image)
@@ -85,6 +90,7 @@ export function CategoriesTab() {
       name_ru: category.name_ru || "",
       image: null,
       is_active: category.is_active !== false,
+      order: category.order || 0,
     })
     setIsDialogOpen(true)
   }
@@ -127,6 +133,7 @@ export function CategoriesTab() {
       name_ru: "",
       image: null,
       is_active: true,
+      order: categories.length + 1,
     })
   }
 
@@ -191,6 +198,19 @@ export function CategoriesTab() {
                     required
                   />
                 </div>
+                <div>
+                  <Label htmlFor="order" className="text-white text-sm">
+                    Tartib raqami
+                  </Label>
+                  <Input
+                    id="order"
+                    type="number"
+                    value={formData.order}
+                    onChange={(e) => setFormData({ ...formData, order: Number.parseInt(e.target.value) || 0 })}
+                    className="bg-white/10 border-white/20 text-white"
+                    placeholder="Avtomatik"
+                  />
+                </div>
               </div>
               <div>
                 <Label htmlFor="image" className="text-white text-sm">
@@ -238,7 +258,9 @@ export function CategoriesTab() {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
-        {categories.map((category) => (
+        {categories
+          .sort((a, b) => (a.order || 0) - (b.order || 0))
+          .map((category) => (
             <div
               key={category.id}
               className="bg-white/10 backdrop-blur-xl rounded-2xl p-3 sm:p-4 border border-white/20 shadow-xl"
