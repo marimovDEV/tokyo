@@ -1,5 +1,5 @@
 "use client"
-import { ArrowLeft, Package, Tag, Megaphone, MessageSquare, LogOut, Plus } from "lucide-react"
+import { ArrowLeft, Package, Tag, Megaphone, MessageSquare, LogOut } from "lucide-react"
 import Link from "next/link"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { CategoriesTab } from "@/components/admin/categories-tab"
@@ -20,10 +20,6 @@ export default function AdminPage() {
     window.location.href = "/admin/login"
   }
 
-  const handleAddClick = () => {
-    // Handle add button click based on active tab
-    toast.info(`Yangi ${activeTab === "categories" ? "kategoriya" : activeTab === "items" ? "taom" : activeTab === "promotions" ? "aksiya" : "fikr"} qo'shish`)
-  }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900">
@@ -128,13 +124,6 @@ export default function AdminPage() {
           </Tabs>
         </div>
 
-        {/* Floating Action Button */}
-        <button
-          onClick={handleAddClick}
-          className="fixed bottom-6 right-6 w-14 h-14 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 rounded-full shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center z-40"
-        >
-          <Plus className="w-6 h-6 text-white" />
-        </button>
       </div>
     </div>
   )
