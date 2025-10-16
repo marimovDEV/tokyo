@@ -29,15 +29,12 @@ export default function MenuPage() {
     let items = menuItems
 
     if (selectedCategory) {
-      console.log('Filtering by category:', selectedCategory, 'Type:', typeof selectedCategory)
-      console.log('Menu items categories:', items.map(item => ({ id: item.id, category: item.category, type: typeof item.category })))
+      // Convert both to numbers for comparison to handle type mismatches
+      const selectedCategoryId = parseInt(selectedCategory)
       items = items.filter((item) => {
-        const itemCategory = item.category.toString()
-        const selectedCat = selectedCategory.toString()
-        console.log('Comparing:', itemCategory, '===', selectedCat, 'Result:', itemCategory === selectedCat)
-        return itemCategory === selectedCat
+        const itemCategoryId = parseInt(item.category.toString())
+        return itemCategoryId === selectedCategoryId
       })
-      console.log('Filtered items count:', items.length)
     }
 
     if (searchQuery) {
