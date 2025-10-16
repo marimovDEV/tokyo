@@ -331,7 +331,8 @@ export function useCategories() {
     const fetchCategories = async () => {
       try {
         setLoading(true);
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api'}/categories/`, {
+        // Use show_all=true to get all categories including inactive ones for admin
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api'}/categories/?show_all=true`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',

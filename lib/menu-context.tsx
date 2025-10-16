@@ -135,9 +135,9 @@ export function MenuProvider({ children }: { children: React.ReactNode }) {
   const { menuItems: apiMenuItems, loading: menuItemsLoading, error: menuItemsError } = useMenuItems()
   const { promotions: apiPromotions, loading: promotionsLoading, error: promotionsError } = usePromotions()
 
-  const [categories, setCategories] = useState<Category[]>(sampleCategories)
-  const [menuItems, setMenuItems] = useState<MenuItem[]>(sampleMenuItems)
-  const [promotions, setPromotions] = useState<Promotion[]>(samplePromotions)
+  const [categories, setCategories] = useState<Category[]>([])
+  const [menuItems, setMenuItems] = useState<MenuItem[]>([])
+  const [promotions, setPromotions] = useState<Promotion[]>([])
 
   const loading = categoriesLoading || menuItemsLoading || promotionsLoading
   const error = categoriesError || menuItemsError || promotionsError
@@ -145,25 +145,30 @@ export function MenuProvider({ children }: { children: React.ReactNode }) {
   // API dan kelgan ma'lumotlarni saqlash
   useEffect(() => {
     console.log('API Categories:', apiCategories)
-    if (apiCategories && Array.isArray(apiCategories) && apiCategories.length > 0) {
+    if (apiCategories && Array.isArray(apiCategories)) {
       console.log('Setting categories from API:', apiCategories)
       setCategories(apiCategories as any)
-    } else {
-      console.log('Using sample categories')
+    } else if (!categoriesLoading && apiCategories === null) {
+      console.log('No categories from API, using empty array')
+      setCategories([])
     }
-  }, [apiCategories])
+  }, [apiCategories, categoriesLoading])
 
   useEffect(() => {
-    if (apiMenuItems && Array.isArray(apiMenuItems) && apiMenuItems.length > 0) {
+    if (apiMenuItems && Array.isArray(apiMenuItems)) {
       setMenuItems(apiMenuItems as any)
+    } else if (!menuItemsLoading && apiMenuItems === null) {
+      setMenuItems([])
     }
-  }, [apiMenuItems])
+  }, [apiMenuItems, menuItemsLoading])
 
   useEffect(() => {
-    if (apiPromotions && Array.isArray(apiPromotions) && apiPromotions.length > 0) {
+    if (apiPromotions && Array.isArray(apiPromotions)) {
       setPromotions(apiPromotions as any)
+    } else if (!promotionsLoading && apiPromotions === null) {
+      setPromotions([])
     }
-  }, [apiPromotions])
+  }, [apiPromotions, promotionsLoading])
 
   const addCategory = (category: Category) => {
     setCategories((prev) => [...prev, category])
@@ -175,10 +180,7 @@ export function MenuProvider({ children }: { children: React.ReactNode }) {
 
   const deleteCategory = (id: string) => {
     setCategories((prev) => prev.filter((cat) => cat.id !== id))
-    // Force refresh API data
-    setTimeout(() => {
-      window.location.reload()
-    }, 1000)
+    // No need to reload page, state is already updated
   }
 
   const addMenuItem = (item: MenuItem) => {
@@ -191,10 +193,7 @@ export function MenuProvider({ children }: { children: React.ReactNode }) {
 
   const deleteMenuItem = (id: string) => {
     setMenuItems((prev) => prev.filter((item) => item.id !== id))
-    // Force refresh API data
-    setTimeout(() => {
-      window.location.reload()
-    }, 1000)
+    // No need to reload page, state is already updated
   }
 
   const addPromotion = (promotion: Promotion) => {
@@ -207,10 +206,7 @@ export function MenuProvider({ children }: { children: React.ReactNode }) {
 
   const deletePromotion = (id: string) => {
     setPromotions((prev) => prev.filter((promo) => promo.id !== id))
-    // Force refresh API data
-    setTimeout(() => {
-      window.location.reload()
-    }, 1000)
+    // No need to reload page, state is already updated
   }
 
   return (
