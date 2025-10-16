@@ -334,8 +334,17 @@ export function MenuItemsTab() {
                   <Input
                     id="price"
                     type="number"
+                    min="0"
                     value={formData.price}
-                    onChange={(e) => setFormData({ ...formData, price: Number.parseInt(e.target.value) })}
+                    onChange={(e) => {
+                      const value = Number.parseInt(e.target.value);
+                      // Only allow positive numbers and 0, prevent NaN
+                      if (!isNaN(value) && value >= 0) {
+                        setFormData({ ...formData, price: value });
+                      } else if (e.target.value === '' || e.target.value === '0') {
+                        setFormData({ ...formData, price: 0 });
+                      }
+                    }}
                     className="bg-white/10 border-white/20 text-white text-sm"
                     required
                   />
@@ -348,8 +357,17 @@ export function MenuItemsTab() {
                     id="weight"
                     type="number"
                     step="0.1"
+                    min="0"
                     value={formData.weight}
-                    onChange={(e) => setFormData({ ...formData, weight: Number.parseFloat(e.target.value) || 0 })}
+                    onChange={(e) => {
+                      const value = Number.parseFloat(e.target.value);
+                      // Only allow positive numbers and 0, prevent NaN
+                      if (!isNaN(value) && value >= 0) {
+                        setFormData({ ...formData, weight: value });
+                      } else if (e.target.value === '' || e.target.value === '0') {
+                        setFormData({ ...formData, weight: 0 });
+                      }
+                    }}
                     className="bg-white/10 border-white/20 text-white text-sm"
                     placeholder="1.5"
                     required
@@ -366,7 +384,15 @@ export function MenuItemsTab() {
                     min="0"
                     max="5"
                     value={formData.rating}
-                    onChange={(e) => setFormData({ ...formData, rating: Number.parseFloat(e.target.value) })}
+                    onChange={(e) => {
+                      const value = Number.parseFloat(e.target.value);
+                      // Only allow numbers between 0 and 5, prevent NaN
+                      if (!isNaN(value) && value >= 0 && value <= 5) {
+                        setFormData({ ...formData, rating: value });
+                      } else if (e.target.value === '' || e.target.value === '0') {
+                        setFormData({ ...formData, rating: 0 });
+                      }
+                    }}
                     className="bg-white/10 border-white/20 text-white text-sm"
                     required
                   />
@@ -378,8 +404,17 @@ export function MenuItemsTab() {
                   <Input
                     id="prep_time"
                     type="number"
+                    min="0"
                     value={formData.prep_time}
-                    onChange={(e) => setFormData({ ...formData, prep_time: Number.parseInt(e.target.value) })}
+                    onChange={(e) => {
+                      const value = Number.parseInt(e.target.value);
+                      // Only allow positive numbers and 0, prevent NaN
+                      if (!isNaN(value) && value >= 0) {
+                        setFormData({ ...formData, prep_time: value });
+                      } else if (e.target.value === '' || e.target.value === '0') {
+                        setFormData({ ...formData, prep_time: 0 });
+                      }
+                    }}
                     className="bg-white/10 border-white/20 text-white text-sm"
                     required
                   />
