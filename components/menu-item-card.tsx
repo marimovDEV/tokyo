@@ -16,20 +16,20 @@ export function MenuItemCard({ item, language }: MenuItemCardProps) {
   const quantity = cartItem?.quantity || 0
 
   const getName = () => {
-    if (language === "uz") return item.nameUz
-    if (language === "ru") return item.nameRu
+    if (language === "uz") return item.name_uz
+    if (language === "ru") return item.name_ru
     return item.name
   }
 
   const getDescription = () => {
-    if (language === "uz") return item.descriptionUz
-    if (language === "ru") return item.descriptionRu
+    if (language === "uz") return item.description_uz
+    if (language === "ru") return item.description_ru
     return item.description
   }
 
   const getIngredients = () => {
-    if (language === "uz") return item.ingredientsUz || []
-    if (language === "ru") return item.ingredientsRu || []
+    if (language === "uz") return item.ingredients_uz || []
+    if (language === "ru") return item.ingredients_ru || []
     return item.ingredients || []
   }
 
@@ -83,7 +83,7 @@ export function MenuItemCard({ item, language }: MenuItemCardProps) {
           </div>
           <div className="flex items-center gap-1.5 bg-gray-600/30 px-3 py-1.5 rounded-full">
             <Clock className="w-4 h-4 text-gray-400" />
-            <span className="text-gray-300 text-sm font-medium">{item.prepTime} min</span>
+            <span className="text-gray-300 text-sm font-medium">{item.prep_time} min</span>
           </div>
         </div>
 

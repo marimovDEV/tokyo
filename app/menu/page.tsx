@@ -29,15 +29,15 @@ export default function MenuPage() {
     let items = menuItems
 
     if (selectedCategory) {
-      items = items.filter((item) => item.categoryId === selectedCategory)
+      items = items.filter((item) => item.category.toString() === selectedCategory)
     }
 
     if (searchQuery) {
       items = items.filter(
         (item) =>
           item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          item.nameUz.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          item.nameRu.toLowerCase().includes(searchQuery.toLowerCase()),
+          item.name_uz.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          item.name_ru.toLowerCase().includes(searchQuery.toLowerCase()),
       )
     }
 
@@ -137,7 +137,7 @@ export default function MenuPage() {
         {/* Menu Items Grid - Optimized for laptop screens */}
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6 lg:gap-8 px-2 md:px-0">
-            {filteredItems.map((item) => (
+              {filteredItems.map((item) => (
               <MenuItemCard key={item.id} item={item} language={language} />
             ))}
                   </div>

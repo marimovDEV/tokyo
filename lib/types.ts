@@ -1,8 +1,8 @@
 export interface Category {
   id: string
   name: string
-  nameUz: string
-  nameRu: string
+  name_uz: string
+  name_ru: string
   image: string
   order: number
 }
@@ -10,21 +10,22 @@ export interface Category {
 export interface MenuItem {
   id: string
   name: string
-  nameUz: string
-  nameRu: string
+  name_uz: string
+  name_ru: string
   description: string
-  descriptionUz: string
-  descriptionRu: string
+  description_uz: string
+  description_ru: string
   image: string
   price: number
   weight: number // in grams
   ingredients: string[]
-  ingredientsUz: string[]
-  ingredientsRu: string[]
+  ingredients_uz: string[]
+  ingredients_ru: string[]
   rating: number
-  prepTime: number // in minutes
-  categoryId: string
+  prep_time: string // in minutes, can be range like "15-20"
+  category: number // category ID from backend
   available: boolean
+  is_active: boolean
 }
 
 export interface CartItem {
