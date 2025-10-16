@@ -131,9 +131,9 @@ const samplePromotions: Promotion[] = [
 
 export function MenuProvider({ children }: { children: React.ReactNode }) {
   // API dan ma'lumot olish
-  const { categories: apiCategories, loading: categoriesLoading, error: categoriesError } = useCategories()
-  const { menuItems: apiMenuItems, loading: menuItemsLoading, error: menuItemsError } = useMenuItems()
-  const { promotions: apiPromotions, loading: promotionsLoading, error: promotionsError } = usePromotions()
+  const { categories: apiCategories, loading: categoriesLoading, error: categoriesError, refetch: refetchCategories } = useCategories()
+  const { menuItems: apiMenuItems, loading: menuItemsLoading, error: menuItemsError, refetch: refetchMenuItems } = useMenuItems()
+  const { promotions: apiPromotions, loading: promotionsLoading, error: promotionsError, refetch: refetchPromotions } = usePromotions()
 
   const [categories, setCategories] = useState<Category[]>([])
   const [menuItems, setMenuItems] = useState<MenuItem[]>([])
@@ -180,7 +180,8 @@ export function MenuProvider({ children }: { children: React.ReactNode }) {
 
   const deleteCategory = (id: string) => {
     setCategories((prev) => prev.filter((cat) => cat.id !== id))
-    // No need to reload page, state is already updated
+    // Refetch from API to ensure consistency
+    refetchCategories()
   }
 
   const addMenuItem = (item: MenuItem) => {
@@ -193,7 +194,8 @@ export function MenuProvider({ children }: { children: React.ReactNode }) {
 
   const deleteMenuItem = (id: string) => {
     setMenuItems((prev) => prev.filter((item) => item.id !== id))
-    // No need to reload page, state is already updated
+    // Refetch from API to ensure consistency
+    refetchMenuItems()
   }
 
   const addPromotion = (promotion: Promotion) => {
@@ -206,7 +208,8 @@ export function MenuProvider({ children }: { children: React.ReactNode }) {
 
   const deletePromotion = (id: string) => {
     setPromotions((prev) => prev.filter((promo) => promo.id !== id))
-    // No need to reload page, state is already updated
+    // Refetch from API to ensure consistency
+    refetchPromotions()
   }
 
   return (

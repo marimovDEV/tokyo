@@ -327,36 +327,41 @@ export function useCategories() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
-  useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        setLoading(true);
-        // Use show_all=true to get all categories including inactive ones for admin
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api'}/categories/?show_all=true`, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          credentials: 'include',
-        });
-        
-        if (!response.ok) {
-          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-        }
-        
-        const data = await response.json();
-        setCategories(data.results || []);
-      } catch (err) {
-        setError(err as Error);
-      } finally {
-        setLoading(false);
+  const fetchCategories = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      // Use show_all=true to get all categories including inactive ones for admin
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api'}/categories/?show_all=true`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
-    };
+      
+      const data = await response.json();
+      setCategories(data.results || []);
+    } catch (err) {
+      setError(err as Error);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
+  useEffect(() => {
     fetchCategories();
-  }, []); // Empty dependency to prevent infinite loop
+  }, [fetchCategories]);
 
-  return { categories, loading, error };
+  const refetch = useCallback(() => {
+    fetchCategories();
+  }, [fetchCategories]);
+
+  return { categories, loading, error, refetch };
 }
 
 // Menu Items hook
@@ -365,35 +370,40 @@ export function useMenuItems() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
-  useEffect(() => {
-    const fetchMenuItems = async () => {
-      try {
-        setLoading(true);
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api'}/menu-items/`, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          credentials: 'include',
-        });
-        
-        if (!response.ok) {
-          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-        }
-        
-        const data = await response.json();
-        setMenuItems(data.results || []);
-      } catch (err) {
-        setError(err as Error);
-      } finally {
-        setLoading(false);
+  const fetchMenuItems = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api'}/menu-items/`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
-    };
+      
+      const data = await response.json();
+      setMenuItems(data.results || []);
+    } catch (err) {
+      setError(err as Error);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
+  useEffect(() => {
     fetchMenuItems();
-  }, []); // Empty dependency to prevent infinite loop
+  }, [fetchMenuItems]);
 
-  return { menuItems, loading, error };
+  const refetch = useCallback(() => {
+    fetchMenuItems();
+  }, [fetchMenuItems]);
+
+  return { menuItems, loading, error, refetch };
 }
 
 // Single Menu Item hook
@@ -430,35 +440,40 @@ export function usePromotions() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
-  useEffect(() => {
-    const fetchPromotions = async () => {
-      try {
-        setLoading(true);
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api'}/promotions/`, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          credentials: 'include',
-        });
-        
-        if (!response.ok) {
-          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-        }
-        
-        const data = await response.json();
-        setPromotions(data.results || []);
-      } catch (err) {
-        setError(err as Error);
-      } finally {
-        setLoading(false);
+  const fetchPromotions = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api'}/promotions/`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
-    };
+      
+      const data = await response.json();
+      setPromotions(data.results || []);
+    } catch (err) {
+      setError(err as Error);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
+  useEffect(() => {
     fetchPromotions();
-  }, []); // Empty dependency to prevent infinite loop
+  }, [fetchPromotions]);
 
-  return { promotions, loading, error };
+  const refetch = useCallback(() => {
+    fetchPromotions();
+  }, [fetchPromotions]);
+
+  return { promotions, loading, error, refetch };
 }
 
 // Hook ishlatish misoli:
