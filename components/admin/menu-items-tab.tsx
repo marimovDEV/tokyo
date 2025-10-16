@@ -15,11 +15,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch"
 import { useMenu } from "@/lib/menu-context"
 import { useApiClient } from "@/hooks/use-api"
+import { useMenuItems } from "@/hooks/use-api"
 import type { MenuItem } from "@/lib/types"
 import { toast } from "sonner"
 
 export function MenuItemsTab() {
   const { categories, menuItems, addMenuItem, updateMenuItem, deleteMenuItem } = useMenu()
+  const { refetch: refetchMenuItems } = useMenuItems()
   const api = useApiClient()
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [editingItem, setEditingItem] = useState<MenuItem | null>(null)
@@ -89,11 +91,13 @@ export function MenuItemsTab() {
         const itemId = parseInt(editingItem.id)
         const updatedItem = await api.patchFormData(`/menu-items/${itemId}/`, formDataToSend)
         updateMenuItem(editingItem.id, updatedItem)
+        refetchMenuItems() // Refetch to ensure data is updated
         toast.success("Taom yangilandi")
       } else {
         // Create new item
         const newItem = await api.postFormData('/menu-items/', formDataToSend)
         addMenuItem(newItem)
+        refetchMenuItems() // Refetch to ensure data is updated
         toast.success("Taom qo'shildi")
       }
 
@@ -143,6 +147,7 @@ export function MenuItemsTab() {
         const itemId = parseInt(itemToDelete.id)
         await api.delete(`/menu-items/${itemId}/`)
         deleteMenuItem(itemToDelete.id)
+        refetchMenuItems() // Refetch to ensure data is updated
         toast.success("Taom o'chirildi")
         setDeleteDialogOpen(false)
         setItemToDelete(null)
@@ -408,8 +413,14 @@ export function MenuItemsTab() {
                     onChange={(e) => {
                       const value = e.target.value;
                       // Allow only numbers and dash for range format like "15-20"
-                      const rangePattern = /^\d+(-\d+)?$/;
-                      if (value === '' || rangePattern.test(value)) {
+                      // Simple validation: only digits and single dash allowed
+                      const isValid = /^[\d-]*$/.test(value) && 
+                                    !value.includes('--') && 
+                                    !value.startsWith('-') && 
+                                    !value.endsWith('-') &&
+                                    (value === '' || /^\d+(-\d+)?$/.test(value));
+                      
+                      if (isValid) {
                         setFormData({ ...formData, prep_time: value });
                       }
                     }}
