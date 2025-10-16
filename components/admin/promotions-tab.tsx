@@ -34,6 +34,7 @@ export function PromotionsTab() {
     descriptionUz: "",
     descriptionRu: "",
     image: "",
+    imageFile: null as File | null,
     discount: 0,
     active: true,
     startDate: "",
@@ -45,7 +46,7 @@ export function PromotionsTab() {
     if (file) {
       const reader = new FileReader()
       reader.onloadend = () => {
-        setFormData({ ...formData, image: reader.result as string })
+        setFormData({ ...formData, image: reader.result as string, imageFile: file })
       }
       reader.readAsDataURL(file)
     }
@@ -55,13 +56,30 @@ export function PromotionsTab() {
     e.preventDefault()
 
     try {
+      // Create FormData for image upload
+      const formDataToSend = new FormData()
+      formDataToSend.append('title', formData.title)
+      formDataToSend.append('title_uz', formData.titleUz)
+      formDataToSend.append('title_ru', formData.titleRu)
+      formDataToSend.append('description', formData.description)
+      formDataToSend.append('description_uz', formData.descriptionUz)
+      formDataToSend.append('description_ru', formData.descriptionRu)
+      formDataToSend.append('discount', formData.discount.toString())
+      formDataToSend.append('active', formData.active.toString())
+      formDataToSend.append('start_date', formData.startDate)
+      formDataToSend.append('end_date', formData.endDate)
+      
+      if (formData.imageFile) {
+        formDataToSend.append('image', formData.imageFile)
+      }
+
       if (editingPromotion) {
         const promotionId = parseInt(editingPromotion.id)
-        const updatedPromotion = await api.patch(`/promotions/${promotionId}/`, formData)
+        const updatedPromotion = await api.patchFormData(`/promotions/${promotionId}/`, formDataToSend)
         updatePromotion(editingPromotion.id, updatedPromotion)
         toast.success("Aksiya yangilandi")
       } else {
-        const newPromotion = await api.post('/promotions/', formData)
+        const newPromotion = await api.postFormData('/promotions/', formDataToSend)
         addPromotion(newPromotion)
         toast.success("Aksiya qo'shildi")
       }
@@ -85,6 +103,7 @@ export function PromotionsTab() {
       descriptionUz: promotion.descriptionUz,
       descriptionRu: promotion.descriptionRu,
       image: promotion.image,
+      imageFile: null,
       discount: promotion.discount,
       active: promotion.active,
       startDate: promotion.startDate,
@@ -130,6 +149,7 @@ export function PromotionsTab() {
       descriptionUz: "",
       descriptionRu: "",
       image: "",
+      imageFile: null,
       discount: 0,
       active: true,
       startDate: "",
