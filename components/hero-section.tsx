@@ -57,6 +57,11 @@ export function HeroSection() {
                   ? "bg-white/40 backdrop-blur-md text-white shadow-lg scale-105 border border-white/50"
                   : "text-white/80 hover:text-white hover:bg-white/20"
               }`}
+              style={{
+                WebkitTextStroke: language === lang ? "1px #fbbf24" : "none",
+                paintOrder: "stroke fill",
+                textShadow: language === lang ? "0 0 8px rgba(251, 191, 36, 0.3)" : "none",
+              }}
             >
               {lang === "uz" ? "O'zbekcha" : lang === "ru" ? "Русский" : "English"}
             </button>
