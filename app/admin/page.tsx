@@ -1,5 +1,5 @@
 "use client"
-import { ArrowLeft, Package, Tag, Megaphone, MessageSquare, LogOut } from "lucide-react"
+import { ArrowLeft, Package, Tag, Megaphone, MessageSquare, LogOut, Plus } from "lucide-react"
 import Link from "next/link"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { CategoriesTab } from "@/components/admin/categories-tab"
@@ -7,8 +7,11 @@ import { MenuItemsTab } from "@/components/admin/menu-items-tab"
 import { PromotionsTab } from "@/components/admin/promotions-tab"
 import { FeedbackTab } from "@/components/admin/feedback-tab"
 import { toast } from "sonner"
+import { useState } from "react"
 
 export default function AdminPage() {
+  const [activeTab, setActiveTab] = useState("categories")
+  
   const handleLogout = () => {
     if (typeof window !== "undefined") {
       localStorage.removeItem("adminAuth")
@@ -16,66 +19,96 @@ export default function AdminPage() {
     toast.success("Chiqish muvaffaqiyatli!")
     window.location.href = "/admin/login"
   }
+
+  const handleAddClick = () => {
+    // Handle add button click based on active tab
+    toast.info(`Yangi ${activeTab === "categories" ? "kategoriya" : activeTab === "items" ? "taom" : activeTab === "promotions" ? "aksiya" : "fikr"} qo'shish`)
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900">
       <div className="fixed inset-0 bg-[url('/tokyo-restaurant-night.png')] bg-cover bg-center bg-fixed opacity-10 pointer-events-none" />
-      <div className="relative z-10 container mx-auto px-3 md:px-4 py-4 md:py-8">
-        {/* Header */}
-        <div className="flex items-center justify-between gap-2 md:gap-4 mb-6 md:mb-8">
-          <div className="flex items-center gap-2 md:gap-4">
-            <Link
-              href="/"
-              className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-white/20 backdrop-blur-xl flex items-center justify-center hover:bg-white/30 transition-all border border-white/30"
-            >
-              <ArrowLeft className="w-4 h-4 md:w-6 md:h-6 text-white" />
-            </Link>
-            <h1 className="text-xl md:text-3xl lg:text-4xl font-bold text-white">Admin Panel</h1>
+      <div className="relative z-10">
+        {/* Mobile Header */}
+        <div className="sticky top-0 z-50 bg-slate-900/80 backdrop-blur-xl border-b border-white/10">
+          <div className="px-4 py-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <Link
+                  href="/"
+                  className="w-9 h-9 rounded-full bg-white/20 backdrop-blur-xl flex items-center justify-center hover:bg-white/30 transition-all border border-white/30"
+                >
+                  <ArrowLeft className="w-4 h-4 text-white" />
+                </Link>
+                <h1 className="text-lg font-bold text-white">Admin Panel</h1>
+              </div>
+              
+              <button
+                onClick={handleLogout}
+                className="w-9 h-9 rounded-full bg-red-500/20 backdrop-blur-xl flex items-center justify-center hover:bg-red-500/30 transition-all border border-red-500/30"
+              >
+                <LogOut className="w-4 h-4 text-red-400" />
+              </button>
+            </div>
           </div>
-          
-          {/* Logout Button */}
-          <button
-            onClick={handleLogout}
-            className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-red-500/20 backdrop-blur-xl flex items-center justify-center hover:bg-red-500/30 transition-all border border-red-500/30"
-          >
-            <LogOut className="w-4 h-4 md:w-5 md:h-5 text-red-400" />
-          </button>
         </div>
 
-        <Tabs defaultValue="categories" className="w-full">
-          <TabsList className="bg-white/10 backdrop-blur-xl border border-white/20 p-1 mb-6 md:mb-8 grid grid-cols-2 md:grid-cols-4 w-full max-w-3xl gap-1 md:gap-0">
-            <TabsTrigger
-              value="categories"
-              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-amber-600 data-[state=active]:text-white text-white/70 rounded-lg text-xs md:text-sm px-2 md:px-3 py-2 md:py-2.5"
+        {/* Mobile Tabs */}
+        <div className="px-4 py-3">
+          <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-2">
+            <button
+              onClick={() => setActiveTab("categories")}
+              className={`flex items-center gap-2 px-4 py-2.5 rounded-full whitespace-nowrap transition-all ${
+                activeTab === "categories"
+                  ? "bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-lg"
+                  : "bg-white/10 text-white/70 hover:bg-white/20"
+              }`}
             >
-              <Tag className="w-3 h-3 md:w-4 md:h-4 mr-1 md:mr-2" />
-              <span className="hidden sm:inline">Kategoriyalar</span>
-              <span className="sm:hidden">Kat.</span>
-            </TabsTrigger>
-            <TabsTrigger
-              value="items"
-              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-amber-600 data-[state=active]:text-white text-white/70 rounded-lg text-xs md:text-sm px-2 md:px-3 py-2 md:py-2.5"
+              <Tag className="w-4 h-4" />
+              <span className="text-sm font-medium">Kategoriyalar</span>
+            </button>
+            
+            <button
+              onClick={() => setActiveTab("items")}
+              className={`flex items-center gap-2 px-4 py-2.5 rounded-full whitespace-nowrap transition-all ${
+                activeTab === "items"
+                  ? "bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-lg"
+                  : "bg-white/10 text-white/70 hover:bg-white/20"
+              }`}
             >
-              <Package className="w-3 h-3 md:w-4 md:h-4 mr-1 md:mr-2" />
-              <span className="hidden sm:inline">Taomlar</span>
-              <span className="sm:hidden">Taom</span>
-            </TabsTrigger>
-            <TabsTrigger
-              value="promotions"
-              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-amber-600 data-[state=active]:text-white text-white/70 rounded-lg text-xs md:text-sm px-2 md:px-3 py-2 md:py-2.5"
+              <Package className="w-4 h-4" />
+              <span className="text-sm font-medium">Taomlar</span>
+            </button>
+            
+            <button
+              onClick={() => setActiveTab("promotions")}
+              className={`flex items-center gap-2 px-4 py-2.5 rounded-full whitespace-nowrap transition-all ${
+                activeTab === "promotions"
+                  ? "bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-lg"
+                  : "bg-white/10 text-white/70 hover:bg-white/20"
+              }`}
             >
-              <Megaphone className="w-3 h-3 md:w-4 md:h-4 mr-1 md:mr-2" />
-              <span className="hidden sm:inline">Aksiyalar</span>
-              <span className="sm:hidden">Aks.</span>
-            </TabsTrigger>
-            <TabsTrigger
-              value="feedback"
-              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-amber-600 data-[state=active]:text-white text-white/70 rounded-lg text-xs md:text-sm px-2 md:px-3 py-2 md:py-2.5"
+              <Megaphone className="w-4 h-4" />
+              <span className="text-sm font-medium">Aksiyalar</span>
+            </button>
+            
+            <button
+              onClick={() => setActiveTab("feedback")}
+              className={`flex items-center gap-2 px-4 py-2.5 rounded-full whitespace-nowrap transition-all ${
+                activeTab === "feedback"
+                  ? "bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-lg"
+                  : "bg-white/10 text-white/70 hover:bg-white/20"
+              }`}
             >
-              <MessageSquare className="w-3 h-3 md:w-4 md:h-4 mr-1 md:mr-2" />
-              <span className="hidden sm:inline">Fikrlar</span>
-              <span className="sm:hidden">Fikr</span>
-            </TabsTrigger>
-          </TabsList>
+              <MessageSquare className="w-4 h-4" />
+              <span className="text-sm font-medium">Fikrlar</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Content Area */}
+        <div className="px-4 pb-20">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
 
             <TabsContent value="categories">
               <CategoriesTab />
@@ -94,6 +127,14 @@ export default function AdminPage() {
             </TabsContent>
           </Tabs>
         </div>
+
+        {/* Floating Action Button */}
+        <button
+          onClick={handleAddClick}
+          className="fixed bottom-6 right-6 w-14 h-14 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 rounded-full shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center z-40"
+        >
+          <Plus className="w-6 h-6 text-white" />
+        </button>
       </div>
     </div>
   )
