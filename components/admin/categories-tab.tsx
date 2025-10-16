@@ -3,9 +3,10 @@
 import type React from "react"
 
 import { useState } from "react"
-import { Plus, Pencil, Trash2 } from "lucide-react"
+import { Plus, Pencil, Trash2, AlertTriangle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useMenu } from "@/lib/menu-context"
@@ -17,6 +18,8 @@ export function CategoriesTab() {
   const { categories, addCategory, updateCategory, deleteCategory } = useMenu()
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [editingCategory, setEditingCategory] = useState<Category | null>(null)
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+  const [categoryToDelete, setCategoryToDelete] = useState<Category | null>(null)
   const [formData, setFormData] = useState({
     name: "",
     nameUz: "",
@@ -67,11 +70,23 @@ export function CategoriesTab() {
     setIsDialogOpen(true)
   }
 
-  const handleDelete = (id: string) => {
-    if (confirm("Kategoriyani o'chirishni xohlaysizmi?")) {
-      deleteCategory(id)
+  const handleDeleteClick = (category: Category) => {
+    setCategoryToDelete(category)
+    setDeleteDialogOpen(true)
+  }
+
+  const handleDeleteConfirm = () => {
+    if (categoryToDelete) {
+      deleteCategory(categoryToDelete.id)
       toast.success("Kategoriya o'chirildi")
+      setDeleteDialogOpen(false)
+      setCategoryToDelete(null)
     }
+  }
+
+  const handleDeleteCancel = () => {
+    setDeleteDialogOpen(false)
+    setCategoryToDelete(null)
   }
 
   const resetForm = () => {
@@ -217,7 +232,7 @@ export function CategoriesTab() {
                   <Button
                     size="icon"
                     variant="ghost"
-                    onClick={() => handleDelete(category.id)}
+                    onClick={() => handleDeleteClick(category)}
                     className="text-red-400 hover:text-red-300 hover:bg-red-500/20 rounded-full h-7 w-7 sm:h-8 sm:w-8"
                   >
                     <Trash2 className="w-3 h-3 sm:w-4 sm:h-4" />
@@ -227,6 +242,43 @@ export function CategoriesTab() {
             </div>
           ))}
       </div>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent className="bg-slate-800 border-slate-700 text-white max-w-md mx-4">
+          <AlertDialogHeader>
+            <div className="flex items-center gap-3 mb-2">
+              <div className="w-10 h-10 rounded-full bg-red-500/20 flex items-center justify-center">
+                <AlertTriangle className="w-5 h-5 text-red-400" />
+              </div>
+              <AlertDialogTitle className="text-lg font-bold">
+                Kategoriyani o'chirish
+              </AlertDialogTitle>
+            </div>
+            <AlertDialogDescription className="text-white/70">
+              <strong>"{categoryToDelete?.nameUz || categoryToDelete?.name}"</strong> kategoriyasini o'chirishni xohlaysizmi?
+              <br />
+              <span className="text-red-400 text-sm mt-2 block">
+                ⚠️ Bu amalni qaytarib bo'lmaydi!
+              </span>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="flex gap-2">
+            <AlertDialogCancel 
+              onClick={handleDeleteCancel}
+              className="bg-white/10 border-white/20 text-white hover:bg-white/20"
+            >
+              Bekor qilish
+            </AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={handleDeleteConfirm}
+              className="bg-red-500 hover:bg-red-600 text-white"
+            >
+              O'chirish
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }

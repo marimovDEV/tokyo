@@ -175,6 +175,10 @@ export function MenuProvider({ children }: { children: React.ReactNode }) {
 
   const deleteCategory = (id: string) => {
     setCategories((prev) => prev.filter((cat) => cat.id !== id))
+    // Force refresh API data
+    setTimeout(() => {
+      window.location.reload()
+    }, 1000)
   }
 
   const addMenuItem = (item: MenuItem) => {
@@ -187,6 +191,10 @@ export function MenuProvider({ children }: { children: React.ReactNode }) {
 
   const deleteMenuItem = (id: string) => {
     setMenuItems((prev) => prev.filter((item) => item.id !== id))
+    // Force refresh API data
+    setTimeout(() => {
+      window.location.reload()
+    }, 1000)
   }
 
   const addPromotion = (promotion: Promotion) => {
@@ -199,6 +207,10 @@ export function MenuProvider({ children }: { children: React.ReactNode }) {
 
   const deletePromotion = (id: string) => {
     setPromotions((prev) => prev.filter((promo) => promo.id !== id))
+    // Force refresh API data
+    setTimeout(() => {
+      window.location.reload()
+    }, 1000)
   }
 
   return (
