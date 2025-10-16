@@ -3,69 +3,87 @@
 import type React from "react"
 
 import { useState } from "react"
-import { Plus, Pencil, Trash2, AlertTriangle } from "lucide-react"
+import { Plus, Pencil, Trash2, AlertTriangle, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useMenu } from "@/lib/menu-context"
+import { useApiClient } from "@/hooks/use-api"
 import type { Category } from "@/lib/types"
 import { toast } from "sonner"
 import Image from "next/image"
 
 export function CategoriesTab() {
   const { categories, addCategory, updateCategory, deleteCategory } = useMenu()
+  const api = useApiClient()
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [editingCategory, setEditingCategory] = useState<Category | null>(null)
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [categoryToDelete, setCategoryToDelete] = useState<Category | null>(null)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isDeleting, setIsDeleting] = useState(false)
   const [formData, setFormData] = useState({
     name: "",
-    nameUz: "",
-    nameRu: "",
-    image: "",
-    order: 0,
+    name_uz: "",
+    name_ru: "",
+    image: null as File | null,
+    is_active: true,
   })
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (file) {
-      const reader = new FileReader()
-      reader.onloadend = () => {
-        setFormData({ ...formData, image: reader.result as string })
-      }
-      reader.readAsDataURL(file)
+      setFormData({ ...formData, image: file })
     }
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    setIsSubmitting(true)
 
-    if (editingCategory) {
-      updateCategory(editingCategory.id, formData)
-      toast.success("Kategoriya yangilandi")
-    } else {
-      const newCategory: Category = {
-        id: Date.now().toString(),
-        ...formData,
+    try {
+      const formDataToSend = new FormData()
+      formDataToSend.append('name', formData.name)
+      formDataToSend.append('name_uz', formData.name_uz)
+      formDataToSend.append('name_ru', formData.name_ru)
+      formDataToSend.append('is_active', formData.is_active.toString())
+      
+      if (formData.image) {
+        formDataToSend.append('image', formData.image)
       }
-      addCategory(newCategory)
-      toast.success("Kategoriya qo'shildi")
-    }
 
-    setIsDialogOpen(false)
-    resetForm()
+      if (editingCategory) {
+        // Update existing category
+        const updatedCategory = await api.patchFormData(`/categories/${editingCategory.id}/`, formDataToSend)
+        updateCategory(editingCategory.id, updatedCategory)
+        toast.success("Kategoriya yangilandi")
+      } else {
+        // Create new category
+        const newCategory = await api.postFormData('/categories/', formDataToSend)
+        addCategory(newCategory)
+        toast.success("Kategoriya qo'shildi")
+      }
+
+      setIsDialogOpen(false)
+      resetForm()
+    } catch (error) {
+      console.error('Error saving category:', error)
+      toast.error("Xatolik yuz berdi. Qaytadan urinib ko'ring.")
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   const handleEdit = (category: Category) => {
     setEditingCategory(category)
     setFormData({
-      name: category.name,
-      nameUz: category.nameUz,
-      nameRu: category.nameRu,
-      image: category.image,
-      order: category.order,
+      name: category.name || "",
+      name_uz: category.name_uz || "",
+      name_ru: category.name_ru || "",
+      image: null,
+      is_active: category.is_active !== false,
     })
     setIsDialogOpen(true)
   }
@@ -75,12 +93,21 @@ export function CategoriesTab() {
     setDeleteDialogOpen(true)
   }
 
-  const handleDeleteConfirm = () => {
+  const handleDeleteConfirm = async () => {
     if (categoryToDelete) {
-      deleteCategory(categoryToDelete.id)
-      toast.success("Kategoriya o'chirildi")
-      setDeleteDialogOpen(false)
-      setCategoryToDelete(null)
+      setIsDeleting(true)
+      try {
+        await api.delete(`/categories/${categoryToDelete.id}/`)
+        deleteCategory(categoryToDelete.id)
+        toast.success("Kategoriya o'chirildi")
+        setDeleteDialogOpen(false)
+        setCategoryToDelete(null)
+      } catch (error) {
+        console.error('Error deleting category:', error)
+        toast.error("Xatolik yuz berdi. Qaytadan urinib ko'ring.")
+      } finally {
+        setIsDeleting(false)
+      }
     }
   }
 
@@ -93,10 +120,10 @@ export function CategoriesTab() {
     setEditingCategory(null)
     setFormData({
       name: "",
-      nameUz: "",
-      nameRu: "",
-      image: "",
-      order: 0,
+      name_uz: "",
+      name_ru: "",
+      image: null,
+      is_active: true,
     })
   }
 
@@ -136,13 +163,13 @@ export function CategoriesTab() {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="nameUz" className="text-white text-sm">
+                  <Label htmlFor="name_uz" className="text-white text-sm">
                     Nomi (UZ)
                   </Label>
                   <Input
-                    id="nameUz"
-                    value={formData.nameUz}
-                    onChange={(e) => setFormData({ ...formData, nameUz: e.target.value })}
+                    id="name_uz"
+                    value={formData.name_uz}
+                    onChange={(e) => setFormData({ ...formData, name_uz: e.target.value })}
                     className="bg-white/10 border-white/20 text-white"
                     required
                   />
@@ -150,26 +177,13 @@ export function CategoriesTab() {
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="nameRu" className="text-white text-sm">
+                  <Label htmlFor="name_ru" className="text-white text-sm">
                     Nomi (RU)
                   </Label>
                   <Input
-                    id="nameRu"
-                    value={formData.nameRu}
-                    onChange={(e) => setFormData({ ...formData, nameRu: e.target.value })}
-                    className="bg-white/10 border-white/20 text-white"
-                    required
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="order" className="text-white text-sm">
-                    Tartib raqami
-                  </Label>
-                  <Input
-                    id="order"
-                    type="number"
-                    value={formData.order}
-                    onChange={(e) => setFormData({ ...formData, order: Number.parseInt(e.target.value) })}
+                    id="name_ru"
+                    value={formData.name_ru}
+                    onChange={(e) => setFormData({ ...formData, name_ru: e.target.value })}
                     className="bg-white/10 border-white/20 text-white"
                     required
                   />
@@ -191,16 +205,29 @@ export function CategoriesTab() {
                   </div>
                   {formData.image && (
                     <div className="relative w-full h-32 rounded-lg overflow-hidden">
-                      <Image src={formData.image || "/placeholder.svg"} alt="Preview" fill className="object-cover" />
+                      <Image src={URL.createObjectURL(formData.image)} alt="Preview" fill className="object-cover" />
+                    </div>
+                  )}
+                  {editingCategory && editingCategory.image && !formData.image && (
+                    <div className="relative w-full h-32 rounded-lg overflow-hidden">
+                      <Image src={editingCategory.image} alt="Current" fill className="object-cover" />
                     </div>
                   )}
                 </div>
               </div>
               <Button
                 type="submit"
-                className="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white"
+                disabled={isSubmitting}
+                className="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white disabled:opacity-50"
               >
-                {editingCategory ? "Yangilash" : "Qo'shish"}
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    {editingCategory ? "Yangilanmoqda..." : "Qo'shilmoqda..."}
+                  </>
+                ) : (
+                  editingCategory ? "Yangilash" : "Qo'shish"
+                )}
               </Button>
             </form>
           </DialogContent>
@@ -208,17 +235,17 @@ export function CategoriesTab() {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
-        {categories
-          .sort((a, b) => a.order - b.order)
-          .map((category) => (
+        {categories.map((category) => (
             <div
               key={category.id}
               className="bg-white/10 backdrop-blur-xl rounded-2xl p-3 sm:p-4 border border-white/20 shadow-xl"
             >
               <div className="flex justify-between items-start mb-3">
                 <div className="flex-1 min-w-0">
-                  <h3 className="text-base sm:text-lg font-bold text-white truncate">{category.nameUz}</h3>
-                  <p className="text-xs sm:text-sm text-white/60">Tartib: {category.order}</p>
+                  <h3 className="text-base sm:text-lg font-bold text-white truncate">{category.name_uz || category.name}</h3>
+                  <p className="text-xs sm:text-sm text-white/60">
+                    {category.is_active ? "Faol" : "Noaktiv"}
+                  </p>
                 </div>
                 <div className="flex gap-1 sm:gap-2 flex-shrink-0 ml-2">
                   <Button
@@ -256,7 +283,7 @@ export function CategoriesTab() {
               </AlertDialogTitle>
             </div>
             <AlertDialogDescription className="text-white/70">
-              <strong>"{categoryToDelete?.nameUz || categoryToDelete?.name}"</strong> kategoriyasini o'chirishni xohlaysizmi?
+              <strong>"{categoryToDelete?.name_uz || categoryToDelete?.name}"</strong> kategoriyasini o'chirishni xohlaysizmi?
               <br />
               <span className="text-red-400 text-sm mt-2 block">
                 ⚠️ Bu amalni qaytarib bo'lmaydi!
@@ -272,9 +299,17 @@ export function CategoriesTab() {
             </AlertDialogCancel>
             <AlertDialogAction 
               onClick={handleDeleteConfirm}
-              className="bg-red-500 hover:bg-red-600 text-white"
+              disabled={isDeleting}
+              className="bg-red-500 hover:bg-red-600 text-white disabled:opacity-50"
             >
-              O'chirish
+              {isDeleting ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  O'chirilmoqda...
+                </>
+              ) : (
+                "O'chirish"
+              )}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
