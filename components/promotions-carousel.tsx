@@ -34,7 +34,7 @@ export function PromotionsCarousel({ language }: PromotionsCarouselProps) {
         console.log('Auto-rotating carousel, prev:', prev, 'next:', nextIndex)
         return nextIndex
       })
-    }, 3000)
+    }, 5000)
 
     return () => {
       console.log('Clearing carousel auto-rotation interval')
@@ -44,7 +44,22 @@ export function PromotionsCarousel({ language }: PromotionsCarouselProps) {
 
   // Menu section'ga scroll qilish funksiyasi
   const scrollToMenu = () => {
-    // Menu sahifasida menu items grid'ni topadi
+    // Agar promotion'da linked_dish bo'lsa, shu taomga scroll qilish
+    if (currentPromotion?.linked_dish) {
+      const linkedDishId = currentPromotion.linked_dish.toString()
+      const dishElement = document.querySelector(`[data-menu-item-id="${linkedDishId}"]`)
+      if (dishElement) {
+        dishElement.scrollIntoView({ behavior: 'smooth', block: 'center' })
+        // Highlight effect uchun
+        dishElement.classList.add('highlight-promotion')
+        setTimeout(() => {
+          dishElement.classList.remove('highlight-promotion')
+        }, 3000)
+        return
+      }
+    }
+    
+    // Agar linked_dish yo'q bo'lsa yoki topilmasa, menu grid'ga scroll qilish
     const menuGrid = document.querySelector('.grid.grid-cols-1.sm\\:grid-cols-2.xl\\:grid-cols-3')
     if (menuGrid) {
       menuGrid.scrollIntoView({ behavior: 'smooth', block: 'start' })
@@ -55,6 +70,22 @@ export function PromotionsCarousel({ language }: PromotionsCarouselProps) {
   const handleAddPromotionToCart = () => {
     if (currentPromotion) {
       addPromotionToCart(currentPromotion)
+      
+      // Qo'shilgandan keyin linked_dish'ga scroll qilish
+      if (currentPromotion.linked_dish) {
+        setTimeout(() => {
+          const linkedDishId = currentPromotion.linked_dish.toString()
+          const dishElement = document.querySelector(`[data-menu-item-id="${linkedDishId}"]`)
+          if (dishElement) {
+            dishElement.scrollIntoView({ behavior: 'smooth', block: 'center' })
+            // Highlight effect uchun
+            dishElement.classList.add('highlight-added')
+            setTimeout(() => {
+              dishElement.classList.remove('highlight-added')
+            }, 3000)
+          }
+        }, 100)
+      }
     }
   }
 
