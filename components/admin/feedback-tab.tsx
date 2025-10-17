@@ -24,6 +24,27 @@ export function FeedbackTab() {
     }
   }
 
+  const getTypeColor = (type: "suggestion" | "complaint") => {
+    if (type === "complaint") {
+      return "bg-red-500/20 border-red-500/30 text-red-300"
+    }
+    return "bg-green-500/20 border-green-500/30 text-green-300"
+  }
+
+  const getTypeIcon = (type: "suggestion" | "complaint") => {
+    if (type === "complaint") {
+      return "⚠️"
+    }
+    return "💡"
+  }
+
+  const getTypeLabel = (type: "suggestion" | "complaint") => {
+    if (type === "complaint") {
+      return "Shikoyat"
+    }
+    return "Taklif"
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -41,20 +62,22 @@ export function FeedbackTab() {
           {feedbacks.map((feedback) => (
             <div
               key={feedback.id}
-              className="bg-white/10 backdrop-blur-xl rounded-2xl p-6 border border-white/20 hover:bg-white/15 transition-all"
+              className={`backdrop-blur-xl rounded-2xl p-6 border hover:bg-opacity-20 transition-all ${
+                feedback.type === "complaint" 
+                  ? "bg-red-500/10 border-red-500/30" 
+                  : "bg-green-500/10 border-green-500/30"
+              }`}
             >
               <div className="flex items-start justify-between gap-4 mb-4">
                 <div className="flex-1">
-                  <h3 className="text-xl font-bold text-white mb-2">{feedback.name}</h3>
+                  <div className="flex items-center gap-3 mb-2">
+                    <h3 className="text-xl font-bold text-white">{feedback.name}</h3>
+                    <span className={`px-3 py-1 rounded-full text-sm font-semibold border ${getTypeColor(feedback.type)}`}>
+                      <span className="mr-1">{getTypeIcon(feedback.type)}</span>
+                      {getTypeLabel(feedback.type)}
+                    </span>
+                  </div>
                   <div className="flex flex-wrap gap-4 text-sm text-white/70">
-                    {feedback.email && (
-                      <div className="flex items-center gap-2">
-                        <Mail className="w-4 h-4" />
-                        <a href={`mailto:${feedback.email}`} className="hover:text-amber-400 transition-colors">
-                          {feedback.email}
-                        </a>
-                      </div>
-                    )}
                     {feedback.phone && (
                       <div className="flex items-center gap-2">
                         <Phone className="w-4 h-4" />
@@ -75,12 +98,16 @@ export function FeedbackTab() {
                 </Button>
               </div>
 
-              <div className="bg-white/5 rounded-xl p-4 border border-white/10">
+              <div className={`rounded-xl p-4 border ${
+                feedback.type === "complaint"
+                  ? "bg-red-500/5 border-red-500/20"
+                  : "bg-green-500/5 border-green-500/20"
+              }`}>
                 <p className="text-white/90 leading-relaxed whitespace-pre-wrap">{feedback.message}</p>
               </div>
 
               <div className="mt-4 text-xs text-white/50">
-                {new Date(feedback.createdAt).toLocaleString("uz-UZ", {
+                {new Date(feedback.date).toLocaleString("uz-UZ", {
                   year: "numeric",
                   month: "long",
                   day: "numeric",
