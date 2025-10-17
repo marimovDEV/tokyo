@@ -31,22 +31,24 @@ export function PromotionsTab() {
   const [promotionToDelete, setPromotionToDelete] = useState<Promotion | null>(null)
   const [formData, setFormData] = useState({
     title: "",
-    titleUz: "",
-    titleRu: "",
+    title_uz: "",
+    title_ru: "",
     description: "",
-    descriptionUz: "",
-    descriptionRu: "",
+    description_uz: "",
+    description_ru: "",
     image: "",
     imageFile: null as File | null,
     discount_percentage: 0,
     discount_amount: 0,
-    active: true,
     is_active: true,
     start_date: "",
     end_date: "",
-    link: "",
     category: "",
     linked_dish: "",
+    price: 0,
+    ingredients: "",
+    ingredients_uz: "",
+    ingredients_ru: "",
   })
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -65,22 +67,31 @@ export function PromotionsTab() {
 
     try {
       // Create FormData for image upload
-      const formDataToSend = new FormData()
-      formDataToSend.append('title', formData.title)
-      formDataToSend.append('title_uz', formData.titleUz)
-      formDataToSend.append('title_ru', formData.titleRu)
-      formDataToSend.append('description', formData.description)
-      formDataToSend.append('description_uz', formData.descriptionUz)
-      formDataToSend.append('description_ru', formData.descriptionRu)
-      formDataToSend.append('discount_percentage', formData.discount_percentage.toString())
-      formDataToSend.append('discount_amount', formData.discount_amount.toString())
-      formDataToSend.append('active', formData.active.toString())
-      formDataToSend.append('is_active', formData.is_active.toString())
-      formDataToSend.append('start_date', formData.start_date)
-      formDataToSend.append('end_date', formData.end_date)
-      formDataToSend.append('link', formData.link)
-      if (formData.category) formDataToSend.append('category', formData.category)
-      if (formData.linked_dish) formDataToSend.append('linked_dish', formData.linked_dish)
+        const formDataToSend = new FormData()
+        formDataToSend.append('title', formData.title)
+        formDataToSend.append('title_uz', formData.title_uz)
+        formDataToSend.append('title_ru', formData.title_ru)
+        formDataToSend.append('description', formData.description)
+        formDataToSend.append('description_uz', formData.description_uz)
+        formDataToSend.append('description_ru', formData.description_ru)
+        formDataToSend.append('discount_percentage', formData.discount_percentage.toString())
+        formDataToSend.append('discount_amount', formData.discount_amount.toString())
+        formDataToSend.append('is_active', formData.is_active.toString())
+        formDataToSend.append('start_date', formData.start_date)
+        formDataToSend.append('end_date', formData.end_date)
+        formDataToSend.append('price', formData.price.toString())
+        
+        // Convert comma-separated strings to JSON arrays
+        const ingredientsArray = formData.ingredients ? formData.ingredients.split(',').map(item => item.trim()).filter(item => item) : []
+        const ingredientsUzArray = formData.ingredients_uz ? formData.ingredients_uz.split(',').map(item => item.trim()).filter(item => item) : []
+        const ingredientsRuArray = formData.ingredients_ru ? formData.ingredients_ru.split(',').map(item => item.trim()).filter(item => item) : []
+        
+        formDataToSend.append('ingredients', JSON.stringify(ingredientsArray))
+        formDataToSend.append('ingredients_uz', JSON.stringify(ingredientsUzArray))
+        formDataToSend.append('ingredients_ru', JSON.stringify(ingredientsRuArray))
+        
+        if (formData.category) formDataToSend.append('category', formData.category)
+        if (formData.linked_dish) formDataToSend.append('linked_dish', formData.linked_dish)
       
       if (formData.imageFile) {
         formDataToSend.append('image', formData.imageFile)
@@ -110,22 +121,24 @@ export function PromotionsTab() {
     setEditingPromotion(promotion)
     setFormData({
       title: promotion.title,
-      titleUz: promotion.titleUz,
-      titleRu: promotion.titleRu,
+      title_uz: promotion.title_uz || promotion.titleUz || "",
+      title_ru: promotion.title_ru || promotion.titleRu || "",
       description: promotion.description,
-      descriptionUz: promotion.descriptionUz,
-      descriptionRu: promotion.descriptionRu,
+      description_uz: promotion.description_uz || promotion.descriptionUz || "",
+      description_ru: promotion.description_ru || promotion.descriptionRu || "",
       image: promotion.image,
       imageFile: null,
       discount_percentage: promotion.discount_percentage || 0,
       discount_amount: promotion.discount_amount || 0,
-      active: promotion.active,
       is_active: promotion.is_active !== false,
       start_date: promotion.start_date || "",
       end_date: promotion.end_date || "",
-      link: promotion.link || "",
       category: promotion.category?.toString() || "",
       linked_dish: promotion.linked_dish?.toString() || "",
+      price: promotion.price || 0,
+      ingredients: Array.isArray(promotion.ingredients) ? promotion.ingredients.join(", ") : "",
+      ingredients_uz: Array.isArray(promotion.ingredients_uz) ? promotion.ingredients_uz.join(", ") : "",
+      ingredients_ru: Array.isArray(promotion.ingredients_ru) ? promotion.ingredients_ru.join(", ") : "",
     })
     setIsDialogOpen(true)
   }
@@ -161,22 +174,24 @@ export function PromotionsTab() {
     setEditingPromotion(null)
     setFormData({
       title: "",
-      titleUz: "",
-      titleRu: "",
+      title_uz: "",
+      title_ru: "",
       description: "",
-      descriptionUz: "",
-      descriptionRu: "",
+      description_uz: "",
+      description_ru: "",
       image: "",
       imageFile: null,
       discount_percentage: 0,
       discount_amount: 0,
-      active: true,
       is_active: true,
       start_date: "",
       end_date: "",
-      link: "",
       category: "",
       linked_dish: "",
+      price: 0,
+      ingredients: "",
+      ingredients_uz: "",
+      ingredients_ru: "",
     })
   }
 
@@ -359,28 +374,15 @@ export function PromotionsTab() {
                 </div>
               </div>
 
-              <div className="flex items-center gap-6">
-                <div className="flex items-center gap-3">
-                  <Switch
-                    id="active"
-                    checked={formData.active}
-                    onCheckedChange={(checked) => setFormData({ ...formData, active: checked })}
-                  />
-                  <Label htmlFor="active" className="text-white text-sm">
-                    Faol
-                  </Label>
-                </div>
-                
-                <div className="flex items-center gap-3">
-                  <Switch
-                    id="is_active"
-                    checked={formData.is_active}
-                    onCheckedChange={(checked) => setFormData({ ...formData, is_active: checked })}
-                  />
-                  <Label htmlFor="is_active" className="text-white text-sm">
-                    Ko'rinadi
-                  </Label>
-                </div>
+              <div className="flex items-center gap-3">
+                <Switch
+                  id="is_active"
+                  checked={formData.is_active}
+                  onCheckedChange={(checked) => setFormData({ ...formData, is_active: checked })}
+                />
+                <Label htmlFor="is_active" className="text-white text-sm">
+                  Ko'rinadi
+                </Label>
               </div>
 
               {/* Date Fields */}
@@ -411,18 +413,20 @@ export function PromotionsTab() {
                 </div>
               </div>
 
-              {/* Link Field */}
+              {/* Price Field */}
               <div>
-                <Label htmlFor="link" className="text-white text-sm">
-                  Havola (Link)
+                <Label htmlFor="price" className="text-white text-sm">
+                  Aksiya Narxi (so'm)
                 </Label>
                 <Input
-                  id="link"
-                  type="url"
-                  value={formData.link}
-                  onChange={(e) => setFormData({ ...formData, link: e.target.value })}
+                  id="price"
+                  type="number"
+                  min="0"
+                  value={formData.price}
+                  onChange={(e) => setFormData({ ...formData, price: Number(e.target.value) || 0 })}
                   className="bg-white/10 border-white/20 text-white text-sm"
-                  placeholder="https://example.com"
+                  placeholder="50000"
+                  required
                 />
               </div>
 
@@ -473,6 +477,50 @@ export function PromotionsTab() {
                 </div>
               </div>
 
+              {/* Ingredients Fields */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold text-white">Tarkibi</h3>
+                
+                <div>
+                  <Label htmlFor="ingredients" className="text-white text-sm">
+                    Tarkibi (EN)
+                  </Label>
+                  <Input
+                    id="ingredients"
+                    value={formData.ingredients}
+                    onChange={(e) => setFormData({ ...formData, ingredients: e.target.value })}
+                    className="bg-white/10 border-white/20 text-white text-sm"
+                    placeholder="Ingredient1, Ingredient2, Ingredient3"
+                  />
+                </div>
+                
+                <div>
+                  <Label htmlFor="ingredients_uz" className="text-white text-sm">
+                    Tarkibi (UZ)
+                  </Label>
+                  <Input
+                    id="ingredients_uz"
+                    value={formData.ingredients_uz}
+                    onChange={(e) => setFormData({ ...formData, ingredients_uz: e.target.value })}
+                    className="bg-white/10 border-white/20 text-white text-sm"
+                    placeholder="Mahsulot1, Mahsulot2, Mahsulot3"
+                  />
+                </div>
+                
+                <div>
+                  <Label htmlFor="ingredients_ru" className="text-white text-sm">
+                    Tarkibi (RU)
+                  </Label>
+                  <Input
+                    id="ingredients_ru"
+                    value={formData.ingredients_ru}
+                    onChange={(e) => setFormData({ ...formData, ingredients_ru: e.target.value })}
+                    className="bg-white/10 border-white/20 text-white text-sm"
+                    placeholder="Ингредиент1, Ингредиент2, Ингредиент3"
+                  />
+                </div>
+              </div>
+
               <Button
                 type="submit"
                 className="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white"
@@ -518,17 +566,17 @@ export function PromotionsTab() {
                 <div>
                   <h3 className="text-lg font-bold text-white">{promotion.titleUz}</h3>
                   <p className="text-sm text-white/60 mb-2">{promotion.descriptionUz}</p>
-                  <div className="text-amber-400 font-bold text-lg">
-                    {promotion.discount_percentage > 0 && (
-                      <p>{promotion.discount_percentage}% chegirma</p>
-                    )}
-                    {promotion.discount_amount > 0 && (
-                      <p>{promotion.discount_amount.toLocaleString()} so'm chegirma</p>
-                    )}
-                    {promotion.discount_percentage === 0 && promotion.discount_amount === 0 && (
-                      <p>Chegirma yo'q</p>
-                    )}
-                  </div>
+              <div className="text-amber-400 font-bold text-lg">
+                {promotion.discount_percentage > 0 && (
+                  <p>{promotion.discount_percentage}% chegirma</p>
+                )}
+                {promotion.discount_percentage === 0 && promotion.discount_amount > 0 && (
+                  <p>{promotion.discount_amount.toLocaleString()} so'm chegirma</p>
+                )}
+                {promotion.price > 0 && (
+                  <p>Narx: {promotion.price.toLocaleString()} so'm</p>
+                )}
+              </div>
                 </div>
                 <div className="flex gap-2">
                   <Button
