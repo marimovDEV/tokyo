@@ -56,6 +56,11 @@ export function PromotionsTab() {
     ingredients_ru: "",
   })
 
+  // Refresh promotions data when component mounts
+  useEffect(() => {
+    refetchPromotions()
+  }, [refetchPromotions])
+
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (file) {
@@ -160,15 +165,17 @@ export function PromotionsTab() {
     if (promotionToDelete) {
       try {
         const promotionId = parseInt(promotionToDelete.id)
+        console.log('Deleting promotion with ID:', promotionId)
         await api.delete(`/promotions/${promotionId}/`)
+        console.log('Promotion deleted successfully')
         deletePromotion(promotionToDelete.id)
-        refetchPromotions() // Refetch to ensure data is updated
+        await refetchPromotions() // Wait for refetch to complete
         toast.success("Aksiya o'chirildi")
         setDeleteDialogOpen(false)
         setPromotionToDelete(null)
       } catch (error) {
         console.error('Error deleting promotion:', error)
-        toast.error("Xatolik yuz berdi. Qaytadan urinib ko'ring.")
+        toast.error(`Xatolik yuz berdi: ${error.message || 'Noma\'lum xato'}`)
       }
     }
   }
