@@ -66,7 +66,7 @@ export function useTextContent(contentType?: string, key?: string) {
 
   useEffect(() => {
     fetchTextContent()
-  }, [fetchTextContent])
+  }, [contentType, key]) // Depend on parameters, not function
 
   const getText = useCallback((key: string, language: string = 'uz', fallback?: string) => {
     const item = textContent.find(content => content.key === key)
@@ -126,7 +126,7 @@ export function useSiteSettings() {
 
   useEffect(() => {
     fetchSettings()
-  }, [fetchSettings])
+  }, []) // Empty dependency array to prevent infinite loop
 
   return { settings, loading, error }
 }
@@ -162,7 +162,7 @@ export function useRestaurantInfo() {
 
   useEffect(() => {
     fetchRestaurantInfo()
-  }, [fetchRestaurantInfo])
+  }, []) // Empty dependency array to prevent infinite loop
 
   return { restaurantInfo, loading, error }
 }

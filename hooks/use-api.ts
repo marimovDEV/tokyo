@@ -355,7 +355,7 @@ export function useCategories() {
 
   useEffect(() => {
     fetchCategories();
-  }, [fetchCategories]);
+  }, []); // Empty dependency array to prevent infinite loop
 
   const refetch = useCallback(() => {
     fetchCategories();
@@ -397,7 +397,7 @@ export function useMenuItems() {
 
   useEffect(() => {
     fetchMenuItems();
-  }, [fetchMenuItems]);
+  }, []); // Empty dependency array to prevent infinite loop
 
   const refetch = useCallback(() => {
     fetchMenuItems();
@@ -470,7 +470,7 @@ export function usePromotions() {
 
   useEffect(() => {
     fetchPromotions();
-  }, [fetchPromotions]);
+  }, []); // Empty dependency array to prevent infinite loop
 
   const refetch = useCallback(() => {
     fetchPromotions();
