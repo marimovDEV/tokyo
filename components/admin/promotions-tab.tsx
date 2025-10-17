@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Plus, Pencil, Trash2 } from "lucide-react"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
