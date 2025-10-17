@@ -12,7 +12,6 @@ import { MenuItemCard } from "@/components/menu-item-card"
 import { useLanguage } from "@/lib/language-context"
 import type { Language } from "@/lib/types"
 import { PromotionsCarousel } from "@/components/promotions-carousel"
-import { Footer } from "@/components/footer"
 
 export default function MenuPage() {
   const { language, setLanguage } = useLanguage()
@@ -169,9 +168,6 @@ export default function MenuPage() {
           </Button>
         </Link>
       )}
-
-      {/* Footer */}
-      <Footer />
     </div>
   )
 }

@@ -1,6 +1,5 @@
 import { HeroSection } from "@/components/hero-section"
 import { PromotionsSection } from "@/components/promotions-section"
-import { Footer } from "@/components/footer"
 import Link from "next/link"
 
 export default function Home() {
@@ -42,9 +41,6 @@ export default function Home() {
           </Link>
         </div>
       </section>
-
-      {/* Footer */}
-      <Footer />
     </main>
   )
 }
