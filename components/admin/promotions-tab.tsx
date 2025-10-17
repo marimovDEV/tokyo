@@ -31,11 +31,7 @@ export function PromotionsTab() {
   const [promotionToDelete, setPromotionToDelete] = useState<Promotion | null>(null)
   const [formData, setFormData] = useState({
     title: "",
-    title_uz: "",
-    title_ru: "",
     description: "",
-    description_uz: "",
-    description_ru: "",
     image: "",
     imageFile: null as File | null,
     discount_percentage: 0,
@@ -47,6 +43,15 @@ export function PromotionsTab() {
     linked_dish: "none",
     price: 0,
     ingredients: "",
+  })
+
+  // Language selection for multilingual fields
+  const [currentLang, setCurrentLang] = useState<'uz' | 'ru' | 'en'>('uz')
+  const [multilingualData, setMultilingualData] = useState({
+    title_uz: "",
+    title_ru: "",
+    description_uz: "",
+    description_ru: "",
     ingredients_uz: "",
     ingredients_ru: "",
   })
@@ -66,14 +71,14 @@ export function PromotionsTab() {
     e.preventDefault()
 
     try {
-      // Create FormData for image upload
+        // Create FormData for image upload
         const formDataToSend = new FormData()
         formDataToSend.append('title', formData.title)
-        formDataToSend.append('title_uz', formData.title_uz)
-        formDataToSend.append('title_ru', formData.title_ru)
+        formDataToSend.append('title_uz', multilingualData.title_uz)
+        formDataToSend.append('title_ru', multilingualData.title_ru)
         formDataToSend.append('description', formData.description)
-        formDataToSend.append('description_uz', formData.description_uz)
-        formDataToSend.append('description_ru', formData.description_ru)
+        formDataToSend.append('description_uz', multilingualData.description_uz)
+        formDataToSend.append('description_ru', multilingualData.description_ru)
         formDataToSend.append('discount_percentage', formData.discount_percentage.toString())
         formDataToSend.append('discount_amount', formData.discount_amount.toString())
         formDataToSend.append('is_active', formData.is_active.toString())
@@ -83,8 +88,8 @@ export function PromotionsTab() {
         
         // Convert comma-separated strings to JSON arrays
         const ingredientsArray = formData.ingredients ? formData.ingredients.split(',').map(item => item.trim()).filter(item => item) : []
-        const ingredientsUzArray = formData.ingredients_uz ? formData.ingredients_uz.split(',').map(item => item.trim()).filter(item => item) : []
-        const ingredientsRuArray = formData.ingredients_ru ? formData.ingredients_ru.split(',').map(item => item.trim()).filter(item => item) : []
+        const ingredientsUzArray = multilingualData.ingredients_uz ? multilingualData.ingredients_uz.split(',').map(item => item.trim()).filter(item => item) : []
+        const ingredientsRuArray = multilingualData.ingredients_ru ? multilingualData.ingredients_ru.split(',').map(item => item.trim()).filter(item => item) : []
         
         formDataToSend.append('ingredients', JSON.stringify(ingredientsArray))
         formDataToSend.append('ingredients_uz', JSON.stringify(ingredientsUzArray))
@@ -121,11 +126,7 @@ export function PromotionsTab() {
     setEditingPromotion(promotion)
     setFormData({
       title: promotion.title,
-      title_uz: promotion.title_uz || promotion.titleUz || "",
-      title_ru: promotion.title_ru || promotion.titleRu || "",
       description: promotion.description,
-      description_uz: promotion.description_uz || promotion.descriptionUz || "",
-      description_ru: promotion.description_ru || promotion.descriptionRu || "",
       image: promotion.image,
       imageFile: null,
       discount_percentage: promotion.discount_percentage || 0,
@@ -137,9 +138,16 @@ export function PromotionsTab() {
       linked_dish: promotion.linked_dish?.toString() || "none",
       price: promotion.price || 0,
       ingredients: Array.isArray(promotion.ingredients) ? promotion.ingredients.join(", ") : "",
+    })
+    setMultilingualData({
+      title_uz: promotion.title_uz || promotion.titleUz || "",
+      title_ru: promotion.title_ru || promotion.titleRu || "",
+      description_uz: promotion.description_uz || promotion.descriptionUz || "",
+      description_ru: promotion.description_ru || promotion.descriptionRu || "",
       ingredients_uz: Array.isArray(promotion.ingredients_uz) ? promotion.ingredients_uz.join(", ") : "",
       ingredients_ru: Array.isArray(promotion.ingredients_ru) ? promotion.ingredients_ru.join(", ") : "",
     })
+    setCurrentLang('uz')
     setIsDialogOpen(true)
   }
 
@@ -174,11 +182,7 @@ export function PromotionsTab() {
     setEditingPromotion(null)
     setFormData({
       title: "",
-      title_uz: "",
-      title_ru: "",
       description: "",
-      description_uz: "",
-      description_ru: "",
       image: "",
       imageFile: null,
       discount_percentage: 0,
@@ -190,9 +194,16 @@ export function PromotionsTab() {
       linked_dish: "none",
       price: 0,
       ingredients: "",
+    })
+    setMultilingualData({
+      title_uz: "",
+      title_ru: "",
+      description_uz: "",
+      description_ru: "",
       ingredients_uz: "",
       ingredients_ru: "",
     })
+    setCurrentLang('uz')
   }
 
   return (
@@ -216,100 +227,110 @@ export function PromotionsTab() {
                 {editingPromotion ? "Aksiyani tahrirlash" : "Yangi aksiya"}
               </DialogTitle>
             </DialogHeader>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="grid grid-cols-3 gap-4">
-                <div>
-                  <Label htmlFor="title" className="text-white text-sm">
-                    Sarlavha (EN)
-                  </Label>
-                  <Input
-                    id="title"
-                    value={formData.title}
-                    onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                    className="bg-white/10 border-white/20 text-white text-sm"
-                    required
-                  />
+            <form onSubmit={handleSubmit} className="space-y-6">
+              {/* Title Field with Language Selection */}
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <Label className="text-white text-sm font-medium">Sarlavha</Label>
+                  <div className="flex gap-2">
+                    {(['uz', 'ru', 'en'] as const).map((lang) => (
+                      <button
+                        key={lang}
+                        type="button"
+                        onClick={() => setCurrentLang(lang)}
+                        className={`px-3 py-1 rounded-full text-xs font-medium transition-all ${
+                          currentLang === lang
+                            ? "bg-amber-500 text-white"
+                            : "bg-white/10 text-white/60 hover:bg-white/20"
+                        }`}
+                      >
+                        {lang === "uz" ? "UZ" : lang === "ru" ? "RU" : "EN"}
+                      </button>
+                    ))}
+                  </div>
                 </div>
-                <div>
-                  <Label htmlFor="titleUz" className="text-white text-sm">
-                    Sarlavha (UZ)
-                  </Label>
-                  <Input
-                    id="titleUz"
-                    value={formData.titleUz}
-                    onChange={(e) => setFormData({ ...formData, titleUz: e.target.value })}
-                    className="bg-white/10 border-white/20 text-white text-sm"
-                    required
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="titleRu" className="text-white text-sm">
-                    Sarlavha (RU)
-                  </Label>
-                  <Input
-                    id="titleRu"
-                    value={formData.titleRu}
-                    onChange={(e) => setFormData({ ...formData, titleRu: e.target.value })}
-                    className="bg-white/10 border-white/20 text-white text-sm"
-                    required
-                  />
-                </div>
+                <Input
+                  value={currentLang === 'uz' ? multilingualData.title_uz : 
+                         currentLang === 'ru' ? multilingualData.title_ru : formData.title}
+                  onChange={(e) => {
+                    if (currentLang === 'uz') {
+                      setMultilingualData({ ...multilingualData, title_uz: e.target.value })
+                    } else if (currentLang === 'ru') {
+                      setMultilingualData({ ...multilingualData, title_ru: e.target.value })
+                    } else {
+                      setFormData({ ...formData, title: e.target.value })
+                    }
+                  }}
+                  className="bg-white/10 border-white/20 text-white text-sm"
+                  placeholder={currentLang === 'uz' ? "O'zbekcha sarlavha" : 
+                             currentLang === 'ru' ? "Русский заголовок" : "English title"}
+                  required
+                />
               </div>
 
-              <div className="grid grid-cols-3 gap-4">
-                <div>
-                  <Label htmlFor="description" className="text-white text-sm">
-                    Tavsif (EN)
-                  </Label>
-                  <Textarea
-                    id="description"
-                    value={formData.description}
-                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                    className="bg-white/10 border-white/20 text-white text-sm min-h-[80px]"
-                    required
-                  />
+              {/* Description Field with Language Selection */}
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <Label className="text-white text-sm font-medium">Tavsif</Label>
+                  <div className="flex gap-2">
+                    {(['uz', 'ru', 'en'] as const).map((lang) => (
+                      <button
+                        key={lang}
+                        type="button"
+                        onClick={() => setCurrentLang(lang)}
+                        className={`px-3 py-1 rounded-full text-xs font-medium transition-all ${
+                          currentLang === lang
+                            ? "bg-amber-500 text-white"
+                            : "bg-white/10 text-white/60 hover:bg-white/20"
+                        }`}
+                      >
+                        {lang === "uz" ? "UZ" : lang === "ru" ? "RU" : "EN"}
+                      </button>
+                    ))}
+                  </div>
                 </div>
-                <div>
-                  <Label htmlFor="descriptionUz" className="text-white text-sm">
-                    Tavsif (UZ)
-                  </Label>
-                  <Textarea
-                    id="descriptionUz"
-                    value={formData.descriptionUz}
-                    onChange={(e) => setFormData({ ...formData, descriptionUz: e.target.value })}
-                    className="bg-white/10 border-white/20 text-white text-sm min-h-[80px]"
-                    required
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="descriptionRu" className="text-white text-sm">
-                    Tavsif (RU)
-                  </Label>
-                  <Textarea
-                    id="descriptionRu"
-                    value={formData.descriptionRu}
-                    onChange={(e) => setFormData({ ...formData, descriptionRu: e.target.value })}
-                    className="bg-white/10 border-white/20 text-white text-sm min-h-[80px]"
-                    required
-                  />
-                </div>
+                <Textarea
+                  value={currentLang === 'uz' ? multilingualData.description_uz : 
+                         currentLang === 'ru' ? multilingualData.description_ru : formData.description}
+                  onChange={(e) => {
+                    if (currentLang === 'uz') {
+                      setMultilingualData({ ...multilingualData, description_uz: e.target.value })
+                    } else if (currentLang === 'ru') {
+                      setMultilingualData({ ...multilingualData, description_ru: e.target.value })
+                    } else {
+                      setFormData({ ...formData, description: e.target.value })
+                    }
+                  }}
+                  className="bg-white/10 border-white/20 text-white text-sm min-h-[100px]"
+                  placeholder={currentLang === 'uz' ? "O'zbekcha tavsif" : 
+                             currentLang === 'ru' ? "Русское описание" : "English description"}
+                  required
+                />
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              {/* Image Upload */}
+              <div>
+                <Label htmlFor="image" className="text-white text-sm font-medium">
+                  Rasm
+                </Label>
+                <Input
+                  id="image"
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageUpload}
+                  className="bg-white/10 border-white/20 text-white text-sm file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-amber-500 file:text-white hover:file:bg-amber-600"
+                />
+                {formData.image && (
+                  <div className="relative w-full h-32 rounded-lg overflow-hidden mt-2">
+                    <Image src={formData.image || "/placeholder.svg"} alt="Preview" fill className="object-cover" />
+                  </div>
+                )}
+              </div>
+
+              {/* Discount Fields - Combined */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="image" className="text-white text-sm">
-                    Rasm
-                  </Label>
-                  <Input
-                    id="image"
-                    type="file"
-                    accept="image/*"
-                    onChange={handleImageUpload}
-                    className="bg-white/10 border-white/20 text-white text-sm file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-amber-500 file:text-white hover:file:bg-amber-600"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="discount_percentage" className="text-white text-sm">
+                  <Label htmlFor="discount_percentage" className="text-white text-sm font-medium">
                     Chegirma (%)
                   </Label>
                   <Input
@@ -324,7 +345,7 @@ export function PromotionsTab() {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="discount_amount" className="text-white text-sm">
+                  <Label htmlFor="discount_amount" className="text-white text-sm font-medium">
                     Chegirma Miqdori (so'm)
                   </Label>
                   <Input
@@ -339,83 +360,9 @@ export function PromotionsTab() {
                 </div>
               </div>
 
-              {formData.image && (
-                <div className="relative w-full h-40 rounded-lg overflow-hidden">
-                  <Image src={formData.image || "/placeholder.svg"} alt="Preview" fill className="object-cover" />
-                </div>
-              )}
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="startDate" className="text-white text-sm">
-                    Boshlanish sanasi
-                  </Label>
-                  <Input
-                    id="startDate"
-                    type="date"
-                    value={formData.startDate}
-                    onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
-                    className="bg-white/10 border-white/20 text-white text-sm"
-                    required
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="endDate" className="text-white text-sm">
-                    Tugash sanasi
-                  </Label>
-                  <Input
-                    id="endDate"
-                    type="date"
-                    value={formData.endDate}
-                    onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
-                    className="bg-white/10 border-white/20 text-white text-sm"
-                    required
-                  />
-                </div>
-              </div>
-
-              <div className="flex items-center gap-3">
-                <Switch
-                  id="is_active"
-                  checked={formData.is_active}
-                  onCheckedChange={(checked) => setFormData({ ...formData, is_active: checked })}
-                />
-                <Label htmlFor="is_active" className="text-white text-sm">
-                  Ko'rinadi
-                </Label>
-              </div>
-
-              {/* Date Fields */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="start_date" className="text-white text-sm">
-                    Boshlanish Sanasi
-                  </Label>
-                  <Input
-                    id="start_date"
-                    type="datetime-local"
-                    value={formData.start_date}
-                    onChange={(e) => setFormData({ ...formData, start_date: e.target.value })}
-                    className="bg-white/10 border-white/20 text-white text-sm"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="end_date" className="text-white text-sm">
-                    Tugash Sanasi
-                  </Label>
-                  <Input
-                    id="end_date"
-                    type="datetime-local"
-                    value={formData.end_date}
-                    onChange={(e) => setFormData({ ...formData, end_date: e.target.value })}
-                    className="bg-white/10 border-white/20 text-white text-sm"
-                  />
-                </div>
-              </div>
-
               {/* Price Field */}
               <div>
-                <Label htmlFor="price" className="text-white text-sm">
+                <Label htmlFor="price" className="text-white text-sm font-medium">
                   Aksiya Narxi (so'm)
                 </Label>
                 <Input
@@ -433,7 +380,7 @@ export function PromotionsTab() {
               {/* Category and Linked Dish */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="category" className="text-white text-sm">
+                  <Label htmlFor="category" className="text-white text-sm font-medium">
                     Kategoriya
                   </Label>
                   <Select
@@ -455,7 +402,7 @@ export function PromotionsTab() {
                 </div>
                 
                 <div>
-                  <Label htmlFor="linked_dish" className="text-white text-sm">
+                  <Label htmlFor="linked_dish" className="text-white text-sm font-medium">
                     Bog'langan Taom
                   </Label>
                   <Select
@@ -477,53 +424,89 @@ export function PromotionsTab() {
                 </div>
               </div>
 
-              {/* Ingredients Fields */}
-              <div className="space-y-4">
-                <h3 className="text-lg font-semibold text-white">Tarkibi</h3>
-                
+              {/* Ingredients Field with Language Selection */}
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <Label className="text-white text-sm font-medium">Tarkibi</Label>
+                  <div className="flex gap-2">
+                    {(['uz', 'ru', 'en'] as const).map((lang) => (
+                      <button
+                        key={lang}
+                        type="button"
+                        onClick={() => setCurrentLang(lang)}
+                        className={`px-3 py-1 rounded-full text-xs font-medium transition-all ${
+                          currentLang === lang
+                            ? "bg-amber-500 text-white"
+                            : "bg-white/10 text-white/60 hover:bg-white/20"
+                        }`}
+                      >
+                        {lang === "uz" ? "UZ" : lang === "ru" ? "RU" : "EN"}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <Input
+                  value={currentLang === 'uz' ? multilingualData.ingredients_uz : 
+                         currentLang === 'ru' ? multilingualData.ingredients_ru : formData.ingredients}
+                  onChange={(e) => {
+                    if (currentLang === 'uz') {
+                      setMultilingualData({ ...multilingualData, ingredients_uz: e.target.value })
+                    } else if (currentLang === 'ru') {
+                      setMultilingualData({ ...multilingualData, ingredients_ru: e.target.value })
+                    } else {
+                      setFormData({ ...formData, ingredients: e.target.value })
+                    }
+                  }}
+                  className="bg-white/10 border-white/20 text-white text-sm"
+                  placeholder={currentLang === 'uz' ? "Mahsulot1, Mahsulot2, Mahsulot3" : 
+                             currentLang === 'ru' ? "Ингредиент1, Ингредиент2, Ингредиент3" : 
+                             "Ingredient1, Ingredient2, Ingredient3"}
+                />
+              </div>
+
+              {/* Date Fields */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="ingredients" className="text-white text-sm">
-                    Tarkibi (EN)
+                  <Label htmlFor="start_date" className="text-white text-sm font-medium">
+                    Boshlanish Sanasi
                   </Label>
                   <Input
-                    id="ingredients"
-                    value={formData.ingredients}
-                    onChange={(e) => setFormData({ ...formData, ingredients: e.target.value })}
+                    id="start_date"
+                    type="datetime-local"
+                    value={formData.start_date}
+                    onChange={(e) => setFormData({ ...formData, start_date: e.target.value })}
                     className="bg-white/10 border-white/20 text-white text-sm"
-                    placeholder="Ingredient1, Ingredient2, Ingredient3"
                   />
                 </div>
-                
                 <div>
-                  <Label htmlFor="ingredients_uz" className="text-white text-sm">
-                    Tarkibi (UZ)
+                  <Label htmlFor="end_date" className="text-white text-sm font-medium">
+                    Tugash Sanasi
                   </Label>
                   <Input
-                    id="ingredients_uz"
-                    value={formData.ingredients_uz}
-                    onChange={(e) => setFormData({ ...formData, ingredients_uz: e.target.value })}
+                    id="end_date"
+                    type="datetime-local"
+                    value={formData.end_date}
+                    onChange={(e) => setFormData({ ...formData, end_date: e.target.value })}
                     className="bg-white/10 border-white/20 text-white text-sm"
-                    placeholder="Mahsulot1, Mahsulot2, Mahsulot3"
-                  />
-                </div>
-                
-                <div>
-                  <Label htmlFor="ingredients_ru" className="text-white text-sm">
-                    Tarkibi (RU)
-                  </Label>
-                  <Input
-                    id="ingredients_ru"
-                    value={formData.ingredients_ru}
-                    onChange={(e) => setFormData({ ...formData, ingredients_ru: e.target.value })}
-                    className="bg-white/10 border-white/20 text-white text-sm"
-                    placeholder="Ингредиент1, Ингредиент2, Ингредиент3"
                   />
                 </div>
               </div>
 
+              {/* Active Status */}
+              <div className="flex items-center gap-3">
+                <Switch
+                  id="is_active"
+                  checked={formData.is_active}
+                  onCheckedChange={(checked) => setFormData({ ...formData, is_active: checked })}
+                />
+                <Label htmlFor="is_active" className="text-white text-sm font-medium">
+                  Ko'rinadi
+                </Label>
+              </div>
+
               <Button
                 type="submit"
-                className="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white"
+                className="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white py-3 rounded-lg font-semibold"
               >
                 {editingPromotion ? "Yangilash" : "Qo'shish"}
               </Button>
