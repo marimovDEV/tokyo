@@ -39,10 +39,9 @@ export function PromotionsSection() {
     console.log('Starting auto-rotation for main section, promotions count:', activePromotions.length)
 
     const interval = setInterval(() => {
-      console.log('Auto-rotating main section, current index:', currentIndex)
       setCurrentIndex((prev) => {
         const nextIndex = (prev + 1) % activePromotions.length
-        console.log('Next index:', nextIndex)
+        console.log('Auto-rotating main section, prev:', prev, 'next:', nextIndex)
         return nextIndex
       })
     }, 3000)
@@ -51,7 +50,7 @@ export function PromotionsSection() {
       console.log('Clearing main section auto-rotation interval')
       clearInterval(interval)
     }
-  }, [activePromotions.length, currentIndex])
+  }, [activePromotions.length])
 
   // Menu sahifasiga scroll qilish funksiyasi
   const scrollToMenu = () => {

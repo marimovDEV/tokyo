@@ -42,10 +42,9 @@ export function PromotionsCarousel({ language }: PromotionsCarouselProps) {
     console.log('Starting auto-rotation for carousel, promotions count:', activePromotions.length)
 
     const interval = setInterval(() => {
-      console.log('Auto-rotating carousel, current index:', currentIndex)
       setCurrentIndex((prev) => {
         const nextIndex = (prev + 1) % activePromotions.length
-        console.log('Next index:', nextIndex)
+        console.log('Auto-rotating carousel, prev:', prev, 'next:', nextIndex)
         return nextIndex
       })
     }, 3000)
@@ -54,7 +53,7 @@ export function PromotionsCarousel({ language }: PromotionsCarouselProps) {
       console.log('Clearing carousel auto-rotation interval')
       clearInterval(interval)
     }
-  }, [activePromotions.length, currentIndex])
+  }, [activePromotions.length])
 
   // Menu sahifasiga scroll qilish funksiyasi
   const scrollToMenu = () => {
