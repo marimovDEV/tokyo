@@ -58,7 +58,16 @@ export function PromotionsTab() {
 
   // Refresh promotions data when component mounts
   useEffect(() => {
-    refetchPromotions()
+    // Force refresh with cache busting
+    const refreshPromotions = async () => {
+      try {
+        await refetchPromotions()
+        console.log('Promotions data refreshed successfully')
+      } catch (error) {
+        console.error('Error refreshing promotions:', error)
+      }
+    }
+    refreshPromotions()
   }, [refetchPromotions])
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
