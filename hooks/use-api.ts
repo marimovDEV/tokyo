@@ -10,7 +10,7 @@ export function useApiClient() {
   const apiClient = useMemo(() => ({
     // GET so'rovlar
     async get<T>(endpoint: string): Promise<T> {
-      const url = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api'}${endpoint}`;
+      const url = `${process.env.NEXT_PUBLIC_API_URL || 'http://193.42.124.54:8000/api'}${endpoint}`;
       
       try {
         const response = await fetch(url, {
@@ -36,7 +36,7 @@ export function useApiClient() {
     // POST so'rovlar
     async post<T>(endpoint: string, data: any): Promise<T> {
       const response = await makeAuthenticatedRequest(
-        `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api'}${endpoint}`,
+        `${process.env.NEXT_PUBLIC_API_URL || 'http://193.42.124.54:8000/api'}${endpoint}`,
         {
           method: 'POST',
           body: JSON.stringify(data),
@@ -54,7 +54,7 @@ export function useApiClient() {
     // PUT so'rovlar
     async put<T>(endpoint: string, data: any): Promise<T> {
       const response = await makeAuthenticatedRequest(
-        `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api'}${endpoint}`,
+        `${process.env.NEXT_PUBLIC_API_URL || 'http://193.42.124.54:8000/api'}${endpoint}`,
         {
           method: 'PUT',
           body: JSON.stringify(data),
@@ -72,7 +72,7 @@ export function useApiClient() {
     // PATCH so'rovlar
     async patch<T>(endpoint: string, data: any): Promise<T> {
       const response = await makeAuthenticatedRequest(
-        `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api'}${endpoint}`,
+        `${process.env.NEXT_PUBLIC_API_URL || 'http://193.42.124.54:8000/api'}${endpoint}`,
         {
           method: 'PATCH',
           body: JSON.stringify(data),
@@ -90,7 +90,7 @@ export function useApiClient() {
     // DELETE so'rovlar
     async delete(endpoint: string): Promise<void> {
       const response = await makeAuthenticatedRequest(
-        `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api'}${endpoint}`,
+        `${process.env.NEXT_PUBLIC_API_URL || 'http://193.42.124.54:8000/api'}${endpoint}`,
         {
           method: 'DELETE',
         }
@@ -105,7 +105,7 @@ export function useApiClient() {
     // FormData bilan so'rovlar (fayl yuklash uchun)
     async postFormData<T>(endpoint: string, formData: FormData): Promise<T> {
       const response = await makeAuthenticatedRequest(
-        `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api'}${endpoint}`,
+        `${process.env.NEXT_PUBLIC_API_URL || 'http://193.42.124.54:8000/api'}${endpoint}`,
         {
           method: 'POST',
           body: formData,
@@ -124,7 +124,7 @@ export function useApiClient() {
     // PATCH FormData bilan
     async patchFormData<T>(endpoint: string, formData: FormData): Promise<T> {
       const response = await makeAuthenticatedRequest(
-        `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api'}${endpoint}`,
+        `${process.env.NEXT_PUBLIC_API_URL || 'http://193.42.124.54:8000/api'}${endpoint}`,
         {
           method: 'PATCH',
           body: formData,
@@ -157,7 +157,7 @@ export function useReviews() {
     const fetchReviews = async () => {
       try {
         setLoading(true);
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api'}/reviews/`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://193.42.124.54:8000/api'}/reviews/`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -202,7 +202,7 @@ export function useRestaurantInfo() {
         
         // Add cache-busting to always get fresh data
         const timestamp = new Date().getTime();
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api'}/restaurant-info/?t=${timestamp}`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://193.42.124.54:8000/api'}/restaurant-info/?t=${timestamp}`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -246,7 +246,7 @@ export function useSiteSettings() {
         
         // Add cache-busting to always get fresh data
         const timestamp = new Date().getTime();
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api'}/site-settings/?t=${timestamp}`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://193.42.124.54:8000/api'}/site-settings/?t=${timestamp}`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -287,7 +287,7 @@ export function useCategories() {
       setLoading(true);
       setError(null);
       // Use show_all=true to get all categories including inactive ones for admin
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api'}/categories/?show_all=true`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://193.42.124.54:8000/api'}/categories/?show_all=true`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -329,7 +329,7 @@ export function useMenuItems() {
     try {
       setLoading(true);
       setError(null);
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api'}/menu-items/?show_all=true`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://193.42.124.54:8000/api'}/menu-items/?show_all=true`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -401,7 +401,7 @@ export function usePromotions() {
       setError(null);
       // Add cache busting to force fresh data
       const timestamp = new Date().getTime();
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api'}/promotions/?show_all=true&t=${timestamp}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://193.42.124.54:8000/api'}/promotions/?show_all=true&t=${timestamp}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
