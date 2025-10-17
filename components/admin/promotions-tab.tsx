@@ -68,7 +68,7 @@ export function PromotionsTab() {
       }
     }
     refreshPromotions()
-  }, [refetchPromotions])
+  }, []) // Empty dependency array to run only once
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
