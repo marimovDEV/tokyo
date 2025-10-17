@@ -7,6 +7,7 @@ import { useCart } from "@/lib/cart-context"
 import { useLanguage } from "@/lib/language-context"
 import type { Language } from "@/lib/types"
 import { toast } from "sonner"
+import { Footer } from "@/components/footer"
 
 export default function CartPage() {
   const { language, setLanguage } = useLanguage()
@@ -178,6 +179,9 @@ export default function CartPage() {
           )}
         </div>
       </div>
+
+      {/* Footer */}
+      <Footer />
     </div>
   )
 }
