@@ -43,8 +43,8 @@ export function PromotionsTab() {
     is_active: true,
     start_date: "",
     end_date: "",
-    category: "",
-    linked_dish: "",
+    category: "none",
+    linked_dish: "none",
     price: 0,
     ingredients: "",
     ingredients_uz: "",
@@ -90,8 +90,8 @@ export function PromotionsTab() {
         formDataToSend.append('ingredients_uz', JSON.stringify(ingredientsUzArray))
         formDataToSend.append('ingredients_ru', JSON.stringify(ingredientsRuArray))
         
-        if (formData.category) formDataToSend.append('category', formData.category)
-        if (formData.linked_dish) formDataToSend.append('linked_dish', formData.linked_dish)
+        if (formData.category && formData.category !== 'none') formDataToSend.append('category', formData.category)
+        if (formData.linked_dish && formData.linked_dish !== 'none') formDataToSend.append('linked_dish', formData.linked_dish)
       
       if (formData.imageFile) {
         formDataToSend.append('image', formData.imageFile)
@@ -133,8 +133,8 @@ export function PromotionsTab() {
       is_active: promotion.is_active !== false,
       start_date: promotion.start_date || "",
       end_date: promotion.end_date || "",
-      category: promotion.category?.toString() || "",
-      linked_dish: promotion.linked_dish?.toString() || "",
+      category: promotion.category?.toString() || "none",
+      linked_dish: promotion.linked_dish?.toString() || "none",
       price: promotion.price || 0,
       ingredients: Array.isArray(promotion.ingredients) ? promotion.ingredients.join(", ") : "",
       ingredients_uz: Array.isArray(promotion.ingredients_uz) ? promotion.ingredients_uz.join(", ") : "",
@@ -186,8 +186,8 @@ export function PromotionsTab() {
       is_active: true,
       start_date: "",
       end_date: "",
-      category: "",
-      linked_dish: "",
+      category: "none",
+      linked_dish: "none",
       price: 0,
       ingredients: "",
       ingredients_uz: "",
@@ -444,7 +444,7 @@ export function PromotionsTab() {
                       <SelectValue placeholder="Kategoriyani tanlang" />
                     </SelectTrigger>
                     <SelectContent className="bg-slate-900 border-white/20">
-                      <SelectItem value="" className="text-white">Kategoriya yo'q</SelectItem>
+                      <SelectItem value="none" className="text-white">Kategoriya yo'q</SelectItem>
                       {categories.map((cat) => (
                         <SelectItem key={cat.id} value={cat.id.toString()} className="text-white">
                           {cat.name_uz || cat.name}
@@ -466,7 +466,7 @@ export function PromotionsTab() {
                       <SelectValue placeholder="Taomni tanlang" />
                     </SelectTrigger>
                     <SelectContent className="bg-slate-900 border-white/20">
-                      <SelectItem value="" className="text-white">Taom yo'q</SelectItem>
+                      <SelectItem value="none" className="text-white">Taom yo'q</SelectItem>
                       {menuItems.map((item) => (
                         <SelectItem key={item.id} value={item.id.toString()} className="text-white">
                           {item.name_uz || item.name}
