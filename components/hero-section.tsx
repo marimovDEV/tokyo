@@ -76,7 +76,7 @@ export function HeroSection() {
 
         <div className="flex items-center gap-4 md:gap-6 mb-6 md:mb-10">
           <a
-            href="https://instagram.com"
+            href="https://www.instagram.com/tokyo.urgench?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw=="
             target="_blank"
             rel="noopener noreferrer"
             className="w-12 h-12 md:w-14 md:h-14 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center hover:bg-white/30 transition-all hover:scale-110 shadow-lg"
@@ -84,13 +84,13 @@ export function HeroSection() {
             <Instagram className="w-6 h-6 md:w-7 md:h-7 text-white" />
           </a>
           <a
-            href="tel:+998971408888"
+            href="tel:+998914331110"
             className="w-12 h-12 md:w-14 md:h-14 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center hover:bg-white/30 transition-all hover:scale-110 shadow-lg"
           >
             <Phone className="w-6 h-6 md:w-7 md:h-7 text-white" />
           </a>
           <a
-            href="https://t.me/tokyorestaurant"
+            href="https://t.me/PizzaCentr_Bot"
             target="_blank"
             rel="noopener noreferrer"
             className="w-12 h-12 md:w-14 md:h-14 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center hover:bg-white/30 transition-all hover:scale-110 shadow-lg"
@@ -139,7 +139,7 @@ export function HeroSection() {
           </Link>
 
           <button
-            onClick={() => openPhoneModal("+998971408888", t.reservation)}
+            onClick={() => openPhoneModal("+998914331110", t.reservation)}
             className="w-full flex items-center gap-3 md:gap-4 px-4 md:px-8 py-3 md:py-5 rounded-2xl md:rounded-3xl bg-white/20 backdrop-blur-xl hover:bg-white/30 transition-all hover:scale-[1.02] shadow-xl border border-white/30 group"
           >
             <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-white/30 flex items-center justify-center group-hover:bg-white/40 transition-all">
@@ -156,12 +156,12 @@ export function HeroSection() {
               >
                 {t.reservation}
               </div>
-              <div className="text-xs md:text-sm text-white/80">+998971408888</div>
+              <div className="text-xs md:text-sm text-white/80">+998914331110</div>
             </div>
           </button>
 
           <button
-            onClick={() => openPhoneModal("+998915707770", t.delivery)}
+            onClick={() => openPhoneModal("+998942311010", t.delivery)}
             className="w-full flex items-center gap-3 md:gap-4 px-4 md:px-8 py-3 md:py-5 rounded-2xl md:rounded-3xl bg-white/20 backdrop-blur-xl hover:bg-white/30 transition-all hover:scale-[1.02] shadow-xl border border-white/30 group"
           >
             <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-white/30 flex items-center justify-center group-hover:bg-white/40 transition-all">
@@ -178,7 +178,7 @@ export function HeroSection() {
               >
                 {t.delivery}
               </div>
-              <div className="text-xs md:text-sm text-white/80">+998915707770</div>
+              <div className="text-xs md:text-sm text-white/80">+998942311010</div>
             </div>
           </button>
         </div>
