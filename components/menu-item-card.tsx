@@ -77,14 +77,20 @@ export function MenuItemCard({ item, language }: MenuItemCardProps) {
 
         {/* Info Pills - Weight and Time */}
         <div className="flex gap-2 mb-4">
-          <div className="flex items-center gap-1.5 bg-gray-600/30 px-3 py-1.5 rounded-full">
-            <Weight className="w-4 h-4 text-gray-400" />
-            <span className="text-gray-300 text-sm font-medium">{item.weight}g</span>
-          </div>
-          <div className="flex items-center gap-1.5 bg-gray-600/30 px-3 py-1.5 rounded-full">
-            <Clock className="w-4 h-4 text-gray-400" />
-            <span className="text-gray-300 text-sm font-medium">{item.prep_time} min</span>
-          </div>
+          {item.weight && item.weight > 0 && (
+            <div className="flex items-center gap-1.5 bg-gray-600/30 px-3 py-1.5 rounded-full">
+              <Weight className="w-4 h-4 text-gray-400" />
+              <span className="text-gray-300 text-sm font-medium">
+                {typeof item.weight === 'number' ? `${item.weight}g` : `${item.weight}`}
+              </span>
+            </div>
+          )}
+          {item.prep_time && item.prep_time.trim() && (
+            <div className="flex items-center gap-1.5 bg-gray-600/30 px-3 py-1.5 rounded-full">
+              <Clock className="w-4 h-4 text-gray-400" />
+              <span className="text-gray-300 text-sm font-medium">{item.prep_time} min</span>
+            </div>
+          )}
         </div>
 
         {/* Ingredients Section */}

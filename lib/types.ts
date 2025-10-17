@@ -17,7 +17,7 @@ export interface MenuItem {
   description_ru: string
   image: string
   price: number
-  weight: number // in grams
+  weight?: number // in grams
   ingredients: string[]
   ingredients_uz: string[]
   ingredients_ru: string[]
