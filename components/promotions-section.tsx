@@ -12,26 +12,6 @@ export function PromotionsSection() {
   const [language, setLanguage] = useState<Language>("uz")
   const [currentIndex, setCurrentIndex] = useState(0)
 
-  // Loading yoki promotions yo'q bo'lsa
-  if (loading || !promotions || !Array.isArray(promotions)) return null
-
-  const activePromotions = promotions.filter((promo) => promo.is_active)
-
-  if (activePromotions.length === 0) return null
-
-  const currentPromotion = activePromotions[currentIndex]
-  
-  // Agar currentPromotion yo'q bo'lsa
-  if (!currentPromotion) return null
-
-  const nextPromotion = () => {
-    setCurrentIndex((prev) => (prev + 1) % activePromotions.length)
-  }
-
-  const prevPromotion = () => {
-    setCurrentIndex((prev) => (prev - 1 + activePromotions.length) % activePromotions.length)
-  }
-
   // Avtomatik aylanish (har 3 soniyada)
   useEffect(() => {
     if (activePromotions.length <= 1) return
@@ -62,6 +42,26 @@ export function PromotionsSection() {
       // Agar menu sahifasida bo'lmasa, menu sahifasiga o'tadi
       window.location.href = '/menu'
     }
+  }
+
+  // Loading yoki promotions yo'q bo'lsa
+  if (loading || !promotions || !Array.isArray(promotions)) return null
+
+  const activePromotions = promotions.filter((promo) => promo.is_active)
+
+  if (activePromotions.length === 0) return null
+
+  const currentPromotion = activePromotions[currentIndex]
+  
+  // Agar currentPromotion yo'q bo'lsa
+  if (!currentPromotion) return null
+
+  const nextPromotion = () => {
+    setCurrentIndex((prev) => (prev + 1) % activePromotions.length)
+  }
+
+  const prevPromotion = () => {
+    setCurrentIndex((prev) => (prev - 1 + activePromotions.length) % activePromotions.length)
   }
 
   const getTitle = () => {
