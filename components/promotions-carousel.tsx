@@ -1,9 +1,10 @@
 "use client"
 
 import { useMenu } from "@/lib/menu-context"
+import { useCart } from "@/lib/cart-context"
 import { useState, useEffect } from "react"
 import Image from "next/image"
-import { ChevronLeft, ChevronRight } from "lucide-react"
+import { ChevronLeft, ChevronRight, ShoppingCart } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import type { Language } from "@/lib/types"
 
@@ -13,6 +14,7 @@ interface PromotionsCarouselProps {
 
 export function PromotionsCarousel({ language }: PromotionsCarouselProps) {
   const { promotions, loading } = useMenu()
+  const { addPromotionToCart } = useCart()
   const [currentIndex, setCurrentIndex] = useState(0)
 
   // Active promotions ni hisoblash
@@ -40,15 +42,19 @@ export function PromotionsCarousel({ language }: PromotionsCarouselProps) {
     }
   }, [activePromotions.length])
 
-  // Menu sahifasiga scroll qilish funksiyasi
+  // Menu section'ga scroll qilish funksiyasi
   const scrollToMenu = () => {
-    // Agar menu sahifasida bo'lsa, menu section'ni topadi
-    const menuSection = document.getElementById('menu-section')
-    if (menuSection) {
-      menuSection.scrollIntoView({ behavior: 'smooth' })
-    } else {
-      // Agar menu sahifasida bo'lmasa, menu sahifasiga o'tadi
-      window.location.href = '/menu'
+    // Menu sahifasida menu items grid'ni topadi
+    const menuGrid = document.querySelector('.grid.grid-cols-1.sm\\:grid-cols-2.xl\\:grid-cols-3')
+    if (menuGrid) {
+      menuGrid.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }
+  }
+
+  // Promotion'ni savatga qo'shish funksiyasi
+  const handleAddPromotionToCart = () => {
+    if (currentPromotion) {
+      addPromotionToCart(currentPromotion)
     }
   }
 
@@ -102,13 +108,26 @@ export function PromotionsCarousel({ language }: PromotionsCarouselProps) {
             <div className="absolute bottom-0 left-0 right-0 p-6">
               <h3 className="text-2xl md:text-3xl font-bold text-white mb-2">{getTitle()}</h3>
               <p className="text-white/90 text-sm md:text-base line-clamp-2 mb-4">{getDescription()}</p>
-              <Button 
-                onClick={scrollToMenu}
-                size="sm"
-                className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white rounded-full text-sm font-semibold shadow-lg shadow-amber-500/30"
-              >
-                {language === "uz" ? "Ko'rish" : language === "ru" ? "Смотреть" : "View"}
-              </Button>
+              
+              {/* Tugmalar */}
+              <div className="flex gap-3">
+                <Button 
+                  onClick={scrollToMenu}
+                  size="sm"
+                  className="bg-white/20 backdrop-blur-xl border border-white/30 text-white hover:bg-white/30 rounded-full text-sm font-semibold flex-1"
+                >
+                  {language === "uz" ? "Ko'rish" : language === "ru" ? "Смотреть" : "View"}
+                </Button>
+                
+                <Button 
+                  onClick={handleAddPromotionToCart}
+                  size="sm"
+                  className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white rounded-full text-sm font-semibold shadow-lg shadow-amber-500/30 flex items-center gap-2"
+                >
+                  <ShoppingCart className="w-4 h-4" />
+                  {language === "uz" ? "Qo'shish" : language === "ru" ? "Добавить" : "Add"}
+                </Button>
+              </div>
             </div>
           </div>
         </div>

@@ -2,11 +2,12 @@
 
 import type React from "react"
 import { createContext, useContext, useState, useEffect } from "react"
-import type { CartItem, MenuItem } from "./types"
+import type { CartItem, MenuItem, Promotion } from "./types"
 
 interface CartContextType {
   cart: CartItem[]
   addToCart: (item: MenuItem) => void
+  addPromotionToCart: (promotion: Promotion) => void
   removeFromCart: (itemId: string) => void
   updateQuantity: (itemId: string, quantity: number) => void
   clearCart: () => void
@@ -44,6 +45,40 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     })
   }
 
+  const addPromotionToCart = (promotion: Promotion) => {
+    // Promotion'ni MenuItem format'iga o'tkazish
+    const promotionAsMenuItem: MenuItem = {
+      id: `promotion-${promotion.id}`,
+      name: promotion.title,
+      name_uz: promotion.title_uz,
+      name_ru: promotion.title_ru,
+      description: promotion.description,
+      description_uz: promotion.description_uz,
+      description_ru: promotion.description_ru,
+      image: promotion.image,
+      price: promotion.price || 0,
+      weight: 0,
+      ingredients: promotion.ingredients || [],
+      ingredients_uz: promotion.ingredients_uz || [],
+      ingredients_ru: promotion.ingredients_ru || [],
+      rating: 5,
+      prep_time: "0-5",
+      category: promotion.category || 0,
+      available: true,
+      is_active: promotion.is_active,
+    }
+
+    setCart((prev) => {
+      const existingItem = prev.find((cartItem) => cartItem.menuItem.id === `promotion-${promotion.id}`)
+      if (existingItem) {
+        return prev.map((cartItem) =>
+          cartItem.menuItem.id === `promotion-${promotion.id}` ? { ...cartItem, quantity: cartItem.quantity + 1 } : cartItem,
+        )
+      }
+      return [...prev, { menuItem: promotionAsMenuItem, quantity: 1 }]
+    })
+  }
+
   const removeFromCart = (itemId: string) => {
     setCart((prev) => prev.filter((item) => item.menuItem.id !== itemId))
   }
@@ -73,6 +108,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       value={{
         cart,
         addToCart,
+        addPromotionToCart,
         removeFromCart,
         updateQuantity,
         clearCart,
