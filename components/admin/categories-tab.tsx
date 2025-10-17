@@ -14,7 +14,6 @@ import { useApiClient } from "@/hooks/use-api"
 import { useCategories } from "@/hooks/use-api"
 import type { Category } from "@/lib/types"
 import { toast } from "sonner"
-import Image from "next/image"
 
 export function CategoriesTab() {
   const { categories, addCategory, updateCategory, deleteCategory } = useMenu()
@@ -30,47 +29,34 @@ export function CategoriesTab() {
     name: "",
     name_uz: "",
     name_ru: "",
-    image: null as File | null,
     is_active: true,
     order: 0,
   })
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (file) {
-      setFormData({ ...formData, image: file })
-    }
-  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsSubmitting(true)
 
     try {
-      const formDataToSend = new FormData()
-      formDataToSend.append('name', formData.name)
-      formDataToSend.append('name_uz', formData.name_uz)
-      formDataToSend.append('name_ru', formData.name_ru)
-      formDataToSend.append('is_active', formData.is_active.toString())
-      
-      // Auto-assign order if not provided
-      const order = formData.order || (categories.length + 1)
-      formDataToSend.append('order', order.toString())
-      
-      if (formData.image) {
-        formDataToSend.append('image', formData.image)
+      const categoryData = {
+        name: formData.name,
+        name_uz: formData.name_uz,
+        name_ru: formData.name_ru,
+        is_active: formData.is_active,
+        order: formData.order || (categories.length + 1),
       }
 
       if (editingCategory) {
         // Update existing category
         const categoryId = parseInt(editingCategory.id)
-        const updatedCategory = await api.patchFormData(`/categories/${categoryId}/`, formDataToSend)
+        const updatedCategory = await api.patch(`/categories/${categoryId}/`, categoryData)
         updateCategory(editingCategory.id, updatedCategory)
         refetchCategories() // Refetch to ensure data is updated
         toast.success("Kategoriya yangilandi")
       } else {
         // Create new category
-        const newCategory = await api.postFormData('/categories/', formDataToSend)
+        const newCategory = await api.post('/categories/', categoryData)
         addCategory(newCategory)
         refetchCategories() // Refetch to ensure data is updated
         toast.success("Kategoriya qo'shildi")
@@ -92,7 +78,6 @@ export function CategoriesTab() {
       name: category.name || "",
       name_uz: category.name_uz || "",
       name_ru: category.name_ru || "",
-      image: null,
       is_active: category.is_active !== false,
       order: category.order || 0,
     })
@@ -136,7 +121,6 @@ export function CategoriesTab() {
       name: "",
       name_uz: "",
       name_ru: "",
-      image: null,
       is_active: true,
       order: categories.length + 1,
     })
@@ -218,32 +202,6 @@ export function CategoriesTab() {
                     className="bg-white/10 border-white/20 text-white"
                     placeholder="Avtomatik"
                   />
-                </div>
-              </div>
-              <div>
-                <Label htmlFor="image" className="text-white text-sm">
-                  Rasm
-                </Label>
-                <div className="flex flex-col gap-3">
-                  <div className="flex items-center gap-2">
-                    <Input
-                      id="image"
-                      type="file"
-                      accept="image/*"
-                      onChange={handleImageUpload}
-                      className="bg-white/10 border-white/20 text-white file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-amber-500 file:text-white hover:file:bg-amber-600"
-                    />
-                  </div>
-                  {formData.image && (
-                    <div className="relative w-full h-32 rounded-lg overflow-hidden">
-                      <Image src={URL.createObjectURL(formData.image)} alt="Preview" fill className="object-cover" />
-                    </div>
-                  )}
-                  {editingCategory && editingCategory.image && !formData.image && (
-                    <div className="relative w-full h-32 rounded-lg overflow-hidden">
-                      <Image src={editingCategory.image} alt="Current" fill className="object-cover" />
-                    </div>
-                  )}
                 </div>
               </div>
               <Button
