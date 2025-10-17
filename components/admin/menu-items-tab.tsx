@@ -6,7 +6,7 @@ import { useState, useCallback, useEffect } from "react"
 import { Plus, Pencil, Trash2, AlertTriangle, Loader2 } from "lucide-react"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -209,6 +209,9 @@ export function MenuItemsTab() {
           <DialogContent className="bg-slate-900 border-white/20 text-white max-w-4xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle className="text-white">{editingItem ? "Taomni tahrirlash" : "Yangi taom"}</DialogTitle>
+              <DialogDescription className="text-white/60">
+                {editingItem ? "Mavjud taomni o'zgartiring" : "Yangi taom yarating va barcha maydonlarni to'ldiring"}
+              </DialogDescription>
             </DialogHeader>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">

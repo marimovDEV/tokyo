@@ -6,7 +6,7 @@ import { useState, useEffect } from "react"
 import { Plus, Pencil, Trash2 } from "lucide-react"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog"
 import { Input } from "@/components/ui/input"
@@ -138,6 +138,24 @@ export function PromotionsTab() {
 
   const handleEdit = (promotion: Promotion) => {
     setEditingPromotion(promotion)
+    
+    // Sana format'ini tuzatish - ISO format'dan datetime-local format'iga
+    const formatDateForInput = (dateString: string) => {
+      if (!dateString) return ""
+      try {
+        const date = new Date(dateString)
+        // Timezone offset'ni olib tashlash va YYYY-MM-DDTHH:MM format'iga o'tkazish
+        const year = date.getFullYear()
+        const month = String(date.getMonth() + 1).padStart(2, '0')
+        const day = String(date.getDate()).padStart(2, '0')
+        const hours = String(date.getHours()).padStart(2, '0')
+        const minutes = String(date.getMinutes()).padStart(2, '0')
+        return `${year}-${month}-${day}T${hours}:${minutes}`
+      } catch {
+        return ""
+      }
+    }
+    
     setFormData({
       title: promotion.title,
       description: promotion.description,
@@ -146,8 +164,8 @@ export function PromotionsTab() {
       discount_percentage: promotion.discount_percentage || 0,
       discount_amount: promotion.discount_amount || 0,
       is_active: promotion.is_active !== false,
-      start_date: promotion.start_date || "",
-      end_date: promotion.end_date || "",
+      start_date: formatDateForInput(promotion.start_date || ""),
+      end_date: formatDateForInput(promotion.end_date || ""),
       category: promotion.category?.toString() || "none",
       linked_dish: promotion.linked_dish?.toString() || "none",
       price: promotion.price || 0,
@@ -242,6 +260,9 @@ export function PromotionsTab() {
               <DialogTitle className="text-white">
                 {editingPromotion ? "Aksiyani tahrirlash" : "Yangi aksiya"}
               </DialogTitle>
+              <DialogDescription className="text-white/60">
+                {editingPromotion ? "Mavjud aksiyani o'zgartiring" : "Yangi aksiya yarating va barcha maydonlarni to'ldiring"}
+              </DialogDescription>
             </DialogHeader>
             <form onSubmit={handleSubmit} className="space-y-6">
               {/* Title Field with Language Selection */}

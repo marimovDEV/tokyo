@@ -5,7 +5,7 @@ import type React from "react"
 import { useState } from "react"
 import { Plus, Pencil, Trash2, AlertTriangle, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -162,6 +162,9 @@ export function CategoriesTab() {
               <DialogTitle className="text-white">
                 {editingCategory ? "Kategoriyani tahrirlash" : "Yangi kategoriya"}
               </DialogTitle>
+              <DialogDescription className="text-white/60">
+                {editingCategory ? "Mavjud kategoriyani o'zgartiring" : "Yangi kategoriya yarating va barcha maydonlarni to'ldiring"}
+              </DialogDescription>
             </DialogHeader>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
