@@ -36,14 +36,14 @@ export function PromotionsCarousel({ language }: PromotionsCarouselProps) {
   }
 
   const getTitle = () => {
-    if (language === "uz") return currentPromotion.titleUz
-    if (language === "ru") return currentPromotion.titleRu
+    if (language === "uz") return currentPromotion.title_uz || currentPromotion.titleUz
+    if (language === "ru") return currentPromotion.title_ru || currentPromotion.titleRu
     return currentPromotion.title
   }
 
   const getDescription = () => {
-    if (language === "uz") return currentPromotion.descriptionUz
-    if (language === "ru") return currentPromotion.descriptionRu
+    if (language === "uz") return currentPromotion.description_uz || currentPromotion.descriptionUz
+    if (language === "ru") return currentPromotion.description_ru || currentPromotion.descriptionRu
     return currentPromotion.description
   }
 
@@ -55,9 +55,14 @@ export function PromotionsCarousel({ language }: PromotionsCarouselProps) {
             <Image src={currentPromotion.image || "/placeholder.svg"} alt={getTitle()} fill className="object-cover" />
             <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
 
-            <div className="absolute top-4 right-4 bg-gradient-to-r from-amber-500 to-amber-600 text-white px-4 py-2 rounded-full text-xl font-bold shadow-lg">
-              -{currentPromotion.discount}%
-            </div>
+            {(currentPromotion.discount_percentage > 0 || currentPromotion.discount_amount > 0) && (
+              <div className="absolute top-4 right-4 bg-gradient-to-r from-amber-500 to-amber-600 text-white px-4 py-2 rounded-full text-xl font-bold shadow-lg">
+                {currentPromotion.discount_percentage > 0 && `-${currentPromotion.discount_percentage}%`}
+                {currentPromotion.discount_percentage === 0 && currentPromotion.discount_amount > 0 && 
+                  `-${currentPromotion.discount_amount.toLocaleString()} so'm`
+                }
+              </div>
+            )}
 
             <div className="absolute bottom-0 left-0 right-0 p-6">
               <h3 className="text-2xl md:text-3xl font-bold text-white mb-2">{getTitle()}</h3>

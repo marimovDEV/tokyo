@@ -33,14 +33,14 @@ export function PromotionsSection() {
   }
 
   const getTitle = () => {
-    if (language === "uz") return currentPromotion.titleUz
-    if (language === "ru") return currentPromotion.titleRu
+    if (language === "uz") return currentPromotion.title_uz || currentPromotion.titleUz
+    if (language === "ru") return currentPromotion.title_ru || currentPromotion.titleRu
     return currentPromotion.title
   }
 
   const getDescription = () => {
-    if (language === "uz") return currentPromotion.descriptionUz
-    if (language === "ru") return currentPromotion.descriptionRu
+    if (language === "uz") return currentPromotion.description_uz || currentPromotion.descriptionUz
+    if (language === "ru") return currentPromotion.description_ru || currentPromotion.descriptionRu
     return currentPromotion.description
   }
 
@@ -65,9 +65,14 @@ export function PromotionsSection() {
                   fill
                   className="object-cover"
                 />
-                <div className="absolute top-4 right-4 bg-gradient-to-r from-amber-500 to-amber-600 text-white px-6 py-3 rounded-full text-2xl font-bold shadow-lg">
-                  -{currentPromotion.discount}%
-                </div>
+                {(currentPromotion.discount_percentage > 0 || currentPromotion.discount_amount > 0) && (
+                  <div className="absolute top-4 right-4 bg-gradient-to-r from-amber-500 to-amber-600 text-white px-6 py-3 rounded-full text-2xl font-bold shadow-lg">
+                    {currentPromotion.discount_percentage > 0 && `-${currentPromotion.discount_percentage}%`}
+                    {currentPromotion.discount_percentage === 0 && currentPromotion.discount_amount > 0 && 
+                      `-${currentPromotion.discount_amount.toLocaleString()} so'm`
+                    }
+                  </div>
+                )}
               </div>
 
               {/* Content */}
@@ -80,13 +85,13 @@ export function PromotionsSection() {
                     <span className="font-semibold">
                       {language === "uz" ? "Boshlanish:" : language === "ru" ? "Начало:" : "Start:"}
                     </span>{" "}
-                    {new Date(currentPromotion.startDate).toLocaleDateString()}
+                    {currentPromotion.start_date ? new Date(currentPromotion.start_date).toLocaleDateString() : 'Belgilanmagan'}
                   </div>
                   <div>
                     <span className="font-semibold">
                       {language === "uz" ? "Tugash:" : language === "ru" ? "Конец:" : "End:"}
                     </span>{" "}
-                    {new Date(currentPromotion.endDate).toLocaleDateString()}
+                    {currentPromotion.end_date ? new Date(currentPromotion.end_date).toLocaleDateString() : 'Belgilanmagan'}
                   </div>
                 </div>
 
@@ -143,11 +148,18 @@ export function PromotionsSection() {
                   className="bg-white/10 backdrop-blur-xl rounded-2xl p-4 border border-white/20 flex items-center gap-4 hover:bg-white/20 transition-all"
                 >
                   <div className="relative w-20 h-20 rounded-xl overflow-hidden flex-shrink-0">
-                    <Image src={promo.image || "/placeholder.svg"} alt={promo.titleUz} fill className="object-cover" />
+                    <Image src={promo.image || "/placeholder.svg"} alt={promo.title_uz || promo.titleUz} fill className="object-cover" />
                   </div>
                   <div className="flex-1 text-left">
-                    <h4 className="text-white font-semibold">{language === "uz" ? promo.titleUz : promo.titleRu}</h4>
-                    <p className="text-amber-400 font-bold">-{promo.discount}%</p>
+                    <h4 className="text-white font-semibold">
+                      {language === "uz" ? (promo.title_uz || promo.titleUz) : (promo.title_ru || promo.titleRu)}
+                    </h4>
+                    <p className="text-amber-400 font-bold">
+                      {promo.discount_percentage > 0 && `-${promo.discount_percentage}%`}
+                      {promo.discount_percentage === 0 && promo.discount_amount > 0 && 
+                        `-${promo.discount_amount.toLocaleString()} so'm`
+                      }
+                    </p>
                   </div>
                 </button>
               )

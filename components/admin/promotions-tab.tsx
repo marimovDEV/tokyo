@@ -7,6 +7,7 @@ import { Plus, Pencil, Trash2 } from "lucide-react"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -14,13 +15,15 @@ import { Textarea } from "@/components/ui/textarea"
 import { Switch } from "@/components/ui/switch"
 import { useMenu } from "@/lib/menu-context"
 import { useApiClient } from "@/hooks/use-api"
-import { usePromotions } from "@/hooks/use-api"
+import { usePromotions, useCategories, useMenuItems } from "@/hooks/use-api"
 import type { Promotion } from "@/lib/types"
 import { toast } from "sonner"
 
 export function PromotionsTab() {
   const { promotions, addPromotion, updatePromotion, deletePromotion } = useMenu()
   const { refetch: refetchPromotions, loading: promotionsLoading } = usePromotions()
+  const { categories } = useCategories()
+  const { menuItems } = useMenuItems()
   const api = useApiClient()
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [editingPromotion, setEditingPromotion] = useState<Promotion | null>(null)
@@ -421,6 +424,53 @@ export function PromotionsTab() {
                   className="bg-white/10 border-white/20 text-white text-sm"
                   placeholder="https://example.com"
                 />
+              </div>
+
+              {/* Category and Linked Dish */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="category" className="text-white text-sm">
+                    Kategoriya
+                  </Label>
+                  <Select
+                    value={formData.category}
+                    onValueChange={(value) => setFormData({ ...formData, category: value })}
+                  >
+                    <SelectTrigger className="bg-white/10 border-white/20 text-white">
+                      <SelectValue placeholder="Kategoriyani tanlang" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-slate-900 border-white/20">
+                      <SelectItem value="" className="text-white">Kategoriya yo'q</SelectItem>
+                      {categories.map((cat) => (
+                        <SelectItem key={cat.id} value={cat.id.toString()} className="text-white">
+                          {cat.name_uz || cat.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                <div>
+                  <Label htmlFor="linked_dish" className="text-white text-sm">
+                    Bog'langan Taom
+                  </Label>
+                  <Select
+                    value={formData.linked_dish}
+                    onValueChange={(value) => setFormData({ ...formData, linked_dish: value })}
+                  >
+                    <SelectTrigger className="bg-white/10 border-white/20 text-white">
+                      <SelectValue placeholder="Taomni tanlang" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-slate-900 border-white/20">
+                      <SelectItem value="" className="text-white">Taom yo'q</SelectItem>
+                      {menuItems.map((item) => (
+                        <SelectItem key={item.id} value={item.id.toString()} className="text-white">
+                          {item.name_uz || item.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
 
               <Button
