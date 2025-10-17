@@ -12,6 +12,11 @@ export function PromotionsSection() {
   const [language, setLanguage] = useState<Language>("uz")
   const [currentIndex, setCurrentIndex] = useState(0)
 
+  // Active promotions ni hisoblash
+  const activePromotions = promotions && Array.isArray(promotions) 
+    ? promotions.filter((promo) => promo.is_active) 
+    : []
+
   // Avtomatik aylanish (har 3 soniyada)
   useEffect(() => {
     if (activePromotions.length <= 1) return
@@ -46,8 +51,6 @@ export function PromotionsSection() {
 
   // Loading yoki promotions yo'q bo'lsa
   if (loading || !promotions || !Array.isArray(promotions)) return null
-
-  const activePromotions = promotions.filter((promo) => promo.is_active)
 
   if (activePromotions.length === 0) return null
 
