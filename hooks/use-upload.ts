@@ -1,3 +1,5 @@
+"use client"
+
 import { useState, useCallback } from 'react';
 import { getCsrfTokenAsync } from '@/lib/csrf';
 import { useToast } from './use-toast';

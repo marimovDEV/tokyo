@@ -1,3 +1,5 @@
+"use client"
+
 import { useState, useEffect } from 'react';
 
 // Cookie-dan token olish uchun funksiya

@@ -1,3 +1,5 @@
+"use client"
+
 import { useCSRF } from './use-csrf';
 import { useState, useEffect, useCallback, useMemo } from 'react';
 
