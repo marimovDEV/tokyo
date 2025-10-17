@@ -1,7 +1,7 @@
 "use client"
 
 import { useMenu } from "@/lib/menu-context"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Image from "next/image"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -35,6 +35,25 @@ export function PromotionsCarousel({ language }: PromotionsCarouselProps) {
     setCurrentIndex((prev) => (prev - 1 + activePromotions.length) % activePromotions.length)
   }
 
+  // Avtomatik aylanish (har 5 soniyada)
+  useEffect(() => {
+    if (activePromotions.length <= 1) return
+
+    const interval = setInterval(() => {
+      setCurrentIndex((prev) => (prev + 1) % activePromotions.length)
+    }, 5000)
+
+    return () => clearInterval(interval)
+  }, [activePromotions.length])
+
+  // Menu sahifasiga scroll qilish funksiyasi
+  const scrollToMenu = () => {
+    const menuSection = document.getElementById('menu-section')
+    if (menuSection) {
+      menuSection.scrollIntoView({ behavior: 'smooth' })
+    }
+  }
+
   const getTitle = () => {
     if (language === "uz") return currentPromotion.title_uz || currentPromotion.titleUz
     if (language === "ru") return currentPromotion.title_ru || currentPromotion.titleRu
@@ -66,7 +85,14 @@ export function PromotionsCarousel({ language }: PromotionsCarouselProps) {
 
             <div className="absolute bottom-0 left-0 right-0 p-6">
               <h3 className="text-2xl md:text-3xl font-bold text-white mb-2">{getTitle()}</h3>
-              <p className="text-white/90 text-sm md:text-base line-clamp-2">{getDescription()}</p>
+              <p className="text-white/90 text-sm md:text-base line-clamp-2 mb-4">{getDescription()}</p>
+              <Button 
+                onClick={scrollToMenu}
+                size="sm"
+                className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white rounded-full text-sm font-semibold shadow-lg shadow-amber-500/30"
+              >
+                {language === "uz" ? "Ko'rish" : language === "ru" ? "Смотреть" : "View"}
+              </Button>
             </div>
           </div>
         </div>
