@@ -20,7 +20,7 @@ export function getCsrfToken(): string | null {
 // API-dan CSRF token olish
 export async function fetchCsrfToken(): Promise<string | null> {
   try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://193.42.124.54:8000/api'}/csrf/`, {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://api.tokyokafe.uz/api'}/csrf/`, {
       credentials: 'include',
     });
     

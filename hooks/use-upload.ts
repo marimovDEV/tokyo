@@ -65,7 +65,7 @@ export function useUpload() {
       }
 
       // Fetch request
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://193.42.124.54:8000/api'}${endpoint}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://api.tokyokafe.uz/api'}${endpoint}`, {
         method,
         body: formData,
         headers: {
