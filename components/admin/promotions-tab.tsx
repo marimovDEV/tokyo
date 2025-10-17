@@ -328,35 +328,57 @@ export function PromotionsTab() {
               </div>
 
               {/* Discount Fields - Combined */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="discount_percentage" className="text-white text-sm font-medium">
-                    Chegirma (%)
-                  </Label>
-                  <Input
-                    id="discount_percentage"
-                    type="number"
-                    min="0"
-                    max="100"
-                    value={formData.discount_percentage}
-                    onChange={(e) => setFormData({ ...formData, discount_percentage: Number.parseInt(e.target.value) || 0 })}
-                    className="bg-white/10 border-white/20 text-white text-sm"
-                    placeholder="20"
-                  />
+              <div className="space-y-4">
+                {/* Warning Rules */}
+                <div className="bg-amber-500/10 border border-amber-500/30 rounded-lg p-4">
+                  <div className="flex items-start gap-3">
+                    <div className="w-5 h-5 rounded-full bg-amber-500/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <span className="text-amber-400 text-xs font-bold">!</span>
+                    </div>
+                    <div className="space-y-2">
+                      <h4 className="text-amber-400 font-semibold text-sm">Chegirma qoidalari:</h4>
+                      <ul className="text-white/80 text-xs space-y-1">
+                        <li>• <strong>Chegirma foizi</strong> va <strong>chegirma miqdori</strong>ni bir vaqtda ishlatmang</li>
+                        <li>• Faqat bitta turda chegirma kiriting: yoki foiz (20%) yoki miqdor (5000 so'm)</li>
+                        <li>• <strong>Aksiya narxi</strong> har doim kiritilishi kerak (yakuniy narx)</li>
+                        <li>• Agar chegirma foizi = 20% va asl narx = 30000 so'm, aksiya narxi = 24000 so'm bo'ladi</li>
+                      </ul>
+                    </div>
+                  </div>
                 </div>
-                <div>
-                  <Label htmlFor="discount_amount" className="text-white text-sm font-medium">
-                    Chegirma Miqdori (so'm)
-                  </Label>
-                  <Input
-                    id="discount_amount"
-                    type="number"
-                    min="0"
-                    value={formData.discount_amount}
-                    onChange={(e) => setFormData({ ...formData, discount_amount: Number.parseInt(e.target.value) || 0 })}
-                    className="bg-white/10 border-white/20 text-white text-sm"
-                    placeholder="5000"
-                  />
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="discount_percentage" className="text-white text-sm font-medium">
+                      Chegirma (%)
+                    </Label>
+                    <Input
+                      id="discount_percentage"
+                      type="number"
+                      min="0"
+                      max="100"
+                      value={formData.discount_percentage}
+                      onChange={(e) => setFormData({ ...formData, discount_percentage: Number.parseInt(e.target.value) || 0 })}
+                      className="bg-white/10 border-white/20 text-white text-sm"
+                      placeholder="20"
+                    />
+                    <p className="text-white/60 text-xs mt-1">0-100% orasida kiriting</p>
+                  </div>
+                  <div>
+                    <Label htmlFor="discount_amount" className="text-white text-sm font-medium">
+                      Chegirma Miqdori (so'm)
+                    </Label>
+                    <Input
+                      id="discount_amount"
+                      type="number"
+                      min="0"
+                      value={formData.discount_amount}
+                      onChange={(e) => setFormData({ ...formData, discount_amount: Number.parseInt(e.target.value) || 0 })}
+                      className="bg-white/10 border-white/20 text-white text-sm"
+                      placeholder="5000"
+                    />
+                    <p className="text-white/60 text-xs mt-1">Belgilangan miqdordagi chegirma</p>
+                  </div>
                 </div>
               </div>
 
@@ -375,6 +397,9 @@ export function PromotionsTab() {
                   placeholder="50000"
                   required
                 />
+                <p className="text-white/60 text-xs mt-1">
+                  <strong>Yakuniy narx</strong> - chegirma qo'llanganidan keyingi narx (majburiy)
+                </p>
               </div>
 
               {/* Category and Linked Dish */}
