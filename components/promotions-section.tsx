@@ -1,7 +1,7 @@
 "use client"
 
 import { useMenu } from "@/lib/menu-context"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Image from "next/image"
 import { ChevronLeft, ChevronRight, Tag } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -30,6 +30,25 @@ export function PromotionsSection() {
 
   const prevPromotion = () => {
     setCurrentIndex((prev) => (prev - 1 + activePromotions.length) % activePromotions.length)
+  }
+
+  // Avtomatik aylanish (har 5 soniyada)
+  useEffect(() => {
+    if (activePromotions.length <= 1) return
+
+    const interval = setInterval(() => {
+      setCurrentIndex((prev) => (prev + 1) % activePromotions.length)
+    }, 5000)
+
+    return () => clearInterval(interval)
+  }, [activePromotions.length])
+
+  // Menu sahifasiga scroll qilish funksiyasi
+  const scrollToMenu = () => {
+    const menuSection = document.getElementById('menu-section')
+    if (menuSection) {
+      menuSection.scrollIntoView({ behavior: 'smooth' })
+    }
   }
 
   const getTitle = () => {
@@ -95,8 +114,11 @@ export function PromotionsSection() {
                   </div>
                 </div>
 
-                <Button className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white rounded-full h-14 text-lg font-semibold shadow-lg shadow-amber-500/30 w-full md:w-auto">
-                  {language === "uz" ? "Buyurtma berish" : language === "ru" ? "Заказать" : "Order Now"}
+                <Button 
+                  onClick={scrollToMenu}
+                  className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white rounded-full h-14 text-lg font-semibold shadow-lg shadow-amber-500/30 w-full md:w-auto"
+                >
+                  {language === "uz" ? "Ko'rish" : language === "ru" ? "Смотреть" : "View"}
                 </Button>
               </div>
             </div>
