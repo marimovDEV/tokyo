@@ -18,7 +18,7 @@ export function PromotionsCarousel({ language }: PromotionsCarouselProps) {
   // Loading yoki promotions yo'q bo'lsa
   if (loading || !promotions || !Array.isArray(promotions)) return null
 
-  const activePromotions = promotions.filter((promo) => promo.active)
+  const activePromotions = promotions.filter((promo) => promo.is_active)
 
   if (activePromotions.length === 0) return null
 
