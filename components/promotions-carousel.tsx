@@ -35,22 +35,36 @@ export function PromotionsCarousel({ language }: PromotionsCarouselProps) {
     setCurrentIndex((prev) => (prev - 1 + activePromotions.length) % activePromotions.length)
   }
 
-  // Avtomatik aylanish (har 5 soniyada)
+  // Avtomatik aylanish (har 3 soniyada)
   useEffect(() => {
     if (activePromotions.length <= 1) return
 
-    const interval = setInterval(() => {
-      setCurrentIndex((prev) => (prev + 1) % activePromotions.length)
-    }, 5000)
+    console.log('Starting auto-rotation for carousel, promotions count:', activePromotions.length)
 
-    return () => clearInterval(interval)
-  }, [activePromotions.length])
+    const interval = setInterval(() => {
+      console.log('Auto-rotating carousel, current index:', currentIndex)
+      setCurrentIndex((prev) => {
+        const nextIndex = (prev + 1) % activePromotions.length
+        console.log('Next index:', nextIndex)
+        return nextIndex
+      })
+    }, 3000)
+
+    return () => {
+      console.log('Clearing carousel auto-rotation interval')
+      clearInterval(interval)
+    }
+  }, [activePromotions.length, currentIndex])
 
   // Menu sahifasiga scroll qilish funksiyasi
   const scrollToMenu = () => {
+    // Agar menu sahifasida bo'lsa, menu section'ni topadi
     const menuSection = document.getElementById('menu-section')
     if (menuSection) {
       menuSection.scrollIntoView({ behavior: 'smooth' })
+    } else {
+      // Agar menu sahifasida bo'lmasa, menu sahifasiga o'tadi
+      window.location.href = '/menu'
     }
   }
 
