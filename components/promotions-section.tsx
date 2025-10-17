@@ -96,8 +96,13 @@ export function PromotionsSection() {
                   fill
                   className="object-cover"
                 />
+                {/* AKSIYA Badge */}
+                <div className="absolute top-4 right-4 bg-gradient-to-r from-red-500 to-red-600 text-white px-4 py-2 rounded-full text-sm font-bold shadow-lg animate-pulse">
+                  AKSIYA
+                </div>
+                
                 {(currentPromotion.discount_percentage > 0 || currentPromotion.discount_amount > 0) && (
-                  <div className="absolute top-4 right-4 bg-gradient-to-r from-amber-500 to-amber-600 text-white px-6 py-3 rounded-full text-2xl font-bold shadow-lg">
+                  <div className="absolute top-4 left-4 bg-gradient-to-r from-amber-500 to-amber-600 text-white px-4 py-2 rounded-full text-lg font-bold shadow-lg">
                     {currentPromotion.discount_percentage > 0 && `-${currentPromotion.discount_percentage}%`}
                     {currentPromotion.discount_percentage === 0 && currentPromotion.discount_amount > 0 && 
                       `-${currentPromotion.discount_amount.toLocaleString()} so'm`
@@ -183,6 +188,10 @@ export function PromotionsSection() {
                 >
                   <div className="relative w-20 h-20 rounded-xl overflow-hidden flex-shrink-0">
                     <Image src={promo.image || "/placeholder.svg"} alt={promo.title_uz || promo.titleUz} fill className="object-cover" />
+                    {/* AKSIYA Badge */}
+                    <div className="absolute top-1 right-1 bg-gradient-to-r from-red-500 to-red-600 text-white px-1 py-0.5 rounded text-xs font-bold shadow-lg">
+                      AKSIYA
+                    </div>
                   </div>
                   <div className="flex-1 text-left">
                     <h4 className="text-white font-semibold">

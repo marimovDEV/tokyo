@@ -123,8 +123,13 @@ export function PromotionsCarousel({ language }: PromotionsCarouselProps) {
             <Image src={currentPromotion.image || "/placeholder.svg"} alt={getTitle()} fill className="object-cover" />
             <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
 
+            {/* AKSIYA Badge */}
+            <div className="absolute top-4 right-4 bg-gradient-to-r from-red-500 to-red-600 text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg animate-pulse">
+              AKSIYA
+            </div>
+            
             {(currentPromotion.discount_percentage > 0 || currentPromotion.discount_amount > 0) && (
-              <div className="absolute top-4 right-4 bg-gradient-to-r from-amber-500 to-amber-600 text-white px-4 py-2 rounded-full text-xl font-bold shadow-lg">
+              <div className="absolute top-4 left-4 bg-gradient-to-r from-amber-500 to-amber-600 text-white px-3 py-1 rounded-full text-lg font-bold shadow-lg">
                 {currentPromotion.discount_percentage > 0 && `-${currentPromotion.discount_percentage}%`}
                 {currentPromotion.discount_percentage === 0 && currentPromotion.discount_amount > 0 && 
                   `-${currentPromotion.discount_amount.toLocaleString()} so'm`
