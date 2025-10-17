@@ -79,12 +79,12 @@ export function PromotionsTab() {
         formDataToSend.append('description', formData.description)
         formDataToSend.append('description_uz', multilingualData.description_uz)
         formDataToSend.append('description_ru', multilingualData.description_ru)
-        formDataToSend.append('discount_percentage', formData.discount_percentage.toString())
-        formDataToSend.append('discount_amount', formData.discount_amount.toString())
+        formDataToSend.append('discount_percentage', (formData.discount_percentage || 0).toString())
+        formDataToSend.append('discount_amount', (formData.discount_amount || 0).toString())
         formDataToSend.append('is_active', formData.is_active.toString())
         formDataToSend.append('start_date', formData.start_date)
         formDataToSend.append('end_date', formData.end_date)
-        formDataToSend.append('price', formData.price.toString())
+        formDataToSend.append('price', (formData.price || 0).toString())
         
         // Convert comma-separated strings to JSON arrays
         const ingredientsArray = formData.ingredients ? formData.ingredients.split(',').map(item => item.trim()).filter(item => item) : []
@@ -357,7 +357,7 @@ export function PromotionsTab() {
                       type="number"
                       min="0"
                       max="100"
-                      value={formData.discount_percentage}
+                      value={formData.discount_percentage || ""}
                       onChange={(e) => setFormData({ ...formData, discount_percentage: Number.parseInt(e.target.value) || 0 })}
                       className="bg-white/10 border-white/20 text-white text-sm"
                       placeholder="20"
@@ -372,7 +372,7 @@ export function PromotionsTab() {
                       id="discount_amount"
                       type="number"
                       min="0"
-                      value={formData.discount_amount}
+                      value={formData.discount_amount || ""}
                       onChange={(e) => setFormData({ ...formData, discount_amount: Number.parseInt(e.target.value) || 0 })}
                       className="bg-white/10 border-white/20 text-white text-sm"
                       placeholder="5000"
@@ -391,7 +391,7 @@ export function PromotionsTab() {
                   id="price"
                   type="number"
                   min="0"
-                  value={formData.price}
+                  value={formData.price || ""}
                   onChange={(e) => setFormData({ ...formData, price: Number(e.target.value) || 0 })}
                   className="bg-white/10 border-white/20 text-white text-sm"
                   placeholder="50000"
