@@ -232,53 +232,6 @@ export function useRestaurantInfo() {
   return { restaurantInfo, loading, error };
 }
 
-// Text Content hook
-export function useTextContent(contentType?: string) {
-  const [textContent, setTextContent] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<Error | null>(null);
-
-  useEffect(() => {
-    const fetchTextContent = async () => {
-      try {
-        setLoading(true);
-        
-        const endpoint = contentType 
-          ? `/text-content/type/${contentType}/`
-          : '/text-content/';
-        
-        // Add cache-busting to always get fresh data
-        const timestamp = new Date().getTime();
-        const cacheBustedEndpoint = endpoint.includes('?') ? `${endpoint}&t=${timestamp}` : `${endpoint}?t=${timestamp}`;
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api'}${cacheBustedEndpoint}`, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          credentials: 'include',
-          cache: 'no-cache',
-        });
-        
-        if (!response.ok) {
-          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-        }
-        
-        const data = await response.json();
-        setTextContent(data.results || []);
-      } catch (err) {
-        setError(err as Error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchTextContent();
-    
-    // No automatic refresh - data will be fetched on component mount only
-  }, [contentType]); // Depend on contentType
-
-  return { textContent, loading, error };
-}
 
 // Site Settings hook
 export function useSiteSettings() {
