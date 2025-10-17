@@ -15,13 +15,14 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch"
 import { useMenu } from "@/lib/menu-context"
 import { useApiClient } from "@/hooks/use-api"
-import { useMenuItems } from "@/hooks/use-api"
+import { useMenuItems, useAdminCategories } from "@/hooks/use-api"
 import type { MenuItem } from "@/lib/types"
 import { toast } from "sonner"
 
 export function MenuItemsTab() {
   const { categories, addMenuItem, updateMenuItem, deleteMenuItem } = useMenu()
   const { menuItems, refetch: refetchMenuItems, loading: menuItemsLoading } = useMenuItems()
+  const { categories: adminCategories } = useAdminCategories()
   const api = useApiClient()
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [editingItem, setEditingItem] = useState<MenuItem | null>(null)
@@ -305,7 +306,7 @@ export function MenuItemsTab() {
                       <SelectValue placeholder="Kategoriyani tanlang" />
                     </SelectTrigger>
                     <SelectContent className="bg-slate-900 border-white/20">
-                      {categories.map((cat) => (
+                      {adminCategories.map((cat) => (
                         <SelectItem key={cat.id} value={cat.id.toString()} className="text-white">
                           {cat.name_uz || cat.name}
                         </SelectItem>

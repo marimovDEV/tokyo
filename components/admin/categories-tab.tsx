@@ -11,13 +11,13 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useMenu } from "@/lib/menu-context"
 import { useApiClient } from "@/hooks/use-api"
-import { useCategories } from "@/hooks/use-api"
+import { useAdminCategories } from "@/hooks/use-api"
 import type { Category } from "@/lib/types"
 import { toast } from "sonner"
 
 export function CategoriesTab() {
   const { categories, addCategory, updateCategory, deleteCategory } = useMenu()
-  const { refetch: refetchCategories, loading: categoriesLoading } = useCategories()
+  const { refetch: refetchCategories, loading: categoriesLoading } = useAdminCategories()
   const api = useApiClient()
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [editingCategory, setEditingCategory] = useState<Category | null>(null)

@@ -286,8 +286,8 @@ export function useCategories() {
     try {
       setLoading(true);
       setError(null);
-      // Use show_all=true to get all categories including inactive ones for admin
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://api.tokyokafe.uz/api'}/categories/?show_all=true`, {
+      // Get only active categories for frontend display
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://api.tokyokafe.uz/api'}/categories/`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -319,6 +319,49 @@ export function useCategories() {
   return { categories, loading, error, refetch };
 }
 
+// Admin panel uchun alohida hook - barcha kategoriyalarni olish (o'chirilganlar ham)
+export function useAdminCategories() {
+  const [categories, setCategories] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
+
+  const fetchCategories = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      // Admin uchun barcha kategoriyalarni olish (o'chirilganlar ham)
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://api.tokyokafe.uz/api'}/categories/?show_all=true`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+      
+      const data = await response.json();
+      setCategories(data.results || []);
+    } catch (err) {
+      setError(err as Error);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchCategories();
+  }, []);
+
+  const refetch = useCallback(() => {
+    fetchCategories();
+  }, [fetchCategories]);
+
+  return { categories, loading, error, refetch };
+}
+
 // Menu Items hook
 export function useMenuItems() {
   const [menuItems, setMenuItems] = useState([]);
@@ -329,7 +372,7 @@ export function useMenuItems() {
     try {
       setLoading(true);
       setError(null);
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://api.tokyokafe.uz/api'}/menu-items/?show_all=true`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://api.tokyokafe.uz/api'}/menu-items/`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -401,7 +444,7 @@ export function usePromotions() {
       setError(null);
       // Add cache busting to force fresh data
       const timestamp = new Date().getTime();
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://api.tokyokafe.uz/api'}/promotions/?show_all=true&t=${timestamp}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://api.tokyokafe.uz/api'}/promotions/?t=${timestamp}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',

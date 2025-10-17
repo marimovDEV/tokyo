@@ -15,14 +15,14 @@ import { Textarea } from "@/components/ui/textarea"
 import { Switch } from "@/components/ui/switch"
 import { useMenu } from "@/lib/menu-context"
 import { useApiClient } from "@/hooks/use-api"
-import { usePromotions, useCategories, useMenuItems } from "@/hooks/use-api"
+import { usePromotions, useAdminCategories, useMenuItems } from "@/hooks/use-api"
 import type { Promotion } from "@/lib/types"
 import { toast } from "sonner"
 
 export function PromotionsTab() {
   const { promotions, addPromotion, updatePromotion, deletePromotion } = useMenu()
   const { refetch: refetchPromotions, loading: promotionsLoading } = usePromotions()
-  const { categories } = useCategories()
+  const { categories } = useAdminCategories()
   const { menuItems } = useMenuItems()
   const api = useApiClient()
   const [isDialogOpen, setIsDialogOpen] = useState(false)
