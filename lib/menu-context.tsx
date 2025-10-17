@@ -144,12 +144,9 @@ export function MenuProvider({ children }: { children: React.ReactNode }) {
 
   // API dan kelgan ma'lumotlarni saqlash
   useEffect(() => {
-    console.log('API Categories:', apiCategories)
     if (apiCategories && Array.isArray(apiCategories)) {
-      console.log('Setting categories from API:', apiCategories)
       setCategories(apiCategories as any)
     } else if (!categoriesLoading && apiCategories === null) {
-      console.log('No categories from API, using empty array')
       setCategories([])
     }
   }, [apiCategories, categoriesLoading])

@@ -442,7 +442,6 @@ function AdminComponent() {
   const handleCreateItem = async (itemData: any) => {
     try {
       const newItem = await api.post('/menu-items/', itemData);
-      console.log('Item created:', newItem);
     } catch (error) {
       console.error('Error creating item:', error);
     }
@@ -451,7 +450,6 @@ function AdminComponent() {
   const handleUpdateItem = async (id: number, itemData: any) => {
     try {
       const updatedItem = await api.patch(`/menu-items/${id}/`, itemData);
-      console.log('Item updated:', updatedItem);
     } catch (error) {
       console.error('Error updating item:', error);
     }
@@ -460,7 +458,6 @@ function AdminComponent() {
   const handleDeleteItem = async (id: number) => {
     try {
       await api.delete(`/menu-items/${id}/`);
-      console.log('Item deleted');
     } catch (error) {
       console.error('Error deleting item:', error);
     }

@@ -21,18 +21,14 @@ export function PromotionsSection() {
   useEffect(() => {
     if (activePromotions.length <= 1) return
 
-    console.log('Starting auto-rotation for main section, promotions count:', activePromotions.length)
-
     const interval = setInterval(() => {
       setCurrentIndex((prev) => {
         const nextIndex = (prev + 1) % activePromotions.length
-        console.log('Auto-rotating main section, prev:', prev, 'next:', nextIndex)
         return nextIndex
       })
-    }, 3000)
+    }, 5000)
 
     return () => {
-      console.log('Clearing main section auto-rotation interval')
       clearInterval(interval)
     }
   }, [activePromotions.length])

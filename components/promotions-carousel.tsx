@@ -26,18 +26,14 @@ export function PromotionsCarousel({ language }: PromotionsCarouselProps) {
   useEffect(() => {
     if (activePromotions.length <= 1) return
 
-    console.log('Starting auto-rotation for carousel, promotions count:', activePromotions.length)
-
     const interval = setInterval(() => {
       setCurrentIndex((prev) => {
         const nextIndex = (prev + 1) % activePromotions.length
-        console.log('Auto-rotating carousel, prev:', prev, 'next:', nextIndex)
         return nextIndex
       })
     }, 5000)
 
     return () => {
-      console.log('Clearing carousel auto-rotation interval')
       clearInterval(interval)
     }
   }, [activePromotions.length])

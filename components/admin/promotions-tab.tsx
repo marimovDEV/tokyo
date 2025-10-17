@@ -62,7 +62,6 @@ export function PromotionsTab() {
     const refreshPromotions = async () => {
       try {
         await refetchPromotions()
-        console.log('Promotions data refreshed successfully')
       } catch (error) {
         console.error('Error refreshing promotions:', error)
       }
@@ -192,9 +191,7 @@ export function PromotionsTab() {
     if (promotionToDelete) {
       try {
         const promotionId = parseInt(promotionToDelete.id)
-        console.log('Deleting promotion with ID:', promotionId)
         await api.delete(`/promotions/${promotionId}/`)
-        console.log('Promotion deleted successfully')
         deletePromotion(promotionToDelete.id)
         await refetchPromotions() // Wait for refetch to complete
         toast.success("Aksiya o'chirildi")
