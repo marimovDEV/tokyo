@@ -35,27 +35,59 @@ export interface CartItem {
 
 export interface Promotion {
   id: string
+  // Asosiy ma'lumotlar
   title: string
   title_uz: string
   title_ru: string
   description: string
   description_uz: string
   description_ru: string
-  image: string
-  discount_percentage: number // percentage
-  discount_amount: number // amount in so'm
-  start_date: string
-  end_date: string
+  
+  // Aksiya turi
+  discount_type: 'percent' | 'amount' | 'bonus' | 'standalone'
+  
+  // Chegirma ma'lumotlari
+  discount_percentage?: number
+  discount_amount?: number
+  
+  // Bonus ma'lumotlari
+  bonus_info?: string
+  bonus_info_uz?: string
+  bonus_info_ru?: string
+  
+  // Rasm
+  image?: string
+  display_image?: string
+  
+  // Muddati
+  start_date?: string
+  end_date?: string
   is_active: boolean
-  category?: number
+  is_expired?: boolean
+  
+  // Bog'lanish
+  linked_product?: number
+  linked_product_name?: string
+  linked_product_name_uz?: string
+  linked_product_name_ru?: string
+  
+  // Aksiya kategoriyasi
+  promotion_category?: number
   category_name?: string
   category_name_uz?: string
   category_name_ru?: string
-  linked_dish?: number
-  price: number // aksiya narxi
+  
+  // Narx va tarkib
+  price: number
+  discounted_price?: number
+  discount_display?: string
   ingredients: string[]
   ingredients_uz: string[]
   ingredients_ru: string[]
+  
+  // Legacy fields (compatibility)
+  category?: number
+  linked_dish?: number
 }
 
 export interface Feedback {
