@@ -128,16 +128,6 @@ export default function AdminLoginPage() {
               </Button>
             </form>
 
-            {/* Demo Credentials */}
-            <div className="mt-6 p-4 bg-white/5 rounded-lg border border-white/10">
-              <p className="text-white/60 text-sm text-center mb-2">
-                Demo ma'lumotlar:
-              </p>
-              <div className="text-white/80 text-sm text-center space-y-1">
-                <p><strong>Foydalanuvchi:</strong> admin</p>
-                <p><strong>Parol:</strong> admin123</p>
-              </div>
-            </div>
           </CardContent>
         </Card>
       </div>
