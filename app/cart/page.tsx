@@ -27,9 +27,21 @@ export default function CartPage() {
   }
 
   const getName = (item: (typeof cart)[0]["menuItem"]) => {
-    if (language === "uz") return item.nameUz
-    if (language === "ru") return item.nameRu
+    if (language === "uz") return item.name_uz || item.nameUz || item.name
+    if (language === "ru") return item.name_ru || item.nameRu || item.name
     return item.name
+  }
+
+  const getDescription = (item: (typeof cart)[0]["menuItem"]) => {
+    if (language === "uz") return item.description_uz || item.descriptionUz || item.description
+    if (language === "ru") return item.description_ru || item.descriptionRu || item.description
+    return item.description
+  }
+
+  const getIngredients = (item: (typeof cart)[0]["menuItem"]) => {
+    if (language === "uz") return item.ingredients_uz || item.ingredientsUz || item.ingredients
+    if (language === "ru") return item.ingredients_ru || item.ingredientsRu || item.ingredients
+    return item.ingredients
   }
 
   return (
@@ -125,7 +137,37 @@ export default function CartPage() {
                           </Button>
                         </div>
 
-                        <p className="text-sm text-white/60 mb-3">{item.menuItem.weight}g</p>
+                        {/* Description */}
+                        {getDescription(item.menuItem) && (
+                          <p className="text-sm text-white/70 mb-2 line-clamp-2">
+                            {getDescription(item.menuItem)}
+                          </p>
+                        )}
+
+                        {/* Ingredients */}
+                        {getIngredients(item.menuItem) && (
+                          <p className="text-xs text-white/50 mb-2">
+                            <span className="font-medium">
+                              {language === "uz" ? "Tarkib:" : language === "ru" ? "Состав:" : "Ingredients:"}
+                            </span>{" "}
+                            {Array.isArray(getIngredients(item.menuItem)) 
+                              ? getIngredients(item.menuItem).join(", ")
+                              : getIngredients(item.menuItem)
+                            }
+                          </p>
+                        )}
+
+                        {/* Weight and Prep Time */}
+                        <div className="flex items-center gap-3 text-sm text-white/60 mb-3">
+                          {item.menuItem.weight && (
+                            <span>{item.menuItem.weight}g</span>
+                          )}
+                          {item.menuItem.prep_time && (
+                            <span>
+                              {language === "uz" ? "Tayyorlanish:" : language === "ru" ? "Приготовление:" : "Prep time:"} {item.menuItem.prep_time}
+                            </span>
+                          )}
+                        </div>
 
                         <div className="flex items-center justify-between gap-4">
                           <div className="text-xl md:text-2xl font-bold text-amber-400">
