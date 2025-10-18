@@ -1,0 +1,14 @@
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://tokyokafe.uz/sitemap.xml
+
+# Disallow admin panel
+Disallow: /admin/
+Disallow: /admin/login
+
+# Allow all other pages
+Allow: /
+Allow: /menu
+Allow: /cart

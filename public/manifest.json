@@ -1,0 +1,26 @@
+{
+  "name": "Tokyo Kafe — Sushi, Rolls va Yapon Taomlari",
+  "short_name": "Tokyo Kafe",
+  "description": "Yapon oshxonasining eng mazali sushi, rolls va ramenlarini tatib ko'ring!",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#f97316",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/static/images/preview.jpg",
+      "sizes": "192x192",
+      "type": "image/jpeg",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/static/images/preview.jpg",
+      "sizes": "512x512",
+      "type": "image/jpeg",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["food", "restaurant", "dining"],
+  "lang": "uz"
+}
