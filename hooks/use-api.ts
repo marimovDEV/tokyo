@@ -353,7 +353,7 @@ export function useAdminCategories() {
 
   useEffect(() => {
     fetchCategories();
-  }, []);
+  }, [fetchCategories]);
 
   const refetch = useCallback(() => {
     fetchCategories();
@@ -395,7 +395,7 @@ export function useMenuItems() {
 
   useEffect(() => {
     fetchMenuItems();
-  }, []); // Empty dependency array to prevent infinite loop
+  }, [fetchMenuItems]); // Proper dependency array
 
   const refetch = useCallback(() => {
     fetchMenuItems();
@@ -468,7 +468,7 @@ export function usePromotions() {
 
   useEffect(() => {
     fetchPromotions();
-  }, []); // Empty dependency array to prevent infinite loop
+  }, [fetchPromotions]); // Proper dependency array
 
   const refetch = useCallback(() => {
     fetchPromotions();

@@ -6,6 +6,7 @@ import { CategoriesTab } from "@/components/admin/categories-tab"
 import { MenuItemsTab } from "@/components/admin/menu-items-tab"
 import { PromotionsTab } from "@/components/admin/promotions-tab"
 import { FeedbackTab } from "@/components/admin/feedback-tab"
+import { ErrorBoundary } from "@/components/admin/error-boundary"
 import { toast } from "sonner"
 import { useState } from "react"
 
@@ -22,9 +23,10 @@ export default function AdminPage() {
 
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900">
-      <div className="fixed inset-0 bg-[url('/tokyo-restaurant-night.png')] bg-cover bg-center bg-fixed opacity-10 pointer-events-none" />
-      <div className="relative z-10">
+    <ErrorBoundary>
+      <div className="min-h-screen bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900">
+        <div className="fixed inset-0 bg-[url('/tokyo-restaurant-night.png')] bg-cover bg-center bg-fixed opacity-10 pointer-events-none" />
+        <div className="relative z-10">
         {/* Mobile Header */}
         <div className="sticky top-0 z-50 bg-slate-900/80 backdrop-blur-xl border-b border-white/10">
           <div className="px-4 py-3">
@@ -108,25 +110,33 @@ export default function AdminPage() {
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
 
             <TabsContent value="categories">
-              <CategoriesTab />
+              <ErrorBoundary>
+                <CategoriesTab />
+              </ErrorBoundary>
             </TabsContent>
 
             <TabsContent value="items">
-              <MenuItemsTab />
+              <ErrorBoundary>
+                <MenuItemsTab />
+              </ErrorBoundary>
             </TabsContent>
 
             <TabsContent value="promotions">
-              <PromotionsTab />
+              <ErrorBoundary>
+                <PromotionsTab />
+              </ErrorBoundary>
             </TabsContent>
 
-
             <TabsContent value="feedback">
-              <FeedbackTab />
+              <ErrorBoundary>
+                <FeedbackTab />
+              </ErrorBoundary>
             </TabsContent>
           </Tabs>
         </div>
 
+        </div>
       </div>
-    </div>
+    </ErrorBoundary>
   )
 }
