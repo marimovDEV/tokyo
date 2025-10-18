@@ -2,7 +2,7 @@
 
 import { useMenu } from "@/lib/menu-context"
 import { useCart } from "@/lib/cart-context"
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo } from "react"
 import Image from "next/image"
 import { ChevronLeft, ChevronRight, ShoppingCart } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -17,10 +17,12 @@ export function PromotionsCarousel({ language }: PromotionsCarouselProps) {
   const { addPromotionToCart } = useCart()
   const [currentIndex, setCurrentIndex] = useState(0)
 
-  // Active promotions ni hisoblash
-  const activePromotions = promotions && Array.isArray(promotions) 
-    ? promotions.filter((promo) => promo.is_active) 
-    : []
+  // Active promotions ni hisoblash (useMemo bilan optimizatsiya)
+  const activePromotions = useMemo(() => {
+    return promotions && Array.isArray(promotions) 
+      ? promotions.filter((promo) => promo.is_active) 
+      : []
+  }, [promotions])
 
   // Avtomatik aylanish (har 3 soniyada)
   useEffect(() => {
@@ -120,7 +122,17 @@ export function PromotionsCarousel({ language }: PromotionsCarouselProps) {
       <div className="relative">
         <div className="bg-white/10 backdrop-blur-xl rounded-3xl overflow-hidden border border-white/20 shadow-xl">
           <div className="relative h-48 md:h-64">
-            <Image src={currentPromotion.image || "/placeholder.svg"} alt={getTitle()} fill className="object-cover" />
+            <Image 
+              src={currentPromotion.image || "/placeholder.svg"} 
+              alt={getTitle()} 
+              fill 
+              className="object-cover"
+              onError={(e) => {
+                const target = e.target as HTMLImageElement;
+                target.src = "/placeholder.svg";
+              }}
+              priority={currentIndex === 0}
+            />
             <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
 
             {/* AKSIYA Badge */}

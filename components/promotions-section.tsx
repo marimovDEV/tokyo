@@ -1,7 +1,7 @@
 "use client"
 
 import { useMenu } from "@/lib/menu-context"
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo } from "react"
 import Image from "next/image"
 import { ChevronLeft, ChevronRight, Tag } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -12,10 +12,12 @@ export function PromotionsSection() {
   const [language, setLanguage] = useState<Language>("uz")
   const [currentIndex, setCurrentIndex] = useState(0)
 
-  // Active promotions ni hisoblash
-  const activePromotions = promotions && Array.isArray(promotions) 
-    ? promotions.filter((promo) => promo.is_active) 
-    : []
+  // Active promotions ni hisoblash (useMemo bilan optimizatsiya)
+  const activePromotions = useMemo(() => {
+    return promotions && Array.isArray(promotions) 
+      ? promotions.filter((promo) => promo.is_active) 
+      : []
+  }, [promotions])
 
   // Avtomatik aylanish (har 3 soniyada)
   useEffect(() => {
@@ -95,6 +97,11 @@ export function PromotionsSection() {
                   alt={getTitle()}
                   fill
                   className="object-cover"
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    target.src = "/placeholder.svg";
+                  }}
+                  priority={currentIndex === 0}
                 />
                 {/* AKSIYA Badge */}
                 <div className="absolute top-4 right-4 bg-gradient-to-r from-red-500 to-red-600 text-white px-4 py-2 rounded-full text-sm font-bold shadow-lg animate-pulse">
@@ -187,7 +194,16 @@ export function PromotionsSection() {
                   className="bg-white/10 backdrop-blur-xl rounded-2xl p-4 border border-white/20 flex items-center gap-4 hover:bg-white/20 transition-all"
                 >
                   <div className="relative w-20 h-20 rounded-xl overflow-hidden flex-shrink-0">
-                    <Image src={promo.image || "/placeholder.svg"} alt={promo.title_uz || promo.titleUz} fill className="object-cover" />
+                    <Image 
+                      src={promo.image || "/placeholder.svg"} 
+                      alt={promo.title_uz || promo.titleUz} 
+                      fill 
+                      className="object-cover"
+                      onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        target.src = "/placeholder.svg";
+                      }}
+                    />
                     {/* AKSIYA Badge */}
                     <div className="absolute top-1 right-1 bg-gradient-to-r from-red-500 to-red-600 text-white px-1 py-0.5 rounded text-xs font-bold shadow-lg">
                       AKSIYA
