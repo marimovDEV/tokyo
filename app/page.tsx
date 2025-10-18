@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     siteName: "Tokyo Kafe",
     images: [
       {
-        url: "/static/images/preview.jpg",
+        url: "https://tokyokafe.uz/static/images/preview.jpg",
         width: 1200,
         height: 630,
         alt: "Tokyo Kafe - Yapon Taomlari",
@@ -26,7 +26,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Tokyo Kafe — Sushi, Rolls va Yapon Taomlari",
     description: "Yapon oshxonasining eng mazali sushi, rolls va ramenlarini tatib ko'ring! Faqat Tokyo Kafe'da — sifat, lazzat va shinam muhit bir joyda.",
-    images: ["/static/images/preview.jpg"],
+    images: ["https://tokyokafe.uz/static/images/preview.jpg"],
   },
 }
 
