@@ -7,10 +7,11 @@ import { MenuItemsTab } from "@/components/admin/menu-items-tab"
 import { PromotionsTab } from "@/components/admin/promotions-tab"
 import { FeedbackTab } from "@/components/admin/feedback-tab"
 import { ErrorBoundary } from "@/components/admin/error-boundary"
+import { AuthGuard } from "@/components/admin/auth-guard"
 import { toast } from "sonner"
 import { useState } from "react"
 
-export default function AdminPage() {
+function AdminPanelContent() {
   const [activeTab, setActiveTab] = useState("categories")
   
   const handleLogout = () => {
@@ -138,5 +139,13 @@ export default function AdminPage() {
         </div>
       </div>
     </ErrorBoundary>
+  )
+}
+
+export default function AdminPage() {
+  return (
+    <AuthGuard>
+      <AdminPanelContent />
+    </AuthGuard>
   )
 }
