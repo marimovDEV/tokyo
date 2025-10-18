@@ -12,7 +12,11 @@ import { LanguageProvider } from "@/lib/language-context"
 import "./globals.css"
 
 export const metadata: Metadata = {
-  title: "Tokyo Kafe — Sushi, Rolls va Yapon Taomlari",
+  metadataBase: new URL('https://tokyokafe.uz'),
+  title: {
+    default: "Tokyo Kafe — Sushi, Rolls va Yapon Taomlari",
+    template: "%s | Tokyo Kafe"
+  },
   description: "Yapon oshxonasining eng mazali sushi, rolls va ramenlarini tatib ko'ring! Faqat Tokyo Kafe'da — sifat, lazzat va shinam muhit bir joyda.",
   keywords: [
     "tokyo kafe",
@@ -32,9 +36,11 @@ export const metadata: Metadata = {
   authors: [{ name: "Tokyo Kafe" }],
   creator: "Tokyo Kafe",
   publisher: "Tokyo Kafe",
-  generator: "Next.js",
-  applicationName: "Tokyo Kafe",
-  referrer: "origin-when-cross-origin",
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
+  },
   robots: {
     index: true,
     follow: true,
@@ -55,7 +61,7 @@ export const metadata: Metadata = {
     description: "Yapon oshxonasining eng mazali sushi, rolls va ramenlarini tatib ko'ring! Faqat Tokyo Kafe'da — sifat, lazzat va shinam muhit bir joyda.",
     images: [
       {
-        url: "https://tokyokafe.uz/static/images/preview.jpg",
+        url: "/static/images/preview.jpg",
         width: 1200,
         height: 630,
         alt: "Tokyo Kafe - Yapon Taomlari",
@@ -69,22 +75,11 @@ export const metadata: Metadata = {
     creator: "@tokyokafe",
     title: "Tokyo Kafe — Sushi, Rolls va Yapon Taomlari",
     description: "Yapon oshxonasining eng mazali sushi, rolls va ramenlarini tatib ko'ring! Faqat Tokyo Kafe'da — sifat, lazzat va shinam muhit bir joyda.",
-    images: ["https://tokyokafe.uz/static/images/preview.jpg"],
-  },
-  verification: {
-    google: "your-google-verification-code",
-    yandex: "your-yandex-verification-code",
+    images: ["/static/images/preview.jpg"],
   },
   alternates: {
     canonical: "https://tokyokafe.uz",
-    languages: {
-      "uz-UZ": "https://tokyokafe.uz",
-      "ru-RU": "https://tokyokafe.uz/ru",
-      "en-US": "https://tokyokafe.uz/en",
-    },
   },
-  category: "Restaurant",
-  classification: "Food & Dining",
 }
 
 export default function RootLayout({

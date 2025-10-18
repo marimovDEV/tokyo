@@ -1,6 +1,34 @@
 import { HeroSection } from "@/components/hero-section"
 import { PromotionsSection } from "@/components/promotions-section"
 import Link from "next/link"
+import type { Metadata } from "next"
+
+export const metadata: Metadata = {
+  title: "Tokyo Kafe — Sushi, Rolls va Yapon Taomlari",
+  description: "Yapon oshxonasining eng mazali sushi, rolls va ramenlarini tatib ko'ring! Faqat Tokyo Kafe'da — sifat, lazzat va shinam muhit bir joyda.",
+  openGraph: {
+    title: "Tokyo Kafe — Sushi, Rolls va Yapon Taomlari",
+    description: "Yapon oshxonasining eng mazali sushi, rolls va ramenlarini tatib ko'ring! Faqat Tokyo Kafe'da — sifat, lazzat va shinam muhit bir joyda.",
+    url: "https://tokyokafe.uz",
+    siteName: "Tokyo Kafe",
+    images: [
+      {
+        url: "/static/images/preview.jpg",
+        width: 1200,
+        height: 630,
+        alt: "Tokyo Kafe - Yapon Taomlari",
+      },
+    ],
+    locale: "uz_UZ",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Tokyo Kafe — Sushi, Rolls va Yapon Taomlari",
+    description: "Yapon oshxonasining eng mazali sushi, rolls va ramenlarini tatib ko'ring! Faqat Tokyo Kafe'da — sifat, lazzat va shinam muhit bir joyda.",
+    images: ["/static/images/preview.jpg"],
+  },
+}
 
 export default function Home() {
   return (
