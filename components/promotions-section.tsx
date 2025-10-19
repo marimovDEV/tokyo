@@ -1,6 +1,7 @@
 "use client"
 
 import { useMenu } from "@/lib/menu-context"
+import { useLanguage } from "@/lib/language-context"
 import { useState, useEffect, useMemo } from "react"
 import Image from "next/image"
 import { ChevronLeft, ChevronRight, Tag } from "lucide-react"
@@ -9,7 +10,7 @@ import type { Language } from "@/lib/types"
 
 export function PromotionsSection() {
   const { promotions, loading } = useMenu()
-  const [language, setLanguage] = useState<Language>("uz")
+  const { language } = useLanguage()
   const [currentIndex, setCurrentIndex] = useState(0)
 
   // Active promotions ni hisoblash (useMemo bilan optimizatsiya)
