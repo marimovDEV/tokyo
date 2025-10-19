@@ -176,49 +176,6 @@ export function PromotionsSection() {
           )}
         </div>
 
-        {/* All Promotions Grid (Mobile) */}
-        {activePromotions.length > 1 && (
-          <div className="mt-8 grid grid-cols-1 gap-4 md:hidden">
-            {activePromotions.map((promo, index) => {
-              if (index === currentIndex) return null
-              return (
-                <button
-                  key={promo.id}
-                  onClick={() => setCurrentIndex(index)}
-                  className="bg-white/10 backdrop-blur-xl rounded-2xl p-4 border border-white/20 flex items-center gap-4 hover:bg-white/20 transition-all"
-                >
-                  <div className="relative w-20 h-20 rounded-xl overflow-hidden flex-shrink-0">
-                    <Image 
-                      src={promo.image || "/placeholder.svg"} 
-                      alt={promo.title_uz || promo.titleUz} 
-                      fill 
-                      className="object-cover"
-                      onError={(e) => {
-                        const target = e.target as HTMLImageElement;
-                        target.src = "/placeholder.svg";
-                      }}
-                    />
-                    {/* AKSIYA Badge */}
-                    <div className="absolute top-1 right-1 bg-gradient-to-r from-red-500 to-red-600 text-white px-1 py-0.5 rounded text-xs font-bold shadow-lg">
-                      AKSIYA
-                    </div>
-                  </div>
-                  <div className="flex-1 text-left">
-                    <h4 className="text-white font-semibold">
-                      {language === "uz" ? (promo.title_uz || promo.titleUz) : (promo.title_ru || promo.titleRu)}
-                    </h4>
-                    <p className="text-amber-400 font-bold">
-                      {promo.discount_percentage > 0 && `-${promo.discount_percentage}%`}
-                      {promo.discount_percentage === 0 && promo.discount_amount > 0 && 
-                        `-${promo.discount_amount.toLocaleString()} so'm`
-                      }
-                    </p>
-                  </div>
-                </button>
-              )
-            })}
-          </div>
-        )}
       </div>
     </section>
   )
