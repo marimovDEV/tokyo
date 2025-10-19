@@ -19,7 +19,7 @@ export function PromotionsSection() {
       : []
   }, [promotions])
 
-  // Avtomatik aylanish (har 3 soniyada)
+  // Avtomatik aylanish (har 4 soniyada, yumshoq transition)
   useEffect(() => {
     if (activePromotions.length <= 1) return
 
@@ -28,7 +28,7 @@ export function PromotionsSection() {
         const nextIndex = (prev + 1) % activePromotions.length
         return nextIndex
       })
-    }, 5000)
+    }, 4000)
 
     return () => {
       clearInterval(interval)
@@ -37,7 +37,22 @@ export function PromotionsSection() {
 
   // Menu sahifasiga scroll qilish funksiyasi
   const scrollToMenu = () => {
-    // Agar menu sahifasida bo'lsa, menu section'ni topadi
+    // Agar promotion'da linked_product bo'lsa, shu mahsulotga scroll qilish
+    if (currentPromotion?.linked_product) {
+      const linkedProductId = currentPromotion.linked_product.toString()
+      const productElement = document.querySelector(`[data-menu-item-id="${linkedProductId}"]`)
+      if (productElement) {
+        productElement.scrollIntoView({ behavior: 'smooth', block: 'center' })
+        // Highlight effect uchun
+        productElement.classList.add('highlight-promotion')
+        setTimeout(() => {
+          productElement.classList.remove('highlight-promotion')
+        }, 3000)
+        return
+      }
+    }
+    
+    // Agar linked_product yo'q bo'lsa yoki topilmasa, menu section'ga scroll qilish
     const menuSection = document.getElementById('menu-section')
     if (menuSection) {
       menuSection.scrollIntoView({ behavior: 'smooth' })
@@ -104,7 +119,7 @@ export function PromotionsSection() {
                   priority={currentIndex === 0}
                 />
                 {/* AKSIYA Badge */}
-                <div className="absolute top-4 right-4 bg-gradient-to-r from-red-500 to-red-600 text-white px-4 py-2 rounded-full text-sm font-bold shadow-lg animate-pulse">
+                <div className="absolute top-4 right-4 bg-gradient-to-r from-red-500 to-red-600 text-white px-4 py-2 rounded-full text-sm font-bold shadow-lg">
                   AKSIYA
                 </div>
                 

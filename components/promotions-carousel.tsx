@@ -24,7 +24,7 @@ export function PromotionsCarousel({ language }: PromotionsCarouselProps) {
       : []
   }, [promotions])
 
-  // Avtomatik aylanish (har 3 soniyada)
+  // Avtomatik aylanish (har 4 soniyada, yumshoq transition)
   useEffect(() => {
     if (activePromotions.length <= 1) return
 
@@ -33,7 +33,7 @@ export function PromotionsCarousel({ language }: PromotionsCarouselProps) {
         const nextIndex = (prev + 1) % activePromotions.length
         return nextIndex
       })
-    }, 5000)
+    }, 4000)
 
     return () => {
       clearInterval(interval)
@@ -42,22 +42,22 @@ export function PromotionsCarousel({ language }: PromotionsCarouselProps) {
 
   // Menu section'ga scroll qilish funksiyasi
   const scrollToMenu = () => {
-    // Agar promotion'da linked_dish bo'lsa, shu taomga scroll qilish
-    if (currentPromotion?.linked_dish) {
-      const linkedDishId = currentPromotion.linked_dish.toString()
-      const dishElement = document.querySelector(`[data-menu-item-id="${linkedDishId}"]`)
-      if (dishElement) {
-        dishElement.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    // Agar promotion'da linked_product bo'lsa, shu mahsulotga scroll qilish
+    if (currentPromotion?.linked_product) {
+      const linkedProductId = currentPromotion.linked_product.toString()
+      const productElement = document.querySelector(`[data-menu-item-id="${linkedProductId}"]`)
+      if (productElement) {
+        productElement.scrollIntoView({ behavior: 'smooth', block: 'center' })
         // Highlight effect uchun
-        dishElement.classList.add('highlight-promotion')
+        productElement.classList.add('highlight-promotion')
         setTimeout(() => {
-          dishElement.classList.remove('highlight-promotion')
+          productElement.classList.remove('highlight-promotion')
         }, 3000)
         return
       }
     }
     
-    // Agar linked_dish yo'q bo'lsa yoki topilmasa, menu grid'ga scroll qilish
+    // Agar linked_product yo'q bo'lsa yoki topilmasa, menu grid'ga scroll qilish
     const menuGrid = document.querySelector('.grid.grid-cols-1.sm\\:grid-cols-2.xl\\:grid-cols-3')
     if (menuGrid) {
       menuGrid.scrollIntoView({ behavior: 'smooth', block: 'start' })
@@ -69,17 +69,17 @@ export function PromotionsCarousel({ language }: PromotionsCarouselProps) {
     if (currentPromotion) {
       addPromotionToCart(currentPromotion)
       
-      // Qo'shilgandan keyin linked_dish'ga scroll qilish
-      if (currentPromotion.linked_dish) {
+      // Qo'shilgandan keyin linked_product'ga scroll qilish
+      if (currentPromotion.linked_product) {
         setTimeout(() => {
-          const linkedDishId = currentPromotion.linked_dish.toString()
-          const dishElement = document.querySelector(`[data-menu-item-id="${linkedDishId}"]`)
-          if (dishElement) {
-            dishElement.scrollIntoView({ behavior: 'smooth', block: 'center' })
+          const linkedProductId = currentPromotion.linked_product.toString()
+          const productElement = document.querySelector(`[data-menu-item-id="${linkedProductId}"]`)
+          if (productElement) {
+            productElement.scrollIntoView({ behavior: 'smooth', block: 'center' })
             // Highlight effect uchun
-            dishElement.classList.add('highlight-added')
+            productElement.classList.add('highlight-added')
             setTimeout(() => {
-              dishElement.classList.remove('highlight-added')
+              productElement.classList.remove('highlight-added')
             }, 3000)
           }
         }, 100)
@@ -136,7 +136,7 @@ export function PromotionsCarousel({ language }: PromotionsCarouselProps) {
             <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
 
             {/* AKSIYA Badge */}
-            <div className="absolute top-4 right-4 bg-gradient-to-r from-red-500 to-red-600 text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg animate-pulse">
+            <div className="absolute top-4 right-4 bg-gradient-to-r from-red-500 to-red-600 text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg">
               AKSIYA
             </div>
             
