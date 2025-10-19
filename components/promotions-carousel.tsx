@@ -30,6 +30,7 @@ export function PromotionsCarousel({ language }: PromotionsCarouselProps) {
   // Avtomatik aylanish (har 4 soniyada, yumshoq transition)
   useEffect(() => {
     if (activePromotions.length <= 1) return
+    if (isModalOpen) return // Modal ochilganda aylanmasin
 
     const interval = setInterval(() => {
       setCurrentIndex((prev) => {
@@ -41,7 +42,7 @@ export function PromotionsCarousel({ language }: PromotionsCarouselProps) {
     return () => {
       clearInterval(interval)
     }
-  }, [activePromotions.length])
+  }, [activePromotions.length, isModalOpen])
 
   // Modal ochish funksiyasi
   const openModal = () => {
