@@ -213,16 +213,6 @@ export function HeroSection() {
         </div>
       )}
 
-      {/* Admin Panel Link */}
-      <div className="fixed bottom-4 right-4 z-50">
-        <Link
-          href="/admin/login"
-          className="w-14 h-14 rounded-full bg-gradient-to-r from-orange-500 to-orange-600 backdrop-blur-xl flex items-center justify-center hover:from-orange-600 hover:to-orange-700 transition-all border border-orange-400/30 shadow-lg shadow-orange-500/30"
-          title="Admin Panel"
-        >
-          <MessageSquare className="w-6 h-6 text-white" />
-        </Link>
-      </div>
     </section>
   )
 }
