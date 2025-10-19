@@ -35,31 +35,10 @@ export function PromotionsSection() {
     }
   }, [activePromotions.length])
 
-  // Menu sahifasiga scroll qilish funksiyasi
+  // Menu sahifasiga o'tish funksiyasi
   const scrollToMenu = () => {
-    // Agar promotion'da linked_product bo'lsa, shu mahsulotga scroll qilish
-    if (currentPromotion?.linked_product) {
-      const linkedProductId = currentPromotion.linked_product.toString()
-      const productElement = document.querySelector(`[data-menu-item-id="${linkedProductId}"]`)
-      if (productElement) {
-        productElement.scrollIntoView({ behavior: 'smooth', block: 'center' })
-        // Highlight effect uchun
-        productElement.classList.add('highlight-promotion')
-        setTimeout(() => {
-          productElement.classList.remove('highlight-promotion')
-        }, 3000)
-        return
-      }
-    }
-    
-    // Agar linked_product yo'q bo'lsa yoki topilmasa, menu section'ga scroll qilish
-    const menuSection = document.getElementById('menu-section')
-    if (menuSection) {
-      menuSection.scrollIntoView({ behavior: 'smooth' })
-    } else {
-      // Agar menu sahifasida bo'lmasa, menu sahifasiga o'tadi
-      window.location.href = '/menu'
-    }
+    // Bosh sahifadan menu sahifasiga o'tish
+    window.location.href = '/menu'
   }
 
   // Loading yoki promotions yo'q bo'lsa
