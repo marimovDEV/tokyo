@@ -6,7 +6,8 @@ import { useState, useEffect, useMemo } from "react"
 import Image from "next/image"
 import { ChevronLeft, ChevronRight, ShoppingCart } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import type { Language } from "@/lib/types"
+import { PromotionModal } from "@/components/promotion-modal"
+import type { Language, Promotion } from "@/lib/types"
 
 interface PromotionsCarouselProps {
   language: Language
@@ -16,6 +17,8 @@ export function PromotionsCarousel({ language }: PromotionsCarouselProps) {
   const { promotions, loading } = useMenu()
   const { addPromotionToCart } = useCart()
   const [currentIndex, setCurrentIndex] = useState(0)
+  const [selectedPromotion, setSelectedPromotion] = useState<Promotion | null>(null)
+  const [isModalOpen, setIsModalOpen] = useState(false)
 
   // Active promotions ni hisoblash (useMemo bilan optimizatsiya)
   const activePromotions = useMemo(() => {
@@ -40,28 +43,16 @@ export function PromotionsCarousel({ language }: PromotionsCarouselProps) {
     }
   }, [activePromotions.length])
 
-  // Menu section'ga scroll qilish funksiyasi
-  const scrollToMenu = () => {
-    // Agar promotion'da linked_product bo'lsa, shu mahsulotga scroll qilish
-    if (currentPromotion?.linked_product) {
-      const linkedProductId = currentPromotion.linked_product.toString()
-      const productElement = document.querySelector(`[data-menu-item-id="${linkedProductId}"]`)
-      if (productElement) {
-        productElement.scrollIntoView({ behavior: 'smooth', block: 'center' })
-        // Highlight effect uchun
-        productElement.classList.add('highlight-promotion')
-        setTimeout(() => {
-          productElement.classList.remove('highlight-promotion')
-        }, 3000)
-        return
-      }
-    }
-    
-    // Agar linked_product yo'q bo'lsa yoki topilmasa, menu grid'ga scroll qilish
-    const menuGrid = document.querySelector('.grid.grid-cols-1.sm\\:grid-cols-2.xl\\:grid-cols-3')
-    if (menuGrid) {
-      menuGrid.scrollIntoView({ behavior: 'smooth', block: 'start' })
-    }
+  // Modal ochish funksiyasi
+  const openModal = () => {
+    setSelectedPromotion(currentPromotion)
+    setIsModalOpen(true)
+  }
+
+  // Modal yopish funksiyasi
+  const closeModal = () => {
+    setIsModalOpen(false)
+    setSelectedPromotion(null)
   }
 
   // Promotion'ni savatga qo'shish funksiyasi
@@ -156,7 +147,7 @@ export function PromotionsCarousel({ language }: PromotionsCarouselProps) {
               {/* Tugmalar */}
               <div className="flex gap-3">
                 <Button 
-                  onClick={scrollToMenu}
+                  onClick={openModal}
                   size="sm"
                   className="bg-white/20 backdrop-blur-xl border border-white/30 text-white hover:bg-white/30 rounded-full text-sm font-semibold flex-1"
                 >
@@ -209,6 +200,14 @@ export function PromotionsCarousel({ language }: PromotionsCarouselProps) {
           </>
         )}
       </div>
+
+      {/* Promotion Modal */}
+      <PromotionModal
+        promotion={selectedPromotion}
+        isOpen={isModalOpen}
+        onClose={closeModal}
+        language={language}
+      />
     </div>
   )
 }
