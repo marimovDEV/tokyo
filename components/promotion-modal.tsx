@@ -143,7 +143,7 @@ export function PromotionModal({ promotion, isOpen, onClose, language }: Promoti
                 {promotion.start_date && (
                   <div className="flex justify-between">
                     <span className="text-white/70">
-                      {language === "uz"*(language === "uz" ? "Boshlanish:" : language === "ru" ? "Начало:" : "Start:"}
+                      {language === "uz" ? "Boshlanish:" : language === "ru" ? "Начало:" : "Start:"}
                     </span>
                     <span className="text-white font-medium">
                       {new Date(promotion.start_date).toLocaleDateString()}
