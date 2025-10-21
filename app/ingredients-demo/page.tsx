@@ -1,8 +1,11 @@
 "use client"
 
 import { IngredientsDisplay } from "@/components/ingredients-display"
+import { useLanguage } from "@/lib/language-context"
 
 export default function IngredientsDemo() {
+  const { language } = useLanguage()
+  
   const sampleDishes = [
     {
       name: "California Roll",
@@ -32,11 +35,15 @@ export default function IngredientsDemo() {
         {/* Header */}
         <div className="text-center mb-12">
           <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
-            Ovqat Tarkibi Komponenti
+            {language === "uz" ? "Ovqat Tarkibi Komponenti" : language === "ru" ? "Компонент Состава Блюда" : "Dish Ingredients Component"}
           </h1>
           <p className="text-gray-400 text-lg max-w-2xl mx-auto">
-            Zamonaviy restoran menyusi uchun ingredientlar ko'rsatish komponenti. 
-            Mobil qurilmalarda modal, desktop'da tooltip bilan ishlaydi.
+            {language === "uz" 
+              ? "Zamonaviy restoran menyusi uchun ingredientlar ko'rsatish komponenti. Mobil qurilmalarda modal, desktop'da tooltip bilan ishlaydi."
+              : language === "ru" 
+              ? "Компонент для отображения ингредиентов современного ресторанного меню. Работает с модальными окнами на мобильных устройствах и подсказками на десктопе."
+              : "Modern restaurant menu ingredient display component. Works with modals on mobile devices and tooltips on desktop."
+            }
           </p>
         </div>
 
@@ -55,7 +62,9 @@ export default function IngredientsDemo() {
               
               {/* Ingredients */}
               <div className="mb-4">
-                <p className="text-gray-400 text-sm mb-3">Ingredientlar:</p>
+                <p className="text-gray-400 text-sm mb-3">
+                  {language === "uz" ? "Ingredientlar:" : language === "ru" ? "Ингредиенты:" : "Ingredients:"}
+                </p>
                 <IngredientsDisplay 
                   ingredients={dish.ingredients}
                   maxVisible={3}
@@ -64,8 +73,11 @@ export default function IngredientsDemo() {
               
               {/* Info */}
               <div className="text-xs text-gray-500 mt-4 pt-4 border-t border-gray-700">
-                {dish.ingredients.length} ta ingredient • 
-                {dish.ingredients.length > 3 ? " +" + (dish.ingredients.length - 3) + " ta yana" : " Barchasi ko'rinadi"}
+                {dish.ingredients.length} {language === "uz" ? "ta ingredient" : language === "ru" ? "ингредиентов" : "ingredients"} • 
+                {dish.ingredients.length > 3 
+                  ? ` +${dish.ingredients.length - 3} ${language === "uz" ? "ta yana" : language === "ru" ? "еще" : "more"}`
+                  : ` ${language === "uz" ? "Barchasi ko'rinadi" : language === "ru" ? "Все показаны" : "All visible"}`
+                }
               </div>
             </div>
           ))}
@@ -74,7 +86,7 @@ export default function IngredientsDemo() {
         {/* Instructions */}
         <div className="mt-16 bg-gradient-to-r from-orange-500/10 to-orange-600/10 rounded-2xl p-8 border border-orange-500/20">
           <h2 className="text-2xl font-bold text-white mb-6 text-center">
-            Qanday Ishlaydi?
+            {language === "uz" ? "Qanday Ishlaydi?" : language === "ru" ? "Как Это Работает?" : "How Does It Work?"}
           </h2>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -82,9 +94,16 @@ export default function IngredientsDemo() {
               <div className="w-12 h-12 bg-orange-500 rounded-full flex items-center justify-center mx-auto mb-4">
                 <span className="text-white font-bold">1</span>
               </div>
-              <h3 className="text-lg font-semibold text-white mb-2">Ingredientlar</h3>
+              <h3 className="text-lg font-semibold text-white mb-2">
+                {language === "uz" ? "Ingredientlar" : language === "ru" ? "Ингредиенты" : "Ingredients"}
+              </h3>
               <p className="text-gray-400 text-sm">
-                Faqat 3 ta ingredient ko'rsatiladi, qolganlari +N belgisi bilan yashirinadi
+                {language === "uz" 
+                  ? "Faqat 3 ta ingredient ko'rsatiladi, qolganlari +N belgisi bilan yashirinadi"
+                  : language === "ru" 
+                  ? "Показывается только 3 ингредиента, остальные скрыты с меткой +N"
+                  : "Only 3 ingredients are shown, the rest are hidden with +N label"
+                }
               </p>
             </div>
             
@@ -92,9 +111,16 @@ export default function IngredientsDemo() {
               <div className="w-12 h-12 bg-orange-500 rounded-full flex items-center justify-center mx-auto mb-4">
                 <span className="text-white font-bold">2</span>
               </div>
-              <h3 className="text-lg font-semibold text-white mb-2">Mobil</h3>
+              <h3 className="text-lg font-semibold text-white mb-2">
+                {language === "uz" ? "Mobil" : language === "ru" ? "Мобильный" : "Mobile"}
+              </h3>
               <p className="text-gray-400 text-sm">
-                +N ustiga bosganda modal oynada barcha ingredientlar ko'rinadi
+                {language === "uz" 
+                  ? "+N ustiga bosganda modal oynada barcha ingredientlar ko'rinadi"
+                  : language === "ru" 
+                  ? "При нажатии на +N в модальном окне отображаются все ингредиенты"
+                  : "Clicking +N shows all ingredients in a modal window"
+                }
               </p>
             </div>
             
@@ -102,9 +128,16 @@ export default function IngredientsDemo() {
               <div className="w-12 h-12 bg-orange-500 rounded-full flex items-center justify-center mx-auto mb-4">
                 <span className="text-white font-bold">3</span>
               </div>
-              <h3 className="text-lg font-semibold text-white mb-2">Desktop</h3>
+              <h3 className="text-lg font-semibold text-white mb-2">
+                {language === "uz" ? "Desktop" : language === "ru" ? "Десктоп" : "Desktop"}
+              </h3>
               <p className="text-gray-400 text-sm">
-                +N ustiga olib borganda tooltip'da qolgan ingredientlar ko'rinadi
+                {language === "uz" 
+                  ? "+N ustiga olib borganda tooltip'da qolgan ingredientlar ko'rinadi"
+                  : language === "ru" 
+                  ? "При наведении на +N в подсказке отображаются остальные ингредиенты"
+                  : "Hovering over +N shows remaining ingredients in a tooltip"
+                }
               </p>
             </div>
           </div>

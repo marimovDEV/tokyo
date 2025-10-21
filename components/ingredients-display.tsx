@@ -2,6 +2,8 @@
 
 import { useState } from "react"
 import { X } from "lucide-react"
+import { useLanguage } from "@/lib/language-context"
+import type { Language } from "@/lib/types"
 
 interface IngredientsDisplayProps {
   ingredients: string[]
@@ -14,6 +16,7 @@ export function IngredientsDisplay({
   maxVisible = 3, 
   className = "" 
 }: IngredientsDisplayProps) {
+  const { language } = useLanguage()
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [isHovered, setIsHovered] = useState(false)
 
@@ -98,8 +101,12 @@ export function IngredientsDisplay({
             
             {/* Header */}
             <div className="mb-6">
-              <h3 className="text-xl font-bold text-white mb-2">Ovqat Tarkibi</h3>
-              <p className="text-gray-400 text-sm">Barcha ingredientlar ro'yxati</p>
+              <h3 className="text-xl font-bold text-white mb-2">
+                {language === "uz" ? "Ovqat Tarkibi" : language === "ru" ? "Состав Блюда" : "Dish Ingredients"}
+              </h3>
+              <p className="text-gray-400 text-sm">
+                {language === "uz" ? "Barcha ingredientlar ro'yxati" : language === "ru" ? "Список всех ингредиентов" : "List of all ingredients"}
+              </p>
             </div>
             
             {/* Ingredients List */}
@@ -121,7 +128,7 @@ export function IngredientsDisplay({
                 onClick={closeModal}
                 className="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-orange-500 to-orange-600 text-white font-semibold hover:from-orange-600 hover:to-orange-700 transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-orange-500/50"
               >
-                Yopish
+                {language === "uz" ? "Yopish" : language === "ru" ? "Закрыть" : "Close"}
               </button>
             </div>
           </div>
@@ -149,8 +156,12 @@ export function IngredientsDisplay({
             
             {/* Header */}
             <div className="mb-8">
-              <h3 className="text-2xl font-bold text-white mb-3">Ovqat Tarkibi</h3>
-              <p className="text-gray-400">Barcha ingredientlar ro'yxati</p>
+              <h3 className="text-2xl font-bold text-white mb-3">
+                {language === "uz" ? "Ovqat Tarkibi" : language === "ru" ? "Состав Блюда" : "Dish Ingredients"}
+              </h3>
+              <p className="text-gray-400">
+                {language === "uz" ? "Barcha ingredientlar ro'yxati" : language === "ru" ? "Список всех ингредиентов" : "List of all ingredients"}
+              </p>
             </div>
             
             {/* Ingredients Grid */}
@@ -172,7 +183,7 @@ export function IngredientsDisplay({
                 onClick={closeModal}
                 className="w-full py-4 px-6 rounded-xl bg-gradient-to-r from-orange-500 to-orange-600 text-white font-semibold hover:from-orange-600 hover:to-orange-700 transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-orange-500/50"
               >
-                Yopish
+                {language === "uz" ? "Yopish" : language === "ru" ? "Закрыть" : "Close"}
               </button>
             </div>
           </div>
