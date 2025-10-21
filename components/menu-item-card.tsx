@@ -2,6 +2,7 @@
 import Image from "next/image"
 import { Star, Clock, Weight, Plus, Minus } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { IngredientsDisplay } from "@/components/ingredients-display"
 import type { MenuItem } from "@/lib/types"
 import { useCart } from "@/lib/cart-context"
 
@@ -97,28 +98,18 @@ export function MenuItemCard({ item, language }: MenuItemCardProps) {
         </div>
 
         {/* Ingredients Section */}
-        <div className="mb-5">
-          <p className="text-xs text-gray-400 mb-2 font-medium">
-            {language === "uz" ? "Tarkibi:" : language === "ru" ? "Состав:" : "Ingredients:"}
-          </p>
-          <div className="flex flex-wrap gap-1.5">
-            {Array.isArray(getIngredients()) && getIngredients()
-              .slice(0, 3)
-              .map((ingredient, index) => (
-                <span
-                  key={index}
-                  className="text-xs bg-white/10 text-gray-300 px-2.5 py-1 rounded-full whitespace-nowrap"
-                >
-                  {ingredient}
-                </span>
-              ))}
-            {Array.isArray(getIngredients()) && getIngredients().length > 3 && (
-              <span className="text-xs text-gray-400 px-2.5 py-1">
-                +{getIngredients().length - 3}
-              </span>
-            )}
+        {Array.isArray(getIngredients()) && getIngredients().length > 0 && (
+          <div className="mb-5">
+            <p className="text-xs text-gray-400 mb-2 font-medium">
+              {language === "uz" ? "Tarkibi:" : language === "ru" ? "Состав:" : "Ingredients:"}
+            </p>
+            <IngredientsDisplay 
+              ingredients={getIngredients()}
+              maxVisible={3}
+              className="text-xs"
+            />
           </div>
-        </div>
+        )}
 
         {/* Price and Add Button - Bottom aligned */}
         <div className="flex items-center justify-between gap-4 pt-4 border-t border-white/10 mt-auto">
