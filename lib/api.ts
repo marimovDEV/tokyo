@@ -728,11 +728,9 @@ export const apiClient = new ApiClient();
 
 // Utility functions for formatting
 export const formatPrice = (price: number): string => {
-  return new Intl.NumberFormat("uz-UZ", {
-    style: "currency",
-    currency: "UZS",
-    minimumFractionDigits: 0,
-  }).format(price);
+  // Convert to integer to remove decimal places
+  const integerPrice = Math.round(price);
+  return `${integerPrice.toLocaleString("uz-UZ")} so'm`;
 };
 
 // Utility function to get full image URL
