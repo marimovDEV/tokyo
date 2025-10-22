@@ -22,7 +22,9 @@ export function FeedbackProvider({ children }: { children: ReactNode }) {
   const fetchFeedbacks = async () => {
     try {
       setLoading(true)
+      console.log('Fetching feedbacks from API...')
       const response = await apiClient.getAllFeedbacks()
+      console.log('Feedbacks received:', response)
       setFeedbacks(response)
     } catch (error) {
       console.error('Error fetching feedbacks:', error)
