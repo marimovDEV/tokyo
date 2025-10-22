@@ -4,6 +4,9 @@ import { createContext, useContext, useState, useEffect, type ReactNode } from "
 import type { Feedback } from "./types"
 import { apiClient } from "./api"
 
+// Force API URL to use correct backend
+const correctApiClient = new (apiClient.constructor as any)('http://193.42.124.54/api')
+
 interface FeedbackContextType {
   feedbacks: Feedback[]
   loading: boolean
@@ -23,7 +26,7 @@ export function FeedbackProvider({ children }: { children: ReactNode }) {
     try {
       setLoading(true)
       console.log('Fetching feedbacks from API...')
-      const response = await apiClient.getAllFeedbacks()
+      const response = await correctApiClient.getAllFeedbacks()
       console.log('Feedbacks received:', response)
       setFeedbacks(response)
     } catch (error) {
@@ -40,7 +43,7 @@ export function FeedbackProvider({ children }: { children: ReactNode }) {
 
   const addFeedback = async (feedback: Omit<Feedback, "id" | "date" | "read">) => {
     try {
-      const newFeedback = await apiClient.createFeedback(feedback)
+      const newFeedback = await correctApiClient.createFeedback(feedback)
       setFeedbacks((prev) => [newFeedback, ...prev])
     } catch (error) {
       console.error('Error creating feedback:', error)

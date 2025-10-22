@@ -2,6 +2,10 @@
 
 import { useFeedback } from "@/lib/feedback-context"
 import { useApiClient } from "@/hooks/use-api"
+import { ApiClient } from "@/lib/api"
+
+// Force API URL to use correct backend
+const correctApiClient = new ApiClient('http://193.42.124.54/api')
 import { Trash2, Mail, Phone, MessageSquare } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { toast } from "sonner"
@@ -12,11 +16,16 @@ export function FeedbackTab() {
   
   console.log('FeedbackTab rendered with feedbacks:', feedbacks)
   console.log('Loading state:', loading)
+  
+  // Debug feedback types
+  feedbacks.forEach((feedback, index) => {
+    console.log(`Feedback ${index}: type="${feedback.feedback_type}", color="${getTypeColor(feedback.feedback_type)}"`)
+  })
 
   const handleDelete = async (id: number) => {
     if (confirm("Ushbu fikrni o'chirmoqchimisiz?")) {
       try {
-        await api.delete(`/feedback/${id}/`)
+        await correctApiClient.deleteFeedback(id)
         deleteFeedback(id)
         toast.success("Fikr o'chirildi")
       } catch (error) {
