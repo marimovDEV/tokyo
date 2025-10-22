@@ -34,6 +34,7 @@ export function FeedbackProvider({ children }: { children: ReactNode }) {
   }
 
   useEffect(() => {
+    console.log('FeedbackProvider mounted, fetching feedbacks...')
     fetchFeedbacks()
   }, [])
 

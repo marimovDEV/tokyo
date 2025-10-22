@@ -9,6 +9,9 @@ import { toast } from "sonner"
 export function FeedbackTab() {
   const { feedbacks, deleteFeedback, loading, refreshFeedbacks } = useFeedback()
   const api = useApiClient()
+  
+  console.log('FeedbackTab rendered with feedbacks:', feedbacks)
+  console.log('Loading state:', loading)
 
   const handleDelete = async (id: number) => {
     if (confirm("Ushbu fikrni o'chirmoqchimisiz?")) {
