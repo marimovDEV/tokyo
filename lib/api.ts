@@ -531,6 +531,24 @@ export class ApiClient {
     return response.results;
   }
 
+  async getAllFeedbacks(): Promise<Feedback[]> {
+    const response = await this.request<{results: Feedback[]}>('/feedback/');
+    return response.results;
+  }
+
+  async createFeedback(feedback: Omit<Feedback, 'id' | 'created_at' | 'updated_at'>): Promise<Feedback> {
+    return this.request<Feedback>('/feedback/', {
+      method: 'POST',
+      body: JSON.stringify(feedback),
+    });
+  }
+
+  async deleteFeedback(id: number): Promise<void> {
+    return this.request<void>(`/feedback/${id}/`, {
+      method: 'DELETE',
+    });
+  }
+
   async createReview(review: Omit<Review, 'id' | 'date' | 'approved'>): Promise<Review> {
     return this.request<Review>('/reviews/', {
       method: 'POST',

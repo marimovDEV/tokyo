@@ -91,13 +91,16 @@ export interface Promotion {
 }
 
 export interface Feedback {
-  id: string
+  id: number
+  feedback_type: "suggestion" | "complaint" | "compliment" | "question"
   name: string
-  phone: string
+  email?: string
+  phone?: string
   message: string
-  type: "suggestion" | "complaint"
-  date: string
-  read: boolean
+  rating?: number
+  is_read: boolean
+  created_at: string
+  updated_at: string
 }
 
 export type Language = "uz" | "ru" | "en"
