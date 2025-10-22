@@ -13,6 +13,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Switch } from "@/components/ui/switch"
+import { formatPrice } from "@/lib/api"
 import { useMenu } from "@/lib/menu-context"
 import { useApiClient } from "@/hooks/use-api"
 import { usePromotions, useAdminCategories, useMenuItems } from "@/hooks/use-api"
@@ -613,10 +614,10 @@ export function PromotionsTab() {
                   <p>{promotion.discount_percentage}% chegirma</p>
                 )}
                 {promotion.discount_percentage === 0 && promotion.discount_amount > 0 && (
-                  <p>{promotion.discount_amount.toLocaleString()} so'm chegirma</p>
+                  <p>{formatPrice(promotion.discount_amount)} chegirma</p>
                 )}
                 {promotion.price > 0 && (
-                  <p>Narx: {promotion.price.toLocaleString()} so'm</p>
+                  <p>Narx: {formatPrice(promotion.price)}</p>
                 )}
               </div>
                 </div>

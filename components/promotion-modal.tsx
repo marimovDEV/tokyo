@@ -6,6 +6,7 @@ import { X, Plus, Minus, ShoppingCart, Star, Clock, Weight, Tag } from "lucide-r
 import { Button } from "@/components/ui/button"
 import { useCart } from "@/lib/cart-context"
 import type { Promotion, Language } from "@/lib/types"
+import { formatPrice } from "@/lib/api"
 
 interface PromotionModalProps {
   promotion: Promotion | null
@@ -51,7 +52,7 @@ export function PromotionModal({ promotion, isOpen, onClose, language }: Promoti
     if (promotion.discount_type === 'percent') {
       return `-${promotion.discount_percentage}%`
     } else if (promotion.discount_type === 'amount') {
-      return `-${promotion.discount_amount?.toLocaleString()} so'm`
+      return `-${formatPrice(promotion.discount_amount || 0)}`
     } else if (promotion.discount_type === 'bonus') {
       return getBonusInfo() || "Bonus"
     } else {
@@ -203,7 +204,7 @@ export function PromotionModal({ promotion, isOpen, onClose, language }: Promoti
           {/* Price and Add Button */}
           <div className="flex items-center justify-between gap-4 pt-6 border-t border-white/20">
             <div className="text-3xl font-bold text-amber-400">
-              {getFinalPrice().toLocaleString()} so'm
+              {formatPrice(getFinalPrice())}
             </div>
 
             {cartQuantity === 0 ? (

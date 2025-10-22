@@ -8,6 +8,7 @@ import { ChevronLeft, ChevronRight, ShoppingCart } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { PromotionModal } from "@/components/promotion-modal"
 import type { Language, Promotion } from "@/lib/types"
+import { formatPrice } from "@/lib/api"
 
 interface PromotionsCarouselProps {
   language: Language
@@ -143,7 +144,7 @@ export function PromotionsCarousel({ language }: PromotionsCarouselProps) {
               <div className="absolute top-4 left-4 bg-gradient-to-r from-amber-500 to-amber-600 text-white px-3 py-1 rounded-full text-lg font-bold shadow-lg">
                 {currentPromotion.discount_percentage > 0 && `-${currentPromotion.discount_percentage}%`}
                 {currentPromotion.discount_percentage === 0 && currentPromotion.discount_amount > 0 && 
-                  `-${currentPromotion.discount_amount.toLocaleString()} so'm`
+                  `-${formatPrice(currentPromotion.discount_amount)}`
                 }
               </div>
             )}

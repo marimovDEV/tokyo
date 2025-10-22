@@ -7,6 +7,7 @@ import Image from "next/image"
 import { ChevronLeft, ChevronRight, Tag } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import type { Language } from "@/lib/types"
+import { formatPrice } from "@/lib/api"
 
 export function PromotionsSection() {
   const { promotions, loading } = useMenu()
@@ -114,7 +115,7 @@ export function PromotionsSection() {
                   <div className="absolute top-4 left-4 bg-gradient-to-r from-amber-500 to-amber-600 text-white px-4 py-2 rounded-full text-lg font-bold shadow-lg">
                     {currentPromotion.discount_percentage > 0 && `-${currentPromotion.discount_percentage}%`}
                     {currentPromotion.discount_percentage === 0 && currentPromotion.discount_amount > 0 && 
-                      `-${currentPromotion.discount_amount.toLocaleString()} so'm`
+                      `-${formatPrice(currentPromotion.discount_amount)}`
                     }
                   </div>
                 )}

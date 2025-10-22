@@ -733,6 +733,12 @@ export const formatPrice = (price: number): string => {
   return `${integerPrice.toLocaleString("uz-UZ")} so'm`;
 };
 
+export const formatWeight = (weight: number): string => {
+  // Convert to integer to remove decimal places and add gram symbol
+  const integerWeight = Math.round(weight);
+  return `${integerWeight}г`;
+};
+
 // Utility function to get full image URL
 export const getImageUrl = (imagePath: string | null | undefined): string => {
   if (!imagePath) return '/placeholder.svg';

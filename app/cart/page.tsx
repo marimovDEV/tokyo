@@ -7,6 +7,7 @@ import { useCart } from "@/lib/cart-context"
 import { useLanguage } from "@/lib/language-context"
 import type { Language } from "@/lib/types"
 import { toast } from "sonner"
+import { formatPrice, formatWeight } from "@/lib/api"
 
 export default function CartPage() {
   const { language, setLanguage } = useLanguage()
@@ -160,7 +161,7 @@ export default function CartPage() {
                         {/* Weight and Prep Time */}
                         <div className="flex items-center gap-3 text-sm text-white/60 mb-3">
                           {item.menuItem.weight && (
-                            <span>{item.menuItem.weight}g</span>
+                            <span>{formatWeight(item.menuItem.weight)}</span>
                           )}
                           {item.menuItem.prep_time && (
                             <span>
@@ -171,7 +172,7 @@ export default function CartPage() {
 
                         <div className="flex items-center justify-between gap-4">
                           <div className="text-xl md:text-2xl font-bold text-amber-400">
-                            {(item.menuItem.price * item.quantity).toLocaleString()} so'm
+                            {formatPrice(item.menuItem.price * item.quantity)}
                           </div>
 
                           <div className="flex items-center gap-2 bg-white/10 rounded-full p-1">
@@ -206,7 +207,7 @@ export default function CartPage() {
                   <span className="text-xl text-white font-semibold">
                     {language === "uz" ? "Jami:" : language === "ru" ? "Итого:" : "Total:"}
                   </span>
-                  <span className="text-3xl font-bold text-amber-400">{getTotalPrice().toLocaleString()} so'm</span>
+                  <span className="text-3xl font-bold text-amber-400">{formatPrice(getTotalPrice())}</span>
                 </div>
 
                 <Button

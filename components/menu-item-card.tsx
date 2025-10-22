@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button"
 import { IngredientsDisplay } from "@/components/ingredients-display"
 import type { MenuItem } from "@/lib/types"
 import { useCart } from "@/lib/cart-context"
+import { formatPrice, formatWeight } from "@/lib/api"
 
 interface MenuItemCardProps {
   item: MenuItem
@@ -85,7 +86,7 @@ export function MenuItemCard({ item, language }: MenuItemCardProps) {
             <div className="flex items-center gap-1.5 bg-gray-600/30 px-3 py-1.5 rounded-full">
               <Weight className="w-4 h-4 text-gray-400" />
               <span className="text-gray-300 text-sm font-medium">
-                {typeof item.weight === 'number' ? `${item.weight}g` : `${item.weight}`}
+                {formatWeight(item.weight)}
               </span>
             </div>
           )}
@@ -114,7 +115,7 @@ export function MenuItemCard({ item, language }: MenuItemCardProps) {
         {/* Price and Add Button - Bottom aligned */}
         <div className="flex items-center justify-between gap-4 pt-4 border-t border-white/10 mt-auto">
           <div className="text-xl font-bold text-orange-400">
-            {item.price.toLocaleString()} so'm
+            {formatPrice(item.price)}
           </div>
 
           {quantity === 0 ? (

@@ -13,6 +13,7 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Switch } from "@/components/ui/switch"
+import { formatPrice, formatWeight } from "@/lib/api"
 import { useMenu } from "@/lib/menu-context"
 import { useApiClient } from "@/hooks/use-api"
 import { useMenuItems, useAdminCategories } from "@/hooks/use-api"
@@ -547,7 +548,7 @@ export function MenuItemsTab() {
                 <div className="flex-1 min-w-0">
                   <h3 className="text-base sm:text-lg font-bold text-white truncate">{item.name_uz || item.name}</h3>
                   <p className="text-xs sm:text-sm text-white/60">
-                    {item.price?.toLocaleString() || 0} so'm • {item.weight || 0}g
+                    {formatPrice(item.price || 0)} • {formatWeight(item.weight || 0)}
                   </p>
                 </div>
                 <div className="flex gap-1 sm:gap-2 flex-shrink-0 ml-2">
