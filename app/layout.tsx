@@ -66,9 +66,9 @@ export default function RootLayout({
     "image": "https://tokyokafe.uz/static/images/preview.webp",
     "address": {
       "@type": "PostalAddress",
-      "streetAddress": "Al-Xorazmiy ko'chasi, 12",
-      "addressLocality": "Urganch",
-      "addressRegion": "Xorazm",
+      "streetAddress": "улица Байналминал, 29",
+      "addressLocality": "Ургенч",
+      "addressRegion": "Хорезмская область",
       "postalCode": "220100",
       "addressCountry": "UZ"
     },
