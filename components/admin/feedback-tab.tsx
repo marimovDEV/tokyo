@@ -4,8 +4,8 @@ import { useFeedback } from "@/lib/feedback-context"
 import { useApiClient } from "@/hooks/use-api"
 import { ApiClient } from "@/lib/api"
 
-// Force API URL to use correct backend
-const correctApiClient = new ApiClient('http://193.42.124.54/api')
+// Force API URL to use correct backend with HTTPS
+const correctApiClient = new ApiClient('https://api.tokyokafe.uz/api')
 import { Trash2, Mail, Phone, MessageSquare } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { toast } from "sonner"

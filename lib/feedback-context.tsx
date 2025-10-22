@@ -4,8 +4,8 @@ import { createContext, useContext, useState, useEffect, type ReactNode } from "
 import type { Feedback } from "./types"
 import { apiClient } from "./api"
 
-// Force API URL to use correct backend
-const correctApiClient = new (apiClient.constructor as any)('http://193.42.124.54/api')
+// Force API URL to use correct backend with HTTPS
+const correctApiClient = new (apiClient.constructor as any)('https://api.tokyokafe.uz/api')
 
 interface FeedbackContextType {
   feedbacks: Feedback[]
