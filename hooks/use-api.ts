@@ -372,7 +372,9 @@ export function useMenuItems() {
     try {
       setLoading(true);
       setError(null);
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://api.tokyokafe.uz/api'}/menu-items/`, {
+      const apiUrl = 'https://api.tokyokafe.uz/api';
+      console.log('useMenuItems: Fetching from API URL:', apiUrl);
+      const response = await fetch(`${apiUrl}/menu-items/`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -385,6 +387,8 @@ export function useMenuItems() {
       }
       
       const data = await response.json();
+      console.log('useMenuItems: API Response:', data);
+      console.log('useMenuItems: Menu items count:', data.results?.length || 0);
       setMenuItems(data.results || []);
     } catch (err) {
       setError(err as Error);

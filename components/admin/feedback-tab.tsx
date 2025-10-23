@@ -16,11 +16,6 @@ export function FeedbackTab() {
   
   console.log('FeedbackTab rendered with feedbacks:', feedbacks)
   console.log('Loading state:', loading)
-  
-  // Debug feedback types
-  feedbacks.forEach((feedback, index) => {
-    console.log(`Feedback ${index}: type="${feedback.feedback_type}", color="${getTypeColor(feedback.feedback_type)}"`)
-  })
 
   const handleDelete = async (id: number) => {
     if (confirm("Ushbu fikrni o'chirmoqchimisiz?")) {
@@ -132,6 +127,14 @@ export function FeedbackTab() {
                         <Phone className="w-4 h-4" />
                         <a href={`tel:${feedback.phone}`} className="hover:text-amber-400 transition-colors">
                           {feedback.phone}
+                        </a>
+                      </div>
+                    )}
+                    {feedback.email && (
+                      <div className="flex items-center gap-2">
+                        <Mail className="w-4 h-4" />
+                        <a href={`mailto:${feedback.email}`} className="hover:text-amber-400 transition-colors">
+                          {feedback.email}
                         </a>
                       </div>
                     )}

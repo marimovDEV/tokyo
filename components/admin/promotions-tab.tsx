@@ -593,7 +593,7 @@ export function PromotionsTab() {
           >
             <div className="relative h-40">
               <Image
-                src={promotion.image || "/placeholder.svg"}
+                src={promotion.image || "https://api.tokyokafe.uz/media/defaults/promo.jpg"}
                 alt={promotion.titleUz}
                 fill
                 className="object-cover"
