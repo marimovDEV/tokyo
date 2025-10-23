@@ -99,9 +99,14 @@ export function MenuItemsTab() {
         toast.success("Taom yangilandi")
       } else {
         // Create new item
+        console.log('Creating new menu item...')
         const newItem = await api.postFormData('/menu-items/', formDataToSend)
+        console.log('New menu item created:', newItem)
         addMenuItem(newItem)
-        refetchMenuItems() // Refetch to ensure data is updated
+        // Force refresh after creation
+        setTimeout(() => {
+          refetchMenuItems()
+        }, 500)
         toast.success("Taom qo'shildi")
       }
 
@@ -150,9 +155,13 @@ export function MenuItemsTab() {
       try {
         // Ensure ID is treated as integer for backend
         const itemId = parseInt(itemToDelete.id)
+        console.log('Deleting menu item with ID:', itemId)
         await api.delete(`/menu-items/${itemId}/`)
         deleteMenuItem(itemToDelete.id)
-        refetchMenuItems() // Refetch to ensure data is updated
+        // Force refresh after deletion
+        setTimeout(() => {
+          refetchMenuItems()
+        }, 500)
         toast.success("Taom o'chirildi")
         setDeleteDialogOpen(false)
         setItemToDelete(null)
