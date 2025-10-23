@@ -18,13 +18,26 @@ export default function FeedbackPage() {
   const [type, setType] = useState<"suggestion" | "complaint">("suggestion")
   const { addFeedback } = useFeedback()
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    addFeedback({ name, phone, message, type })
-    toast.success("Xabaringiz yuborildi! Tez orada siz bilan bog'lanamiz.")
-    setName("")
-    setPhone("")
-    setMessage("")
+    try {
+      await addFeedback({ 
+        name, 
+        phone, 
+        message, 
+        feedback_type: type,
+        email: null,
+        rating: null,
+        is_read: false
+      })
+      toast.success("Xabaringiz yuborildi! Tez orada siz bilan bog'lanamiz.")
+      setName("")
+      setPhone("")
+      setMessage("")
+    } catch (error) {
+      console.error('Error submitting feedback:', error)
+      toast.error("Xatolik yuz berdi. Qaytadan urinib ko'ring.")
+    }
   }
 
   return (

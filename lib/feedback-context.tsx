@@ -41,9 +41,11 @@ export function FeedbackProvider({ children }: { children: ReactNode }) {
     fetchFeedbacks()
   }, [])
 
-  const addFeedback = async (feedback: Omit<Feedback, "id" | "date" | "read">) => {
+  const addFeedback = async (feedback: Omit<Feedback, "id" | "created_at" | "updated_at">) => {
     try {
+      console.log('Creating feedback:', feedback)
       const newFeedback = await correctApiClient.createFeedback(feedback)
+      console.log('Feedback created successfully:', newFeedback)
       setFeedbacks((prev) => [newFeedback, ...prev])
     } catch (error) {
       console.error('Error creating feedback:', error)
