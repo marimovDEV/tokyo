@@ -421,13 +421,8 @@ export function MenuItemsTab() {
                     value={formData.prep_time}
                     onChange={(e) => {
                       const value = e.target.value;
-                      // Allow only numbers and dash for range format like "15-20"
-                      // Simple validation: only digits and single dash allowed
-                      const isValid = /^[\d-]*$/.test(value) && 
-                                    !value.includes('--') && 
-                                    !value.startsWith('-') && 
-                                    !value.endsWith('-') &&
-                                    (value === '' || /^\d+(-\d+)?$/.test(value));
+                      // Allow numbers, dash, and spaces for formats like "15-20", "15 - 20", "15 min"
+                      const isValid = /^[\d\s\-a-zA-Z]*$/.test(value);
                       
                       if (isValid) {
                         setFormData({ ...formData, prep_time: value });

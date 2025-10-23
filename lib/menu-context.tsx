@@ -188,19 +188,25 @@ export function MenuProvider({ children }: { children: React.ReactNode }) {
   const addMenuItem = (item: MenuItem) => {
     setMenuItems((prev) => [...prev, item])
     // Refetch from API to ensure consistency
-    refetchMenuItems()
+    setTimeout(() => {
+      refetchMenuItems()
+    }, 100)
   }
 
   const updateMenuItem = (id: string, updates: Partial<MenuItem>) => {
     setMenuItems((prev) => prev.map((item) => (item.id === id ? { ...item, ...updates } : item)))
     // Refetch from API to ensure consistency
-    refetchMenuItems()
+    setTimeout(() => {
+      refetchMenuItems()
+    }, 100)
   }
 
   const deleteMenuItem = (id: string) => {
     setMenuItems((prev) => prev.filter((item) => item.id !== id))
     // Refetch from API to ensure consistency
-    refetchMenuItems()
+    setTimeout(() => {
+      refetchMenuItems()
+    }, 100)
   }
 
   const addPromotion = (promotion: Promotion) => {
