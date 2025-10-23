@@ -46,6 +46,7 @@ export function MenuItemsTab() {
     ingredients_ru: "",
     rating: 5,
     prep_time: "15", // String for range format like "15-20"
+    order: 0, // Kategoriyadagi tartib raqami
     category: "",
     available: true,
     is_active: true,
@@ -82,6 +83,7 @@ export function MenuItemsTab() {
       formDataToSend.append('ingredients_ru', JSON.stringify(ingredientsRuArray))
       formDataToSend.append('rating', formData.rating.toString())
       formDataToSend.append('prep_time', formData.prep_time) // Already string
+      formDataToSend.append('order', formData.order.toString())
       formDataToSend.append('category', formData.category.toString())
       formDataToSend.append('available', formData.available.toString())
       formDataToSend.append('is_active', formData.is_active.toString())
@@ -137,6 +139,7 @@ export function MenuItemsTab() {
       ingredients_ru: Array.isArray(item.ingredients_ru) ? item.ingredients_ru.join(", ") : (item.ingredients_ru || ""),
       rating: item.rating || 5,
       prep_time: item.prep_time || "15", // String for range format
+      order: item.order || 0,
       category: item.category ? item.category.toString() : "",
       available: item.available !== false,
       is_active: item.is_active !== false,
@@ -196,6 +199,7 @@ export function MenuItemsTab() {
       ingredients_ru: "",
       rating: 5,
       prep_time: "15", // String for range format
+      order: 0,
       category: "",
       available: true,
       is_active: true,
@@ -441,6 +445,23 @@ export function MenuItemsTab() {
                     placeholder="15-20"
                     required
                   />
+                </div>
+                <div>
+                  <Label htmlFor="order" className="text-white text-sm">
+                    Tartib raqami
+                  </Label>
+                  <Input
+                    id="order"
+                    type="number"
+                    min="0"
+                    value={formData.order}
+                    onChange={(e) => setFormData({ ...formData, order: parseInt(e.target.value) || 0 })}
+                    className="bg-white/10 border-white/20 text-white text-sm"
+                    placeholder="0 (avtomatik)"
+                  />
+                  <p className="text-xs text-white/60 mt-1">
+                    Agar kiritilmasa, avtomatik ravishda oxirgi o'rindan keyin qo'shiladi
+                  </p>
                 </div>
               </div>
 
