@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Restaurant Menu System
 
 A complete restaurant menu management system with Django REST API backend and Next.js frontend.
@@ -238,3 +239,6 @@ For questions or issues:
 2. Review the API endpoints
 3. Check Django and Next.js documentation
 4. Create an issue in the repository
+=======
+# Force Vercel redeploy
+>>>>>>> 79810ef833d943563cd53eefb505f1a445667698
