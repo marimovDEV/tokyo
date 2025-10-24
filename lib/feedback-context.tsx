@@ -46,7 +46,8 @@ export function FeedbackProvider({ children }: { children: ReactNode }) {
       console.log('Creating feedback:', feedback)
       const newFeedback = await correctApiClient.createFeedback(feedback)
       console.log('Feedback created successfully:', newFeedback)
-      setFeedbacks((prev) => [newFeedback, ...prev])
+      // Don't update local state, just refresh from API to ensure consistency
+      await fetchFeedbacks()
     } catch (error) {
       console.error('Error creating feedback:', error)
       throw error
@@ -57,8 +58,9 @@ export function FeedbackProvider({ children }: { children: ReactNode }) {
     setFeedbacks((prev) => prev.map((f) => (f.id === id ? { ...f, is_read: true } : f)))
   }
 
-  const deleteFeedback = (id: number) => {
-    setFeedbacks((prev) => prev.filter((f) => f.id !== id))
+  const deleteFeedback = async (id: number) => {
+    // Don't update local state, just refresh from API to ensure consistency
+    await fetchFeedbacks()
   }
 
   const refreshFeedbacks = async () => {

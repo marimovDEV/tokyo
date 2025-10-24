@@ -21,7 +21,7 @@ export function FeedbackTab() {
     if (confirm("Ushbu fikrni o'chirmoqchimisiz?")) {
       try {
         await correctApiClient.deleteFeedback(id)
-        deleteFeedback(id)
+        await deleteFeedback(id) // Wait for refresh
         toast.success("Fikr o'chirildi")
       } catch (error) {
         console.error('Error deleting feedback:', error)
