@@ -187,6 +187,12 @@ export function MenuItemsTab() {
         // Force refresh from API
         await refetchMenuItems()
         console.log('Menu items refreshed after delete')
+        
+        // Force additional refresh to ensure UI updates
+        setTimeout(() => {
+          refetchMenuItems()
+        }, 100)
+        
         toast.success("Taom o'chirildi")
       } catch (error) {
         console.error('Error deleting menu item:', error)

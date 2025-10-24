@@ -122,6 +122,12 @@ export function CategoriesTab() {
         // Then refetch data
         await refetchCategories() // Refetch to ensure data is updated
         console.log('Categories refreshed after delete')
+        
+        // Force additional refresh to ensure UI updates
+        setTimeout(() => {
+          refetchCategories()
+        }, 100)
+        
         toast.success("Kategoriya o'chirildi")
       } catch (error) {
         console.error('Error deleting category:', error)

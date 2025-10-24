@@ -219,6 +219,12 @@ export function PromotionsTab() {
         // Then refetch data
         await refetchPromotions() // Wait for refetch to complete
         console.log('Promotions refreshed after delete')
+        
+        // Force additional refresh to ensure UI updates
+        setTimeout(() => {
+          refetchPromotions()
+        }, 100)
+        
         toast.success("Aksiya o'chirildi")
       } catch (error) {
         console.error('Error deleting promotion:', error)

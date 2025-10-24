@@ -316,6 +316,7 @@ export function useCategories() {
   }, []); // Empty dependency array to prevent infinite loop
 
   const refetch = useCallback(() => {
+    console.log('useCategories: Force refetch called');
     fetchCategories();
   }, [fetchCategories]);
 
@@ -359,6 +360,7 @@ export function useAdminCategories() {
   }, [fetchCategories]);
 
   const refetch = useCallback(() => {
+    console.log('useAdminCategories: Force refetch called');
     fetchCategories();
   }, [fetchCategories]);
 
@@ -409,6 +411,7 @@ export function useMenuItems() {
   }, [fetchMenuItems]); // Proper dependency array
 
   const refetch = useCallback(() => {
+    console.log('useMenuItems: Force refetch called');
     fetchMenuItems();
   }, [fetchMenuItems]);
 
@@ -482,6 +485,7 @@ export function usePromotions() {
   }, [fetchPromotions]); // Proper dependency array
 
   const refetch = useCallback(() => {
+    console.log('usePromotions: Force refetch called');
     fetchPromotions();
   }, [fetchPromotions]);
 

@@ -24,6 +24,12 @@ export function FeedbackTab() {
       try {
         await correctApiClient.deleteFeedback(id)
         await deleteFeedback(id) // Wait for refresh
+        
+        // Force additional refresh to ensure UI updates
+        setTimeout(() => {
+          refreshFeedbacks()
+        }, 100)
+        
         toast.success("Fikr o'chirildi")
       } catch (error) {
         console.error('Error deleting feedback:', error)
