@@ -128,10 +128,10 @@ export function PromotionsTab() {
         toast.success("Aksiya qo'shildi")
       }
       
-      // Force multiple refreshes to ensure UI updates immediately
+      // Force refresh to ensure UI updates immediately
       await refetchPromotions() // Refetch to ensure data is updated
-      setTimeout(() => refetchPromotions(), 100) // Force additional refresh
-      setTimeout(() => refetchPromotions(), 300) // Another refresh for safety
+      // Single additional refresh for safety
+      setTimeout(() => refetchPromotions(), 200)
       setIsDialogOpen(false)
       resetForm()
     } catch (error) {

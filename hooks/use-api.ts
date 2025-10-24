@@ -15,26 +15,46 @@ export function useApiClient() {
       const separator = endpoint.includes('?') ? '&' : '?';
       const url = `${process.env.NEXT_PUBLIC_API_URL || 'https://api.tokyokafe.uz/api'}${endpoint}${separator}t=${timestamp}`;
       
-      try {
-        const response = await fetch(url, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          credentials: 'include',
-          cache: 'no-cache', // Cache-ni to'liq o'chirish
-        });
-        
-        if (!response.ok) {
-          const errorText = await response.text();
-          throw new Error(`API request failed: ${response.status} ${response.statusText} - ${errorText}`);
+      // Retry mechanism for network errors
+      let lastError;
+      for (let attempt = 1; attempt <= 3; attempt++) {
+        try {
+          const response = await fetch(url, {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+            cache: 'no-cache', // Cache-ni to'liq o'chirish
+            signal: AbortSignal.timeout(10000), // 10 second timeout
+          });
+          
+          if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`API request failed: ${response.status} ${response.statusText} - ${errorText}`);
+          }
+          
+          const data = await response.json();
+          return data;
+        } catch (error) {
+          lastError = error;
+          console.warn(`API request attempt ${attempt} failed:`, error);
+          
+          // Don't retry on client errors (4xx) or server errors (5xx)
+          if (error.message && (error.message.includes('400') || error.message.includes('401') || 
+              error.message.includes('403') || error.message.includes('404') || 
+              error.message.includes('500'))) {
+            throw error;
+          }
+          
+          // Wait before retry (exponential backoff)
+          if (attempt < 3) {
+            await new Promise(resolve => setTimeout(resolve, attempt * 1000));
+          }
         }
-        
-        const data = await response.json();
-        return data;
-      } catch (error) {
-        throw error;
       }
+      
+      throw lastError;
     },
 
     // POST so'rovlar
@@ -285,8 +305,16 @@ export function useCategories() {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
+  const [lastFetchTime, setLastFetchTime] = useState(0);
 
-  const fetchCategories = useCallback(async () => {
+  const fetchCategories = useCallback(async (force = false) => {
+    // Prevent excessive API calls - only fetch if more than 5 seconds have passed or forced
+    const now = Date.now();
+    if (!force && now - lastFetchTime < 5000) {
+      console.log('useCategories: Skipping fetch - too recent');
+      return;
+    }
+
     try {
       setLoading(true);
       setError(null);
@@ -308,20 +336,22 @@ export function useCategories() {
       
       const data = await response.json();
       setCategories(data.results || []);
+      setLastFetchTime(now);
     } catch (err) {
+      console.error('useCategories: Error fetching categories:', err);
       setError(err as Error);
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [lastFetchTime]);
 
   useEffect(() => {
-    fetchCategories();
+    fetchCategories(true); // Force initial fetch
   }, []); // Empty dependency array to prevent infinite loop
 
   const refetch = useCallback(() => {
     console.log('useCategories: Force refetch called');
-    fetchCategories();
+    fetchCategories(true); // Force refetch
   }, [fetchCategories]);
 
   return { categories, loading, error, refetch };
@@ -376,8 +406,16 @@ export function useMenuItems() {
   const [menuItems, setMenuItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
+  const [lastFetchTime, setLastFetchTime] = useState(0);
 
-  const fetchMenuItems = useCallback(async () => {
+  const fetchMenuItems = useCallback(async (force = false) => {
+    // Prevent excessive API calls - only fetch if more than 5 seconds have passed or forced
+    const now = Date.now();
+    if (!force && now - lastFetchTime < 5000) {
+      console.log('useMenuItems: Skipping fetch - too recent');
+      return;
+    }
+
     try {
       setLoading(true);
       setError(null);
@@ -403,20 +441,22 @@ export function useMenuItems() {
       console.log('useMenuItems: API Response:', data);
       console.log('useMenuItems: Menu items count:', data.results?.length || 0);
       setMenuItems(data.results || []);
+      setLastFetchTime(now);
     } catch (err) {
+      console.error('useMenuItems: Error fetching menu items:', err);
       setError(err as Error);
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [lastFetchTime]);
 
   useEffect(() => {
-    fetchMenuItems();
-  }, [fetchMenuItems]); // Proper dependency array
+    fetchMenuItems(true); // Force initial fetch
+  }, []); // Empty dependency array to prevent infinite loops
 
   const refetch = useCallback(() => {
     console.log('useMenuItems: Force refetch called');
-    fetchMenuItems();
+    fetchMenuItems(true); // Force refetch
   }, [fetchMenuItems]);
 
   return { menuItems, loading, error, refetch };
@@ -455,8 +495,16 @@ export function usePromotions() {
   const [promotions, setPromotions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
+  const [lastFetchTime, setLastFetchTime] = useState(0);
 
-  const fetchPromotions = useCallback(async () => {
+  const fetchPromotions = useCallback(async (force = false) => {
+    // Prevent excessive API calls - only fetch if more than 5 seconds have passed or forced
+    const now = Date.now();
+    if (!force && now - lastFetchTime < 5000) {
+      console.log('usePromotions: Skipping fetch - too recent');
+      return;
+    }
+
     try {
       setLoading(true);
       setError(null);
@@ -477,20 +525,22 @@ export function usePromotions() {
       
       const data = await response.json();
       setPromotions(data.results || []);
+      setLastFetchTime(now);
     } catch (err) {
+      console.error('usePromotions: Error fetching promotions:', err);
       setError(err as Error);
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [lastFetchTime]);
 
   useEffect(() => {
-    fetchPromotions();
-  }, [fetchPromotions]); // Proper dependency array
+    fetchPromotions(true); // Force initial fetch
+  }, []); // Empty dependency array to prevent infinite loops
 
   const refetch = useCallback(() => {
     console.log('usePromotions: Force refetch called');
-    fetchPromotions();
+    fetchPromotions(true); // Force refetch
   }, [fetchPromotions]);
 
   return { promotions, loading, error, refetch };

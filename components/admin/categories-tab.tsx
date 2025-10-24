@@ -52,18 +52,18 @@ export function CategoriesTab() {
         // Update existing category
         const categoryId = parseInt(editingCategory.id)
         const updatedCategory = await api.patch(`/categories/${categoryId}/`, categoryData)
-        // Force multiple refreshes to ensure UI updates immediately
+        // Force refresh to ensure UI updates immediately
         await refetchCategories() // Refetch to ensure data is updated
-        setTimeout(() => refetchCategories(), 100) // Force additional refresh
-        setTimeout(() => refetchCategories(), 300) // Another refresh for safety
+        // Single additional refresh for safety
+        setTimeout(() => refetchCategories(), 200)
         toast.success("Kategoriya yangilandi")
       } else {
         // Create new category
         const newCategory = await api.post('/categories/', categoryData)
-        // Force multiple refreshes to ensure UI updates immediately
+        // Force refresh to ensure UI updates immediately
         await refetchCategories() // Refetch to ensure data is updated
-        setTimeout(() => refetchCategories(), 100) // Force additional refresh
-        setTimeout(() => refetchCategories(), 300) // Another refresh for safety
+        // Single additional refresh for safety
+        setTimeout(() => refetchCategories(), 200)
         toast.success("Kategoriya qo'shildi")
       }
 
