@@ -95,7 +95,21 @@ export function CategoriesTab() {
       try {
         // Ensure ID is treated as integer for backend
         const categoryId = parseInt(categoryToDelete.id)
+        console.log('Deleting category with ID:', categoryId, 'Original ID:', categoryToDelete.id)
+        
+        // Check if category exists in current categories
+        const currentCategory = categories.find(cat => cat.id === categoryToDelete.id)
+        if (!currentCategory) {
+          console.warn('Category not found in current categories, refreshing first...')
+          await refetchCategories()
+          toast.error("Bu kategoriya allaqachon o'chirilgan yoki mavjud emas.")
+          setDeleteDialogOpen(false)
+          setCategoryToDelete(null)
+          return
+        }
+        
         await api.delete(`/categories/${categoryId}/`)
+        console.log('Delete successful, refreshing categories...')
         
         // Close dialog first for better UX
         setDeleteDialogOpen(false)
@@ -103,6 +117,7 @@ export function CategoriesTab() {
         
         // Then refetch data
         await refetchCategories() // Refetch to ensure data is updated
+        console.log('Categories refreshed after delete')
         toast.success("Kategoriya o'chirildi")
       } catch (error) {
         console.error('Error deleting category:', error)

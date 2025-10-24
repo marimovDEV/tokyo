@@ -192,7 +192,21 @@ export function PromotionsTab() {
     if (promotionToDelete) {
       try {
         const promotionId = parseInt(promotionToDelete.id)
+        console.log('Deleting promotion with ID:', promotionId, 'Original ID:', promotionToDelete.id)
+        
+        // Check if promotion exists in current promotions
+        const currentPromotion = promotions.find(promo => promo.id === promotionToDelete.id)
+        if (!currentPromotion) {
+          console.warn('Promotion not found in current promotions, refreshing first...')
+          await refetchPromotions()
+          toast.error("Bu aksiya allaqachon o'chirilgan yoki mavjud emas.")
+          setDeleteDialogOpen(false)
+          setPromotionToDelete(null)
+          return
+        }
+        
         await api.delete(`/promotions/${promotionId}/`)
+        console.log('Delete successful, refreshing promotions...')
         
         // Close dialog first for better UX
         setDeleteDialogOpen(false)
@@ -200,6 +214,7 @@ export function PromotionsTab() {
         
         // Then refetch data
         await refetchPromotions() // Wait for refetch to complete
+        console.log('Promotions refreshed after delete')
         toast.success("Aksiya o'chirildi")
       } catch (error) {
         console.error('Error deleting promotion:', error)
