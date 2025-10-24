@@ -26,9 +26,25 @@ export function FeedbackProvider({ children }: { children: ReactNode }) {
     try {
       setLoading(true)
       console.log('Fetching feedbacks from API...')
-      const response = await correctApiClient.getAllFeedbacks()
-      console.log('Feedbacks received:', response)
-      setFeedbacks(response)
+      
+      // Add cache-busting to force fresh data
+      const timestamp = new Date().getTime()
+      const response = await fetch(`https://api.tokyokafe.uz/api/feedback/?t=${timestamp}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        cache: 'no-cache',
+      })
+      
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`)
+      }
+      
+      const data = await response.json()
+      console.log('Feedbacks received:', data.results || [])
+      setFeedbacks(data.results || [])
     } catch (error) {
       console.error('Error fetching feedbacks:', error)
     } finally {
