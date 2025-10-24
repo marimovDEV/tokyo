@@ -21,7 +21,7 @@ import type { MenuItem } from "@/lib/types"
 import { toast } from "sonner"
 
 export function MenuItemsTab() {
-  const { categories, addMenuItem, updateMenuItem, deleteMenuItem } = useMenu()
+  const { categories } = useMenu()
   const { menuItems, refetch: refetchMenuItems, loading: menuItemsLoading } = useMenuItems()
   const { categories: adminCategories } = useAdminCategories()
   const api = useApiClient()
@@ -99,8 +99,8 @@ export function MenuItemsTab() {
         console.log('Updating menu item with ID:', itemId)
         const updatedItem = await api.patchFormData(`/menu-items/${itemId}/`, formDataToSend)
         console.log('Updated item:', updatedItem)
-        updateMenuItem(editingItem.id, updatedItem)
-        refetchMenuItems() // Refetch to ensure data is updated
+        // Force refresh from API
+        await refetchMenuItems()
         toast.success("Taom yangilandi")
       } else {
         // Create new item
@@ -108,11 +108,8 @@ export function MenuItemsTab() {
         console.log('FormData contents:', Array.from(formDataToSend.entries()))
         const newItem = await api.postFormData('/menu-items/', formDataToSend)
         console.log('New menu item created:', newItem)
-        addMenuItem(newItem)
-        // Force refresh after creation
-        setTimeout(() => {
-          refetchMenuItems()
-        }, 500)
+        // Force refresh from API
+        await refetchMenuItems()
         toast.success("Taom qo'shildi")
       }
 
@@ -164,18 +161,32 @@ export function MenuItemsTab() {
         // Ensure ID is treated as integer for backend
         const itemId = parseInt(itemToDelete.id)
         console.log('Deleting menu item with ID:', itemId)
+        
+        // Check if item exists in current menu items
+        const currentItem = menuItems.find(item => item.id === itemToDelete.id)
+        if (!currentItem) {
+          console.warn('Item not found in current menu items, refreshing first...')
+          await refetchMenuItems()
+          toast.error("Bu taom allaqachon o'chirilgan yoki mavjud emas.")
+          setDeleteDialogOpen(false)
+          setItemToDelete(null)
+          return
+        }
+        
         await api.delete(`/menu-items/${itemId}/`)
-        deleteMenuItem(itemToDelete.id)
-        // Force refresh after deletion
-        setTimeout(() => {
-          refetchMenuItems()
-        }, 500)
+        // Force refresh from API
+        await refetchMenuItems()
         toast.success("Taom o'chirildi")
         setDeleteDialogOpen(false)
         setItemToDelete(null)
       } catch (error) {
         console.error('Error deleting menu item:', error)
-        toast.error("Xatolik yuz berdi. Qaytadan urinib ko'ring.")
+        if (error.message.includes('404')) {
+          toast.error("Bu taom allaqachon o'chirilgan yoki mavjud emas.")
+          await refetchMenuItems() // Refresh to sync with server
+        } else {
+          toast.error("Xatolik yuz berdi. Qaytadan urinib ko'ring.")
+        }
       } finally {
         setIsDeleting(false)
       }
