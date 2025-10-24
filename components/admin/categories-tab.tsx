@@ -96,11 +96,14 @@ export function CategoriesTab() {
         // Ensure ID is treated as integer for backend
         const categoryId = parseInt(categoryToDelete.id)
         await api.delete(`/categories/${categoryId}/`)
-        // Don't use deleteCategory to avoid double deleting, just refetch
-        await refetchCategories() // Refetch to ensure data is updated
-        toast.success("Kategoriya o'chirildi")
+        
+        // Close dialog first for better UX
         setDeleteDialogOpen(false)
         setCategoryToDelete(null)
+        
+        // Then refetch data
+        await refetchCategories() // Refetch to ensure data is updated
+        toast.success("Kategoriya o'chirildi")
       } catch (error) {
         console.error('Error deleting category:', error)
         toast.error("Xatolik yuz berdi. Qaytadan urinib ko'ring.")

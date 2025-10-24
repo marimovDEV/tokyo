@@ -193,11 +193,14 @@ export function PromotionsTab() {
       try {
         const promotionId = parseInt(promotionToDelete.id)
         await api.delete(`/promotions/${promotionId}/`)
-        // Don't use deletePromotion to avoid double deleting, just refetch
-        await refetchPromotions() // Wait for refetch to complete
-        toast.success("Aksiya o'chirildi")
+        
+        // Close dialog first for better UX
         setDeleteDialogOpen(false)
         setPromotionToDelete(null)
+        
+        // Then refetch data
+        await refetchPromotions() // Wait for refetch to complete
+        toast.success("Aksiya o'chirildi")
       } catch (error) {
         console.error('Error deleting promotion:', error)
         toast.error(`Xatolik yuz berdi: ${error.message || 'Noma\'lum xato'}`)
