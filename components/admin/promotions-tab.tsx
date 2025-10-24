@@ -119,15 +119,15 @@ export function PromotionsTab() {
       if (editingPromotion) {
         const promotionId = parseInt(editingPromotion.id)
         const updatedPromotion = await api.patchFormData(`/promotions/${promotionId}/`, formDataToSend)
-        updatePromotion(editingPromotion.id, updatedPromotion)
+        // Don't use updatePromotion to avoid double updating, just refetch
         toast.success("Aksiya yangilandi")
       } else {
         const newPromotion = await api.postFormData('/promotions/', formDataToSend)
-        addPromotion(newPromotion)
+        // Don't use addPromotion to avoid double adding, just refetch
         toast.success("Aksiya qo'shildi")
       }
       
-      refetchPromotions() // Refetch to ensure data is updated
+      await refetchPromotions() // Refetch to ensure data is updated
       setIsDialogOpen(false)
       resetForm()
     } catch (error) {
@@ -193,7 +193,7 @@ export function PromotionsTab() {
       try {
         const promotionId = parseInt(promotionToDelete.id)
         await api.delete(`/promotions/${promotionId}/`)
-        deletePromotion(promotionToDelete.id)
+        // Don't use deletePromotion to avoid double deleting, just refetch
         await refetchPromotions() // Wait for refetch to complete
         toast.success("Aksiya o'chirildi")
         setDeleteDialogOpen(false)

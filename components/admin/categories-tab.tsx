@@ -51,14 +51,14 @@ export function CategoriesTab() {
         // Update existing category
         const categoryId = parseInt(editingCategory.id)
         const updatedCategory = await api.patch(`/categories/${categoryId}/`, categoryData)
-        updateCategory(editingCategory.id, updatedCategory)
-        refetchCategories() // Refetch to ensure data is updated
+        // Don't use updateCategory to avoid double updating, just refetch
+        await refetchCategories() // Refetch to ensure data is updated
         toast.success("Kategoriya yangilandi")
       } else {
         // Create new category
         const newCategory = await api.post('/categories/', categoryData)
-        addCategory(newCategory)
-        refetchCategories() // Refetch to ensure data is updated
+        // Don't use addCategory to avoid double adding, just refetch
+        await refetchCategories() // Refetch to ensure data is updated
         toast.success("Kategoriya qo'shildi")
       }
 
@@ -96,8 +96,8 @@ export function CategoriesTab() {
         // Ensure ID is treated as integer for backend
         const categoryId = parseInt(categoryToDelete.id)
         await api.delete(`/categories/${categoryId}/`)
-        deleteCategory(categoryToDelete.id)
-        refetchCategories() // Refetch to ensure data is updated
+        // Don't use deleteCategory to avoid double deleting, just refetch
+        await refetchCategories() // Refetch to ensure data is updated
         toast.success("Kategoriya o'chirildi")
         setDeleteDialogOpen(false)
         setCategoryToDelete(null)
