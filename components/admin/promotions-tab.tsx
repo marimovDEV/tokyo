@@ -30,6 +30,7 @@ export function PromotionsTab() {
   const [editingPromotion, setEditingPromotion] = useState<Promotion | null>(null)
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [promotionToDelete, setPromotionToDelete] = useState<Promotion | null>(null)
+  const [deletingPromotionId, setDeletingPromotionId] = useState<string | null>(null)
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -119,15 +120,15 @@ export function PromotionsTab() {
       if (editingPromotion) {
         const promotionId = parseInt(editingPromotion.id)
         const updatedPromotion = await api.patchFormData(`/promotions/${promotionId}/`, formDataToSend)
-        updatePromotion(editingPromotion.id, updatedPromotion)
+        // Don't use updatePromotion to avoid double updating, just refetch
         toast.success("Aksiya yangilandi")
       } else {
         const newPromotion = await api.postFormData('/promotions/', formDataToSend)
-        addPromotion(newPromotion)
+        // Don't use addPromotion to avoid double adding, just refetch
         toast.success("Aksiya qo'shildi")
       }
       
-      refetchPromotions() // Refetch to ensure data is updated
+      await refetchPromotions() // Refetch to ensure data is updated
       setIsDialogOpen(false)
       resetForm()
     } catch (error) {
@@ -190,17 +191,53 @@ export function PromotionsTab() {
 
   const handleDeleteConfirm = async () => {
     if (promotionToDelete) {
+      setDeletingPromotionId(promotionToDelete.id)
       try {
         const promotionId = parseInt(promotionToDelete.id)
+        console.log('Deleting promotion with ID:', promotionId, 'Original ID:', promotionToDelete.id)
+        
+        // Check if promotion exists in current promotions
+        const currentPromotion = promotions.find(promo => promo.id === promotionToDelete.id)
+        if (!currentPromotion) {
+          console.warn('Promotion not found in current promotions, closing dialog...')
+          toast.error("Bu aksiya allaqachon o'chirilgan yoki mavjud emas.")
+          setDeleteDialogOpen(false)
+          setPromotionToDelete(null)
+          setDeletingPromotionId(null)
+          // Refresh data without trying to delete
+          await refetchPromotions()
+          return
+        }
+        
         await api.delete(`/promotions/${promotionId}/`)
-        deletePromotion(promotionToDelete.id)
-        await refetchPromotions() // Wait for refetch to complete
-        toast.success("Aksiya o'chirildi")
+        console.log('Delete successful, refreshing promotions...')
+        
+        // Close dialog first for better UX
         setDeleteDialogOpen(false)
         setPromotionToDelete(null)
+        
+        // Then refetch data
+        await refetchPromotions() // Wait for refetch to complete
+        console.log('Promotions refreshed after delete')
+        
+        // Force additional refresh to ensure UI updates
+        setTimeout(() => {
+          refetchPromotions()
+        }, 100)
+        
+        toast.success("Aksiya o'chirildi")
       } catch (error) {
         console.error('Error deleting promotion:', error)
-        toast.error(`Xatolik yuz berdi: ${error.message || 'Noma\'lum xato'}`)
+        // If it's a 404 error, it means the promotion was already deleted
+        if (error.message && error.message.includes('404')) {
+          console.log('Promotion already deleted (404), refreshing data...')
+          toast.success("Aksiya o'chirildi")
+          await refetchPromotions()
+        } else {
+          toast.error(`Xatolik yuz berdi: ${error.message || 'Noma\'lum xato'}`)
+        }
+      } finally {
+        setDeletingPromotionId(null)
       }
     }
   }
@@ -589,11 +626,13 @@ export function PromotionsTab() {
           promotions.map((promotion) => (
           <div
             key={promotion.id}
-            className="bg-white/10 backdrop-blur-xl rounded-2xl overflow-hidden border border-white/20 shadow-xl"
+            className={`bg-white/10 backdrop-blur-xl rounded-2xl overflow-hidden border border-white/20 shadow-xl transition-opacity ${
+              deletingPromotionId === promotion.id ? 'opacity-50' : ''
+            }`}
           >
             <div className="relative h-40">
               <Image
-                src={promotion.image || "/placeholder.svg"}
+                src={promotion.image || "https://api.tokyokafe.uz/media/defaults/promo.jpg"}
                 alt={promotion.titleUz}
                 fill
                 className="object-cover"

@@ -95,7 +95,7 @@ export function PromotionModal({ promotion, isOpen, onClose, language }: Promoti
         {/* Image Section */}
         <div className="relative h-64 md:h-80">
           <Image
-            src={promotion.image || promotion.display_image || "/placeholder.svg"}
+            src={promotion.image || promotion.display_image || "https://api.tokyokafe.uz/media/defaults/promo.jpg"}
             alt={getTitle()}
             fill
             className="object-cover"

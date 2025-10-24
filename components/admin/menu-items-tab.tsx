@@ -21,7 +21,7 @@ import type { MenuItem } from "@/lib/types"
 import { toast } from "sonner"
 
 export function MenuItemsTab() {
-  const { categories, addMenuItem, updateMenuItem, deleteMenuItem } = useMenu()
+  const { categories } = useMenu()
   const { menuItems, refetch: refetchMenuItems, loading: menuItemsLoading } = useMenuItems()
   const { categories: adminCategories } = useAdminCategories()
   const api = useApiClient()
@@ -31,6 +31,7 @@ export function MenuItemsTab() {
   const [itemToDelete, setItemToDelete] = useState<MenuItem | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
+  const [deletingItemId, setDeletingItemId] = useState<string | null>(null)
   const [formData, setFormData] = useState({
     name: "",
     name_uz: "",
@@ -46,6 +47,7 @@ export function MenuItemsTab() {
     ingredients_ru: "",
     rating: 5,
     prep_time: "15", // String for range format like "15-20"
+    order: 0, // Kategoriyadagi tartib raqami
     category: "",
     available: true,
     is_active: true,
@@ -61,6 +63,7 @@ export function MenuItemsTab() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsSubmitting(true)
+    console.log('Form submitted with data:', formData)
 
     try {
       const formDataToSend = new FormData()
@@ -82,6 +85,7 @@ export function MenuItemsTab() {
       formDataToSend.append('ingredients_ru', JSON.stringify(ingredientsRuArray))
       formDataToSend.append('rating', formData.rating.toString())
       formDataToSend.append('prep_time', formData.prep_time) // Already string
+      formDataToSend.append('order', formData.order.toString())
       formDataToSend.append('category', formData.category.toString())
       formDataToSend.append('available', formData.available.toString())
       formDataToSend.append('is_active', formData.is_active.toString())
@@ -93,15 +97,20 @@ export function MenuItemsTab() {
       if (editingItem) {
         // Update existing item
         const itemId = parseInt(editingItem.id)
+        console.log('Updating menu item with ID:', itemId)
         const updatedItem = await api.patchFormData(`/menu-items/${itemId}/`, formDataToSend)
-        updateMenuItem(editingItem.id, updatedItem)
-        refetchMenuItems() // Refetch to ensure data is updated
+        console.log('Updated item:', updatedItem)
+        // Force refresh from API
+        await refetchMenuItems()
         toast.success("Taom yangilandi")
       } else {
         // Create new item
+        console.log('Creating new menu item...')
+        console.log('FormData contents:', Array.from(formDataToSend.entries()))
         const newItem = await api.postFormData('/menu-items/', formDataToSend)
-        addMenuItem(newItem)
-        refetchMenuItems() // Refetch to ensure data is updated
+        console.log('New menu item created:', newItem)
+        // Force refresh from API
+        await refetchMenuItems()
         toast.success("Taom qo'shildi")
       }
 
@@ -109,7 +118,8 @@ export function MenuItemsTab() {
       resetForm()
     } catch (error) {
       console.error('Error saving menu item:', error)
-      toast.error("Xatolik yuz berdi. Qaytadan urinib ko'ring.")
+      console.error('Error details:', error.message)
+      toast.error(`Xatolik yuz berdi: ${error.message}`)
     } finally {
       setIsSubmitting(false)
     }
@@ -132,6 +142,7 @@ export function MenuItemsTab() {
       ingredients_ru: Array.isArray(item.ingredients_ru) ? item.ingredients_ru.join(", ") : (item.ingredients_ru || ""),
       rating: item.rating || 5,
       prep_time: item.prep_time || "15", // String for range format
+      order: item.order || 0,
       category: item.category ? item.category.toString() : "",
       available: item.available !== false,
       is_active: item.is_active !== false,
@@ -147,20 +158,55 @@ export function MenuItemsTab() {
   const handleDeleteConfirm = async () => {
     if (itemToDelete) {
       setIsDeleting(true)
+      setDeletingItemId(itemToDelete.id)
       try {
         // Ensure ID is treated as integer for backend
         const itemId = parseInt(itemToDelete.id)
+        console.log('Deleting menu item with ID:', itemId)
+        
+        // Check if item exists in current menu items
+        const currentItem = menuItems.find(item => item.id === itemToDelete.id)
+        if (!currentItem) {
+          console.warn('Item not found in current menu items, closing dialog...')
+          toast.error("Bu taom allaqachon o'chirilgan yoki mavjud emas.")
+          setDeleteDialogOpen(false)
+          setItemToDelete(null)
+          setDeletingItemId(null)
+          // Refresh data without trying to delete
+          await refetchMenuItems()
+          return
+        }
+        
         await api.delete(`/menu-items/${itemId}/`)
-        deleteMenuItem(itemToDelete.id)
-        refetchMenuItems() // Refetch to ensure data is updated
-        toast.success("Taom o'chirildi")
+        console.log('Delete successful, refreshing menu items...')
+        
+        // Close dialog first for better UX
         setDeleteDialogOpen(false)
         setItemToDelete(null)
+        
+        // Force refresh from API
+        await refetchMenuItems()
+        console.log('Menu items refreshed after delete')
+        
+        // Force additional refresh to ensure UI updates
+        setTimeout(() => {
+          refetchMenuItems()
+        }, 100)
+        
+        toast.success("Taom o'chirildi")
       } catch (error) {
         console.error('Error deleting menu item:', error)
-        toast.error("Xatolik yuz berdi. Qaytadan urinib ko'ring.")
+        // If it's a 404 error, it means the item was already deleted
+        if (error.message && error.message.includes('404')) {
+          console.log('Menu item already deleted (404), refreshing data...')
+          toast.success("Taom o'chirildi")
+          await refetchMenuItems()
+        } else {
+          toast.error("Xatolik yuz berdi. Qaytadan urinib ko'ring.")
+        }
       } finally {
         setIsDeleting(false)
+        setDeletingItemId(null)
       }
     }
   }
@@ -187,6 +233,7 @@ export function MenuItemsTab() {
       ingredients_ru: "",
       rating: 5,
       prep_time: "15", // String for range format
+      order: 0,
       category: "",
       available: true,
       is_active: true,
@@ -421,13 +468,8 @@ export function MenuItemsTab() {
                     value={formData.prep_time}
                     onChange={(e) => {
                       const value = e.target.value;
-                      // Allow only numbers and dash for range format like "15-20"
-                      // Simple validation: only digits and single dash allowed
-                      const isValid = /^[\d-]*$/.test(value) && 
-                                    !value.includes('--') && 
-                                    !value.startsWith('-') && 
-                                    !value.endsWith('-') &&
-                                    (value === '' || /^\d+(-\d+)?$/.test(value));
+                      // Allow numbers, dash, and spaces for formats like "15-20", "15 - 20", "15 min"
+                      const isValid = /^[\d\s\-a-zA-Z]*$/.test(value);
                       
                       if (isValid) {
                         setFormData({ ...formData, prep_time: value });
@@ -437,6 +479,23 @@ export function MenuItemsTab() {
                     placeholder="15-20"
                     required
                   />
+                </div>
+                <div>
+                  <Label htmlFor="order" className="text-white text-sm">
+                    Tartib raqami
+                  </Label>
+                  <Input
+                    id="order"
+                    type="number"
+                    min="0"
+                    value={formData.order}
+                    onChange={(e) => setFormData({ ...formData, order: parseInt(e.target.value) || 0 })}
+                    className="bg-white/10 border-white/20 text-white text-sm"
+                    placeholder="0 (oxiriga qo'shish)"
+                  />
+                  <p className="text-xs text-white/60 mt-1">
+                    0 yozilsa oxiriga qo'shiladi. Raqam yozilsa shu o'rinda joylashadi va boshqalar siljidi.
+                  </p>
                 </div>
               </div>
 
@@ -538,7 +597,9 @@ export function MenuItemsTab() {
           menuItems.map((item) => (
           <div
             key={item.id}
-            className="bg-white/10 backdrop-blur-xl rounded-2xl overflow-hidden border border-white/20 shadow-xl"
+            className={`bg-white/10 backdrop-blur-xl rounded-2xl overflow-hidden border border-white/20 shadow-xl transition-opacity ${
+              deletingItemId === item.id ? 'opacity-50' : ''
+            }`}
           >
             <div className="relative h-32">
               <Image src={item.image || "/placeholder.svg"} alt={item.name_uz || item.name} fill className="object-cover" />

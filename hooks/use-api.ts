@@ -287,12 +287,15 @@ export function useCategories() {
       setLoading(true);
       setError(null);
       // Get only active categories for frontend display
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://api.tokyokafe.uz/api'}/categories/`, {
+      // Add cache-busting to always get fresh data
+      const timestamp = new Date().getTime();
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://api.tokyokafe.uz/api'}/categories/?t=${timestamp}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
         },
         credentials: 'include',
+        cache: 'no-cache', // Added this line
       });
       
       if (!response.ok) {
@@ -313,6 +316,7 @@ export function useCategories() {
   }, []); // Empty dependency array to prevent infinite loop
 
   const refetch = useCallback(() => {
+    console.log('useCategories: Force refetch called');
     fetchCategories();
   }, [fetchCategories]);
 
@@ -356,6 +360,7 @@ export function useAdminCategories() {
   }, [fetchCategories]);
 
   const refetch = useCallback(() => {
+    console.log('useAdminCategories: Force refetch called');
     fetchCategories();
   }, [fetchCategories]);
 
@@ -372,12 +377,18 @@ export function useMenuItems() {
     try {
       setLoading(true);
       setError(null);
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://api.tokyokafe.uz/api'}/menu-items/`, {
+      const apiUrl = 'https://api.tokyokafe.uz/api';
+      console.log('useMenuItems: Fetching from API URL:', apiUrl);
+      
+      // Add cache-busting to always get fresh data
+      const timestamp = new Date().getTime();
+      const response = await fetch(`${apiUrl}/menu-items/?t=${timestamp}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
         },
         credentials: 'include',
+        cache: 'no-cache',
       });
       
       if (!response.ok) {
@@ -385,6 +396,8 @@ export function useMenuItems() {
       }
       
       const data = await response.json();
+      console.log('useMenuItems: API Response:', data);
+      console.log('useMenuItems: Menu items count:', data.results?.length || 0);
       setMenuItems(data.results || []);
     } catch (err) {
       setError(err as Error);
@@ -398,6 +411,7 @@ export function useMenuItems() {
   }, [fetchMenuItems]); // Proper dependency array
 
   const refetch = useCallback(() => {
+    console.log('useMenuItems: Force refetch called');
     fetchMenuItems();
   }, [fetchMenuItems]);
 
@@ -471,6 +485,7 @@ export function usePromotions() {
   }, [fetchPromotions]); // Proper dependency array
 
   const refetch = useCallback(() => {
+    console.log('usePromotions: Force refetch called');
     fetchPromotions();
   }, [fetchPromotions]);
 

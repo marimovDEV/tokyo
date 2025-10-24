@@ -1,5 +1,6 @@
 "use client"
 
+import { useState } from "react"
 import { useFeedback } from "@/lib/feedback-context"
 import { useApiClient } from "@/hooks/use-api"
 import { ApiClient } from "@/lib/api"
@@ -13,24 +14,36 @@ import { toast } from "sonner"
 export function FeedbackTab() {
   const { feedbacks, deleteFeedback, loading, refreshFeedbacks } = useFeedback()
   const api = useApiClient()
+  const [deletingFeedbackId, setDeletingFeedbackId] = useState<number | null>(null)
   
   console.log('FeedbackTab rendered with feedbacks:', feedbacks)
   console.log('Loading state:', loading)
-  
-  // Debug feedback types
-  feedbacks.forEach((feedback, index) => {
-    console.log(`Feedback ${index}: type="${feedback.feedback_type}", color="${getTypeColor(feedback.feedback_type)}"`)
-  })
 
   const handleDelete = async (id: number) => {
     if (confirm("Ushbu fikrni o'chirmoqchimisiz?")) {
+      setDeletingFeedbackId(id)
       try {
         await correctApiClient.deleteFeedback(id)
-        deleteFeedback(id)
+        await deleteFeedback(id) // Wait for refresh
+        
+        // Force additional refresh to ensure UI updates
+        setTimeout(() => {
+          refreshFeedbacks()
+        }, 100)
+        
         toast.success("Fikr o'chirildi")
       } catch (error) {
         console.error('Error deleting feedback:', error)
-        toast.error("Xatolik yuz berdi. Qaytadan urinib ko'ring.")
+        // If it's a 404 error, it means the feedback was already deleted
+        if (error.message && error.message.includes('404')) {
+          console.log('Feedback already deleted (404), refreshing data...')
+          toast.success("Fikr o'chirildi")
+          await refreshFeedbacks()
+        } else {
+          toast.error("Xatolik yuz berdi. Qaytadan urinib ko'ring.")
+        }
+      } finally {
+        setDeletingFeedbackId(null)
       }
     }
   }
@@ -115,6 +128,8 @@ export function FeedbackTab() {
                   : feedback.feedback_type === "question"
                   ? "bg-blue-500/10 border-blue-500/30"
                   : "bg-green-500/10 border-green-500/30"
+              } ${
+                deletingFeedbackId === feedback.id ? 'opacity-50' : ''
               }`}
             >
               <div className="flex items-start justify-between gap-4 mb-4">
@@ -132,6 +147,14 @@ export function FeedbackTab() {
                         <Phone className="w-4 h-4" />
                         <a href={`tel:${feedback.phone}`} className="hover:text-amber-400 transition-colors">
                           {feedback.phone}
+                        </a>
+                      </div>
+                    )}
+                    {feedback.email && (
+                      <div className="flex items-center gap-2">
+                        <Mail className="w-4 h-4" />
+                        <a href={`mailto:${feedback.email}`} className="hover:text-amber-400 transition-colors">
+                          {feedback.email}
                         </a>
                       </div>
                     )}

@@ -26,9 +26,25 @@ export function FeedbackProvider({ children }: { children: ReactNode }) {
     try {
       setLoading(true)
       console.log('Fetching feedbacks from API...')
-      const response = await correctApiClient.getAllFeedbacks()
-      console.log('Feedbacks received:', response)
-      setFeedbacks(response)
+      
+      // Add cache-busting to force fresh data
+      const timestamp = new Date().getTime()
+      const response = await fetch(`https://api.tokyokafe.uz/api/feedback/?t=${timestamp}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        cache: 'no-cache',
+      })
+      
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`)
+      }
+      
+      const data = await response.json()
+      console.log('Feedbacks received:', data.results || [])
+      setFeedbacks(data.results || [])
     } catch (error) {
       console.error('Error fetching feedbacks:', error)
     } finally {
@@ -41,10 +57,13 @@ export function FeedbackProvider({ children }: { children: ReactNode }) {
     fetchFeedbacks()
   }, [])
 
-  const addFeedback = async (feedback: Omit<Feedback, "id" | "date" | "read">) => {
+  const addFeedback = async (feedback: Omit<Feedback, "id" | "created_at" | "updated_at">) => {
     try {
+      console.log('Creating feedback:', feedback)
       const newFeedback = await correctApiClient.createFeedback(feedback)
-      setFeedbacks((prev) => [newFeedback, ...prev])
+      console.log('Feedback created successfully:', newFeedback)
+      // Don't update local state, just refresh from API to ensure consistency
+      await fetchFeedbacks()
     } catch (error) {
       console.error('Error creating feedback:', error)
       throw error
@@ -55,8 +74,9 @@ export function FeedbackProvider({ children }: { children: ReactNode }) {
     setFeedbacks((prev) => prev.map((f) => (f.id === id ? { ...f, is_read: true } : f)))
   }
 
-  const deleteFeedback = (id: number) => {
-    setFeedbacks((prev) => prev.filter((f) => f.id !== id))
+  const deleteFeedback = async (id: number) => {
+    // Don't update local state, just refresh from API to ensure consistency
+    await fetchFeedbacks()
   }
 
   const refreshFeedbacks = async () => {

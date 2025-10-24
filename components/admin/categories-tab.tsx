@@ -25,6 +25,7 @@ export function CategoriesTab() {
   const [categoryToDelete, setCategoryToDelete] = useState<Category | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
+  const [deletingCategoryId, setDeletingCategoryId] = useState<string | null>(null)
   const [formData, setFormData] = useState({
     name: "",
     name_uz: "",
@@ -51,14 +52,14 @@ export function CategoriesTab() {
         // Update existing category
         const categoryId = parseInt(editingCategory.id)
         const updatedCategory = await api.patch(`/categories/${categoryId}/`, categoryData)
-        updateCategory(editingCategory.id, updatedCategory)
-        refetchCategories() // Refetch to ensure data is updated
+        // Don't use updateCategory to avoid double updating, just refetch
+        await refetchCategories() // Refetch to ensure data is updated
         toast.success("Kategoriya yangilandi")
       } else {
         // Create new category
         const newCategory = await api.post('/categories/', categoryData)
-        addCategory(newCategory)
-        refetchCategories() // Refetch to ensure data is updated
+        // Don't use addCategory to avoid double adding, just refetch
+        await refetchCategories() // Refetch to ensure data is updated
         toast.success("Kategoriya qo'shildi")
       }
 
@@ -92,20 +93,55 @@ export function CategoriesTab() {
   const handleDeleteConfirm = async () => {
     if (categoryToDelete) {
       setIsDeleting(true)
+      setDeletingCategoryId(categoryToDelete.id)
       try {
         // Ensure ID is treated as integer for backend
         const categoryId = parseInt(categoryToDelete.id)
+        console.log('Deleting category with ID:', categoryId, 'Original ID:', categoryToDelete.id)
+        
+        // Check if category exists in current categories
+        const currentCategory = categories.find(cat => cat.id === categoryToDelete.id)
+        if (!currentCategory) {
+          console.warn('Category not found in current categories, closing dialog...')
+          toast.error("Bu kategoriya allaqachon o'chirilgan yoki mavjud emas.")
+          setDeleteDialogOpen(false)
+          setCategoryToDelete(null)
+          setDeletingCategoryId(null)
+          // Refresh data without trying to delete
+          await refetchCategories()
+          return
+        }
+        
         await api.delete(`/categories/${categoryId}/`)
-        deleteCategory(categoryToDelete.id)
-        refetchCategories() // Refetch to ensure data is updated
-        toast.success("Kategoriya o'chirildi")
+        console.log('Delete successful, refreshing categories...')
+        
+        // Close dialog first for better UX
         setDeleteDialogOpen(false)
         setCategoryToDelete(null)
+        
+        // Then refetch data
+        await refetchCategories() // Refetch to ensure data is updated
+        console.log('Categories refreshed after delete')
+        
+        // Force additional refresh to ensure UI updates
+        setTimeout(() => {
+          refetchCategories()
+        }, 100)
+        
+        toast.success("Kategoriya o'chirildi")
       } catch (error) {
         console.error('Error deleting category:', error)
-        toast.error("Xatolik yuz berdi. Qaytadan urinib ko'ring.")
+        // If it's a 404 error, it means the category was already deleted
+        if (error.message && error.message.includes('404')) {
+          console.log('Category already deleted (404), refreshing data...')
+          toast.success("Kategoriya o'chirildi")
+          await refetchCategories()
+        } else {
+          toast.error("Xatolik yuz berdi. Qaytadan urinib ko'ring.")
+        }
       } finally {
         setIsDeleting(false)
+        setDeletingCategoryId(null)
       }
     }
   }
@@ -239,7 +275,9 @@ export function CategoriesTab() {
             .map((category) => (
             <div
               key={category.id}
-              className="bg-white/10 backdrop-blur-xl rounded-2xl p-3 sm:p-4 border border-white/20 shadow-xl"
+              className={`bg-white/10 backdrop-blur-xl rounded-2xl p-3 sm:p-4 border border-white/20 shadow-xl transition-opacity ${
+                deletingCategoryId === category.id ? 'opacity-50' : ''
+              }`}
             >
               <div className="flex justify-between items-start mb-3">
                 <div className="flex-1 min-w-0">

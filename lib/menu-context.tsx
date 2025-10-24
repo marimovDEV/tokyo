@@ -153,11 +153,19 @@ export function MenuProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (apiMenuItems && Array.isArray(apiMenuItems)) {
+      console.log('Setting menu items from API:', apiMenuItems.length)
       setMenuItems(apiMenuItems as any)
     } else if (!menuItemsLoading && apiMenuItems === null) {
+      console.log('No menu items from API, using empty array')
       setMenuItems([])
     }
   }, [apiMenuItems, menuItemsLoading])
+
+  // Force refresh on mount
+  useEffect(() => {
+    console.log('MenuProvider mounted, forcing refresh...')
+    refetchMenuItems()
+  }, [])
 
   useEffect(() => {
     if (apiPromotions && Array.isArray(apiPromotions)) {
@@ -188,19 +196,25 @@ export function MenuProvider({ children }: { children: React.ReactNode }) {
   const addMenuItem = (item: MenuItem) => {
     setMenuItems((prev) => [...prev, item])
     // Refetch from API to ensure consistency
-    refetchMenuItems()
+    setTimeout(() => {
+      refetchMenuItems()
+    }, 100)
   }
 
   const updateMenuItem = (id: string, updates: Partial<MenuItem>) => {
     setMenuItems((prev) => prev.map((item) => (item.id === id ? { ...item, ...updates } : item)))
     // Refetch from API to ensure consistency
-    refetchMenuItems()
+    setTimeout(() => {
+      refetchMenuItems()
+    }, 100)
   }
 
   const deleteMenuItem = (id: string) => {
     setMenuItems((prev) => prev.filter((item) => item.id !== id))
     // Refetch from API to ensure consistency
-    refetchMenuItems()
+    setTimeout(() => {
+      refetchMenuItems()
+    }, 100)
   }
 
   const addPromotion = (promotion: Promotion) => {
