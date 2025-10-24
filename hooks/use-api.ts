@@ -287,12 +287,15 @@ export function useCategories() {
       setLoading(true);
       setError(null);
       // Get only active categories for frontend display
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://api.tokyokafe.uz/api'}/categories/`, {
+      // Add cache-busting to always get fresh data
+      const timestamp = new Date().getTime();
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://api.tokyokafe.uz/api'}/categories/?t=${timestamp}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
         },
         credentials: 'include',
+        cache: 'no-cache', // Added this line
       });
       
       if (!response.ok) {
