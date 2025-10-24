@@ -481,10 +481,10 @@ export function MenuItemsTab() {
                     value={formData.order}
                     onChange={(e) => setFormData({ ...formData, order: parseInt(e.target.value) || 0 })}
                     className="bg-white/10 border-white/20 text-white text-sm"
-                    placeholder="0 (avtomatik)"
+                    placeholder="0 (oxiriga qo'shish)"
                   />
                   <p className="text-xs text-white/60 mt-1">
-                    Agar kiritilmasa, avtomatik ravishda oxirgi o'rindan keyin qo'shiladi
+                    0 yozilsa oxiriga qo'shiladi. Raqam yozilsa shu o'rinda joylashadi va boshqalar siljidi.
                   </p>
                 </div>
               </div>
