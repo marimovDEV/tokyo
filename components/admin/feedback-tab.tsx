@@ -13,12 +13,14 @@ import { toast } from "sonner"
 export function FeedbackTab() {
   const { feedbacks, deleteFeedback, loading, refreshFeedbacks } = useFeedback()
   const api = useApiClient()
+  const [deletingFeedbackId, setDeletingFeedbackId] = useState<number | null>(null)
   
   console.log('FeedbackTab rendered with feedbacks:', feedbacks)
   console.log('Loading state:', loading)
 
   const handleDelete = async (id: number) => {
     if (confirm("Ushbu fikrni o'chirmoqchimisiz?")) {
+      setDeletingFeedbackId(id)
       try {
         await correctApiClient.deleteFeedback(id)
         await deleteFeedback(id) // Wait for refresh
@@ -26,6 +28,8 @@ export function FeedbackTab() {
       } catch (error) {
         console.error('Error deleting feedback:', error)
         toast.error("Xatolik yuz berdi. Qaytadan urinib ko'ring.")
+      } finally {
+        setDeletingFeedbackId(null)
       }
     }
   }
@@ -110,6 +114,8 @@ export function FeedbackTab() {
                   : feedback.feedback_type === "question"
                   ? "bg-blue-500/10 border-blue-500/30"
                   : "bg-green-500/10 border-green-500/30"
+              } ${
+                deletingFeedbackId === feedback.id ? 'opacity-50' : ''
               }`}
             >
               <div className="flex items-start justify-between gap-4 mb-4">

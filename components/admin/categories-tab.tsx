@@ -25,6 +25,7 @@ export function CategoriesTab() {
   const [categoryToDelete, setCategoryToDelete] = useState<Category | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
+  const [deletingCategoryId, setDeletingCategoryId] = useState<string | null>(null)
   const [formData, setFormData] = useState({
     name: "",
     name_uz: "",
@@ -92,6 +93,7 @@ export function CategoriesTab() {
   const handleDeleteConfirm = async () => {
     if (categoryToDelete) {
       setIsDeleting(true)
+      setDeletingCategoryId(categoryToDelete.id)
       try {
         // Ensure ID is treated as integer for backend
         const categoryId = parseInt(categoryToDelete.id)
@@ -105,6 +107,7 @@ export function CategoriesTab() {
           toast.error("Bu kategoriya allaqachon o'chirilgan yoki mavjud emas.")
           setDeleteDialogOpen(false)
           setCategoryToDelete(null)
+          setDeletingCategoryId(null)
           return
         }
         
@@ -124,6 +127,7 @@ export function CategoriesTab() {
         toast.error("Xatolik yuz berdi. Qaytadan urinib ko'ring.")
       } finally {
         setIsDeleting(false)
+        setDeletingCategoryId(null)
       }
     }
   }
@@ -257,7 +261,9 @@ export function CategoriesTab() {
             .map((category) => (
             <div
               key={category.id}
-              className="bg-white/10 backdrop-blur-xl rounded-2xl p-3 sm:p-4 border border-white/20 shadow-xl"
+              className={`bg-white/10 backdrop-blur-xl rounded-2xl p-3 sm:p-4 border border-white/20 shadow-xl transition-opacity ${
+                deletingCategoryId === category.id ? 'opacity-50' : ''
+              }`}
             >
               <div className="flex justify-between items-start mb-3">
                 <div className="flex-1 min-w-0">

@@ -30,6 +30,7 @@ export function PromotionsTab() {
   const [editingPromotion, setEditingPromotion] = useState<Promotion | null>(null)
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [promotionToDelete, setPromotionToDelete] = useState<Promotion | null>(null)
+  const [deletingPromotionId, setDeletingPromotionId] = useState<string | null>(null)
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -190,6 +191,7 @@ export function PromotionsTab() {
 
   const handleDeleteConfirm = async () => {
     if (promotionToDelete) {
+      setDeletingPromotionId(promotionToDelete.id)
       try {
         const promotionId = parseInt(promotionToDelete.id)
         console.log('Deleting promotion with ID:', promotionId, 'Original ID:', promotionToDelete.id)
@@ -202,6 +204,7 @@ export function PromotionsTab() {
           toast.error("Bu aksiya allaqachon o'chirilgan yoki mavjud emas.")
           setDeleteDialogOpen(false)
           setPromotionToDelete(null)
+          setDeletingPromotionId(null)
           return
         }
         
@@ -219,6 +222,8 @@ export function PromotionsTab() {
       } catch (error) {
         console.error('Error deleting promotion:', error)
         toast.error(`Xatolik yuz berdi: ${error.message || 'Noma\'lum xato'}`)
+      } finally {
+        setDeletingPromotionId(null)
       }
     }
   }
@@ -607,7 +612,9 @@ export function PromotionsTab() {
           promotions.map((promotion) => (
           <div
             key={promotion.id}
-            className="bg-white/10 backdrop-blur-xl rounded-2xl overflow-hidden border border-white/20 shadow-xl"
+            className={`bg-white/10 backdrop-blur-xl rounded-2xl overflow-hidden border border-white/20 shadow-xl transition-opacity ${
+              deletingPromotionId === promotion.id ? 'opacity-50' : ''
+            }`}
           >
             <div className="relative h-40">
               <Image
