@@ -100,8 +100,10 @@ export function MenuItemsTab() {
         console.log('Updating menu item with ID:', itemId)
         const updatedItem = await api.patchFormData(`/menu-items/${itemId}/`, formDataToSend)
         console.log('Updated item:', updatedItem)
-        // Force refresh from API
+        // Force multiple refreshes to ensure UI updates immediately
         await refetchMenuItems()
+        setTimeout(() => refetchMenuItems(), 100) // Force additional refresh
+        setTimeout(() => refetchMenuItems(), 300) // Another refresh for safety
         toast.success("Taom yangilandi")
       } else {
         // Create new item
@@ -109,8 +111,10 @@ export function MenuItemsTab() {
         console.log('FormData contents:', Array.from(formDataToSend.entries()))
         const newItem = await api.postFormData('/menu-items/', formDataToSend)
         console.log('New menu item created:', newItem)
-        // Force refresh from API
+        // Force multiple refreshes to ensure UI updates immediately
         await refetchMenuItems()
+        setTimeout(() => refetchMenuItems(), 100) // Force additional refresh
+        setTimeout(() => refetchMenuItems(), 300) // Another refresh for safety
         toast.success("Taom qo'shildi")
       }
 

@@ -10,7 +10,10 @@ export function useApiClient() {
   const apiClient = useMemo(() => ({
     // GET so'rovlar
     async get<T>(endpoint: string): Promise<T> {
-      const url = `${process.env.NEXT_PUBLIC_API_URL || 'https://api.tokyokafe.uz/api'}${endpoint}`;
+      // Cache-busting uchun timestamp qo'shish
+      const timestamp = new Date().getTime();
+      const separator = endpoint.includes('?') ? '&' : '?';
+      const url = `${process.env.NEXT_PUBLIC_API_URL || 'https://api.tokyokafe.uz/api'}${endpoint}${separator}t=${timestamp}`;
       
       try {
         const response = await fetch(url, {
@@ -19,6 +22,7 @@ export function useApiClient() {
             'Content-Type': 'application/json',
           },
           credentials: 'include',
+          cache: 'no-cache', // Cache-ni to'liq o'chirish
         });
         
         if (!response.ok) {

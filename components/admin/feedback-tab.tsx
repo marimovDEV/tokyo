@@ -26,10 +26,13 @@ export function FeedbackTab() {
         await correctApiClient.deleteFeedback(id)
         await deleteFeedback(id) // Wait for refresh
         
-        // Force additional refresh to ensure UI updates
+        // Force multiple refreshes to ensure UI updates immediately
         setTimeout(() => {
           refreshFeedbacks()
         }, 100)
+        setTimeout(() => {
+          refreshFeedbacks()
+        }, 300)
         
         toast.success("Fikr o'chirildi")
       } catch (error) {
