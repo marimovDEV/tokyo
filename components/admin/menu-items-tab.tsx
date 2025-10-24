@@ -62,6 +62,7 @@ export function MenuItemsTab() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsSubmitting(true)
+    console.log('Form submitted with data:', formData)
 
     try {
       const formDataToSend = new FormData()
@@ -95,13 +96,16 @@ export function MenuItemsTab() {
       if (editingItem) {
         // Update existing item
         const itemId = parseInt(editingItem.id)
+        console.log('Updating menu item with ID:', itemId)
         const updatedItem = await api.patchFormData(`/menu-items/${itemId}/`, formDataToSend)
+        console.log('Updated item:', updatedItem)
         updateMenuItem(editingItem.id, updatedItem)
         refetchMenuItems() // Refetch to ensure data is updated
         toast.success("Taom yangilandi")
       } else {
         // Create new item
         console.log('Creating new menu item...')
+        console.log('FormData contents:', Array.from(formDataToSend.entries()))
         const newItem = await api.postFormData('/menu-items/', formDataToSend)
         console.log('New menu item created:', newItem)
         addMenuItem(newItem)
@@ -116,7 +120,8 @@ export function MenuItemsTab() {
       resetForm()
     } catch (error) {
       console.error('Error saving menu item:', error)
-      toast.error("Xatolik yuz berdi. Qaytadan urinib ko'ring.")
+      console.error('Error details:', error.message)
+      toast.error(`Xatolik yuz berdi: ${error.message}`)
     } finally {
       setIsSubmitting(false)
     }
