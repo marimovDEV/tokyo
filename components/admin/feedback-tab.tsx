@@ -34,7 +34,14 @@ export function FeedbackTab() {
         toast.success("Fikr o'chirildi")
       } catch (error) {
         console.error('Error deleting feedback:', error)
-        toast.error("Xatolik yuz berdi. Qaytadan urinib ko'ring.")
+        // If it's a 404 error, it means the feedback was already deleted
+        if (error.message && error.message.includes('404')) {
+          console.log('Feedback already deleted (404), refreshing data...')
+          toast.success("Fikr o'chirildi")
+          await refreshFeedbacks()
+        } else {
+          toast.error("Xatolik yuz berdi. Qaytadan urinib ko'ring.")
+        }
       } finally {
         setDeletingFeedbackId(null)
       }
