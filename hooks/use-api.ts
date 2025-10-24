@@ -374,12 +374,16 @@ export function useMenuItems() {
       setError(null);
       const apiUrl = 'https://api.tokyokafe.uz/api';
       console.log('useMenuItems: Fetching from API URL:', apiUrl);
-      const response = await fetch(`${apiUrl}/menu-items/`, {
+      
+      // Add cache-busting to always get fresh data
+      const timestamp = new Date().getTime();
+      const response = await fetch(`${apiUrl}/menu-items/?t=${timestamp}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
         },
         credentials: 'include',
+        cache: 'no-cache',
       });
       
       if (!response.ok) {

@@ -31,6 +31,7 @@ export function MenuItemsTab() {
   const [itemToDelete, setItemToDelete] = useState<MenuItem | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
+  const [deletingItemId, setDeletingItemId] = useState<string | null>(null)
   const [formData, setFormData] = useState({
     name: "",
     name_uz: "",
@@ -157,6 +158,7 @@ export function MenuItemsTab() {
   const handleDeleteConfirm = async () => {
     if (itemToDelete) {
       setIsDeleting(true)
+      setDeletingItemId(itemToDelete.id)
       try {
         // Ensure ID is treated as integer for backend
         const itemId = parseInt(itemToDelete.id)
@@ -174,11 +176,16 @@ export function MenuItemsTab() {
         }
         
         await api.delete(`/menu-items/${itemId}/`)
-        // Force refresh from API
-        await refetchMenuItems()
-        toast.success("Taom o'chirildi")
+        console.log('Delete successful, refreshing menu items...')
+        
+        // Close dialog first for better UX
         setDeleteDialogOpen(false)
         setItemToDelete(null)
+        
+        // Force refresh from API
+        await refetchMenuItems()
+        console.log('Menu items refreshed after delete')
+        toast.success("Taom o'chirildi")
       } catch (error) {
         console.error('Error deleting menu item:', error)
         if (error.message.includes('404')) {
@@ -189,6 +196,7 @@ export function MenuItemsTab() {
         }
       } finally {
         setIsDeleting(false)
+        setDeletingItemId(null)
       }
     }
   }
@@ -579,7 +587,9 @@ export function MenuItemsTab() {
           menuItems.map((item) => (
           <div
             key={item.id}
-            className="bg-white/10 backdrop-blur-xl rounded-2xl overflow-hidden border border-white/20 shadow-xl"
+            className={`bg-white/10 backdrop-blur-xl rounded-2xl overflow-hidden border border-white/20 shadow-xl transition-opacity ${
+              deletingItemId === item.id ? 'opacity-50' : ''
+            }`}
           >
             <div className="relative h-32">
               <Image src={item.image || "/placeholder.svg"} alt={item.name_uz || item.name} fill className="object-cover" />
