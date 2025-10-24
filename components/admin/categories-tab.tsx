@@ -102,12 +102,13 @@ export function CategoriesTab() {
         // Check if category exists in current categories
         const currentCategory = categories.find(cat => cat.id === categoryToDelete.id)
         if (!currentCategory) {
-          console.warn('Category not found in current categories, refreshing first...')
-          await refetchCategories()
+          console.warn('Category not found in current categories, closing dialog...')
           toast.error("Bu kategoriya allaqachon o'chirilgan yoki mavjud emas.")
           setDeleteDialogOpen(false)
           setCategoryToDelete(null)
           setDeletingCategoryId(null)
+          // Refresh data without trying to delete
+          await refetchCategories()
           return
         }
         
@@ -124,7 +125,14 @@ export function CategoriesTab() {
         toast.success("Kategoriya o'chirildi")
       } catch (error) {
         console.error('Error deleting category:', error)
-        toast.error("Xatolik yuz berdi. Qaytadan urinib ko'ring.")
+        // If it's a 404 error, it means the category was already deleted
+        if (error.message && error.message.includes('404')) {
+          console.log('Category already deleted (404), refreshing data...')
+          toast.success("Kategoriya o'chirildi")
+          await refetchCategories()
+        } else {
+          toast.error("Xatolik yuz berdi. Qaytadan urinib ko'ring.")
+        }
       } finally {
         setIsDeleting(false)
         setDeletingCategoryId(null)

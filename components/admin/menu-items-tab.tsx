@@ -167,11 +167,13 @@ export function MenuItemsTab() {
         // Check if item exists in current menu items
         const currentItem = menuItems.find(item => item.id === itemToDelete.id)
         if (!currentItem) {
-          console.warn('Item not found in current menu items, refreshing first...')
-          await refetchMenuItems()
+          console.warn('Item not found in current menu items, closing dialog...')
           toast.error("Bu taom allaqachon o'chirilgan yoki mavjud emas.")
           setDeleteDialogOpen(false)
           setItemToDelete(null)
+          setDeletingItemId(null)
+          // Refresh data without trying to delete
+          await refetchMenuItems()
           return
         }
         
@@ -188,9 +190,11 @@ export function MenuItemsTab() {
         toast.success("Taom o'chirildi")
       } catch (error) {
         console.error('Error deleting menu item:', error)
-        if (error.message.includes('404')) {
-          toast.error("Bu taom allaqachon o'chirilgan yoki mavjud emas.")
-          await refetchMenuItems() // Refresh to sync with server
+        // If it's a 404 error, it means the item was already deleted
+        if (error.message && error.message.includes('404')) {
+          console.log('Menu item already deleted (404), refreshing data...')
+          toast.success("Taom o'chirildi")
+          await refetchMenuItems()
         } else {
           toast.error("Xatolik yuz berdi. Qaytadan urinib ko'ring.")
         }

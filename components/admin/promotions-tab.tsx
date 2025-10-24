@@ -199,12 +199,13 @@ export function PromotionsTab() {
         // Check if promotion exists in current promotions
         const currentPromotion = promotions.find(promo => promo.id === promotionToDelete.id)
         if (!currentPromotion) {
-          console.warn('Promotion not found in current promotions, refreshing first...')
-          await refetchPromotions()
+          console.warn('Promotion not found in current promotions, closing dialog...')
           toast.error("Bu aksiya allaqachon o'chirilgan yoki mavjud emas.")
           setDeleteDialogOpen(false)
           setPromotionToDelete(null)
           setDeletingPromotionId(null)
+          // Refresh data without trying to delete
+          await refetchPromotions()
           return
         }
         
@@ -221,7 +222,14 @@ export function PromotionsTab() {
         toast.success("Aksiya o'chirildi")
       } catch (error) {
         console.error('Error deleting promotion:', error)
-        toast.error(`Xatolik yuz berdi: ${error.message || 'Noma\'lum xato'}`)
+        // If it's a 404 error, it means the promotion was already deleted
+        if (error.message && error.message.includes('404')) {
+          console.log('Promotion already deleted (404), refreshing data...')
+          toast.success("Aksiya o'chirildi")
+          await refetchPromotions()
+        } else {
+          toast.error(`Xatolik yuz berdi: ${error.message || 'Noma\'lum xato'}`)
+        }
       } finally {
         setDeletingPromotionId(null)
       }
