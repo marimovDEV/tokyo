@@ -237,11 +237,29 @@ export function CategoriesTab() {
                   <Input
                     id="order"
                     type="number"
+                    min="1"
+                    max={editingCategory ? categories.length : categories.length + 1}
                     value={formData.order}
-                    onChange={(e) => setFormData({ ...formData, order: Number.parseInt(e.target.value) || 0 })}
+                    onChange={(e) => {
+                      const value = Number.parseInt(e.target.value) || 0;
+                      const maxValue = editingCategory ? categories.length : categories.length + 1;
+                      if (value > maxValue) {
+                        setFormData({ ...formData, order: maxValue });
+                      } else if (value < 1) {
+                        setFormData({ ...formData, order: 1 });
+                      } else {
+                        setFormData({ ...formData, order: value });
+                      }
+                    }}
                     className="bg-white/10 border-white/20 text-white"
-                    placeholder="Avtomatik"
+                    placeholder={`1-${editingCategory ? categories.length : categories.length + 1}`}
                   />
+                  <p className="text-xs text-white/60 mt-1">
+                    {editingCategory 
+                      ? `1 dan ${categories.length} gacha raqam kiriting`
+                      : `1 dan ${categories.length + 1} gacha raqam kiriting (yangi kategoriya uchun)`
+                    }
+                  </p>
                 </div>
               </div>
               <Button
@@ -287,7 +305,7 @@ export function CategoriesTab() {
                 <div className="flex-1 min-w-0">
                   <h3 className="text-base sm:text-lg font-bold text-white truncate">{category.name_uz || category.name}</h3>
                   <p className="text-xs sm:text-sm text-white/60">
-                    {category.is_active ? "Faol" : "Noaktiv"}
+                    Tartib: {category.order || 0}
                   </p>
                 </div>
                 <div className="flex gap-1 sm:gap-2 flex-shrink-0 ml-2">
