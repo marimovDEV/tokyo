@@ -58,6 +58,9 @@ export function CategoriesTab() {
         setTimeout(() => refetchCategories(), 200)
         // Extra refresh to ensure order numbers are updated
         setTimeout(() => refetchCategories(), 500)
+        // Additional refreshes for order changes
+        setTimeout(() => refetchCategories(), 1000)
+        setTimeout(() => refetchCategories(), 1500)
         toast.success("Kategoriya yangilandi")
       } else {
         // Create new category

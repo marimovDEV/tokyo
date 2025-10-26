@@ -13,8 +13,9 @@ export function useApiClient() {
       // Cache-busting uchun timestamp qo'shish
       const timestamp = new Date().getTime();
       const random = Math.random().toString(36).substring(7);
+      const random2 = Math.random().toString(36).substring(7);
       const separator = endpoint.includes('?') ? '&' : '?';
-      const url = `${process.env.NEXT_PUBLIC_API_URL || 'https://api.tokyokafe.uz/api'}${endpoint}${separator}t=${timestamp}&r=${random}`;
+      const url = `${process.env.NEXT_PUBLIC_API_URL || 'https://api.tokyokafe.uz/api'}${endpoint}${separator}t=${timestamp}&r=${random}&r2=${random2}`;
       
       // Retry mechanism for network errors
       let lastError;
@@ -372,7 +373,8 @@ export function useAdminCategories() {
       // Admin uchun barcha kategoriyalarni olish (o'chirilganlar ham)
       const timestamp = new Date().getTime();
       const random = Math.random().toString(36).substring(7);
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://api.tokyokafe.uz/api'}/categories/?show_all=true&t=${timestamp}&r=${random}`, {
+      const random2 = Math.random().toString(36).substring(7);
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://api.tokyokafe.uz/api'}/categories/?show_all=true&t=${timestamp}&r=${random}&r2=${random2}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
