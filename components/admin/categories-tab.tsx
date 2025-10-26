@@ -266,7 +266,7 @@ export function CategoriesTab() {
                   />
                   <p className="text-xs text-white/60 mt-1">
                     {editingCategory 
-                      ? `1 dan ${categories.length} gacha raqam kiriting`
+                      ? `1 dan ${categories.length} gacha raqam kiriting. Masalan: ${formData.order === 1 ? "birinchi o'rinda" : formData.order === categories.length ? "oxirgi o'rinda" : `${formData.order} o'rinda`}`
                       : `1 dan ${categories.length + 1} gacha raqam kiriting (yangi kategoriya uchun)`
                     }
                   </p>
