@@ -12,8 +12,9 @@ export function useApiClient() {
     async get<T>(endpoint: string): Promise<T> {
       // Cache-busting uchun timestamp qo'shish
       const timestamp = new Date().getTime();
+      const random = Math.random().toString(36).substring(7);
       const separator = endpoint.includes('?') ? '&' : '?';
-      const url = `${process.env.NEXT_PUBLIC_API_URL || 'https://api.tokyokafe.uz/api'}${endpoint}${separator}t=${timestamp}`;
+      const url = `${process.env.NEXT_PUBLIC_API_URL || 'https://api.tokyokafe.uz/api'}${endpoint}${separator}t=${timestamp}&r=${random}`;
       
       // Retry mechanism for network errors
       let lastError;
@@ -321,7 +322,8 @@ export function useCategories() {
       // Get only active categories for frontend display
       // Add cache-busting to always get fresh data
       const timestamp = new Date().getTime();
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://api.tokyokafe.uz/api'}/categories/?t=${timestamp}`, {
+      const random = Math.random().toString(36).substring(7);
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://api.tokyokafe.uz/api'}/categories/?t=${timestamp}&r=${random}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -368,7 +370,9 @@ export function useAdminCategories() {
       setLoading(true);
       setError(null);
       // Admin uchun barcha kategoriyalarni olish (o'chirilganlar ham)
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://api.tokyokafe.uz/api'}/categories/?show_all=true`, {
+      const timestamp = new Date().getTime();
+      const random = Math.random().toString(36).substring(7);
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://api.tokyokafe.uz/api'}/categories/?show_all=true&t=${timestamp}&r=${random}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
