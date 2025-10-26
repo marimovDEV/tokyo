@@ -56,6 +56,8 @@ export function CategoriesTab() {
         await refetchCategories() // Refetch to ensure data is updated
         // Single additional refresh for safety
         setTimeout(() => refetchCategories(), 200)
+        // Extra refresh to ensure order numbers are updated
+        setTimeout(() => refetchCategories(), 500)
         toast.success("Kategoriya yangilandi")
       } else {
         // Create new category
@@ -64,6 +66,8 @@ export function CategoriesTab() {
         await refetchCategories() // Refetch to ensure data is updated
         // Single additional refresh for safety
         setTimeout(() => refetchCategories(), 200)
+        // Extra refresh to ensure order numbers are updated
+        setTimeout(() => refetchCategories(), 500)
         toast.success("Kategoriya qo'shildi")
       }
 
