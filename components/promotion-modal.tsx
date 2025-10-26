@@ -116,7 +116,7 @@ export function PromotionModal({ promotion, isOpen, onClose, language }: Promoti
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
           
           {/* Discount Badge */}
-          <div className="absolute top-4 right-4 bg-gradient-to-r from-amber-500 to-amber-600 text-white px-4 py-2 rounded-full text-lg font-bold shadow-lg">
+          <div className="absolute top-4 left-4 bg-gradient-to-r from-amber-500 to-amber-600 text-white px-4 py-2 rounded-full text-lg font-bold shadow-lg">
             {getDiscountDisplay()}
           </div>
         </div>
