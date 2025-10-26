@@ -47,7 +47,8 @@ export function MenuItemsTab() {
     ingredients_ru: "",
     rating: 5,
     prep_time: "15", // String for range format like "15-20"
-    order: 0, // Kategoriyadagi tartib raqami
+    global_order: 0, // Barcha taomlar orasidagi umumiy tartib
+    category_order: 0, // Faqat o'z kategoriyasi ichidagi tartib
     category: "",
     available: true,
     is_active: true,
@@ -85,7 +86,8 @@ export function MenuItemsTab() {
       formDataToSend.append('ingredients_ru', JSON.stringify(ingredientsRuArray))
       formDataToSend.append('rating', formData.rating.toString())
       formDataToSend.append('prep_time', formData.prep_time) // Already string
-      formDataToSend.append('order', formData.order.toString())
+      formDataToSend.append('global_order', formData.global_order.toString())
+      formDataToSend.append('category_order', formData.category_order.toString())
       formDataToSend.append('category', formData.category.toString())
       formDataToSend.append('available', formData.available.toString())
       formDataToSend.append('is_active', formData.is_active.toString())
@@ -146,7 +148,8 @@ export function MenuItemsTab() {
       ingredients_ru: Array.isArray(item.ingredients_ru) ? item.ingredients_ru.join(", ") : (item.ingredients_ru || ""),
       rating: item.rating || 5,
       prep_time: item.prep_time || "15", // String for range format
-      order: item.order || 0,
+      global_order: item.global_order || 0,
+      category_order: item.category_order || 0,
       category: item.category ? item.category.toString() : "",
       available: item.available !== false,
       is_active: item.is_active !== false,
@@ -237,7 +240,8 @@ export function MenuItemsTab() {
       ingredients_ru: "",
       rating: 5,
       prep_time: "15", // String for range format
-      order: 0,
+      global_order: 0,
+      category_order: 0,
       category: "",
       available: true,
       is_active: true,
@@ -485,15 +489,32 @@ export function MenuItemsTab() {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="order" className="text-white text-sm">
-                    Tartib raqami
+                  <Label htmlFor="global_order" className="text-white text-sm">
+                    Global Tartib (Barcha taomlar orasida)
                   </Label>
                   <Input
-                    id="order"
+                    id="global_order"
                     type="number"
                     min="0"
-                    value={formData.order}
-                    onChange={(e) => setFormData({ ...formData, order: parseInt(e.target.value) || 0 })}
+                    value={formData.global_order}
+                    onChange={(e) => setFormData({ ...formData, global_order: parseInt(e.target.value) || 0 })}
+                    className="bg-white/10 border-white/20 text-white text-sm"
+                    placeholder="0 (oxiriga qo'shish)"
+                  />
+                  <p className="text-xs text-white/60 mt-1">
+                    0 yozilsa oxiriga qo'shiladi. Raqam yozilsa shu o'rinda joylashadi va boshqalar siljidi.
+                  </p>
+                </div>
+                <div>
+                  <Label htmlFor="category_order" className="text-white text-sm">
+                    Kategoriya Tartibi (Faqat shu kategoriyada)
+                  </Label>
+                  <Input
+                    id="category_order"
+                    type="number"
+                    min="0"
+                    value={formData.category_order}
+                    onChange={(e) => setFormData({ ...formData, category_order: parseInt(e.target.value) || 0 })}
                     className="bg-white/10 border-white/20 text-white text-sm"
                     placeholder="0 (oxiriga qo'shish)"
                   />

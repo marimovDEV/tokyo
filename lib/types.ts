@@ -23,7 +23,8 @@ export interface MenuItem {
   ingredients_ru: string[]
   rating: number
   prep_time: string // in minutes, can be range like "15-20"
-  order: number // Kategoriyadagi tartib raqami
+  global_order: number // Barcha taomlar orasidagi umumiy tartib
+  category_order: number // Faqat o'z kategoriyasi ichidagi tartib
   category: number // category ID from backend
   available: boolean
   is_active: boolean
