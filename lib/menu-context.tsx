@@ -153,17 +153,14 @@ export function MenuProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (apiMenuItems && Array.isArray(apiMenuItems)) {
-      console.log('Setting menu items from API:', apiMenuItems.length)
       setMenuItems(apiMenuItems as any)
     } else if (!menuItemsLoading && apiMenuItems === null) {
-      console.log('No menu items from API, using empty array')
       setMenuItems([])
     }
   }, [apiMenuItems, menuItemsLoading])
 
   // Force refresh on mount
   useEffect(() => {
-    console.log('MenuProvider mounted, forcing refresh...')
     refetchMenuItems()
   }, [])
 

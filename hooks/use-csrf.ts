@@ -81,21 +81,15 @@ export function useCSRF() {
     url: string, 
     options: RequestInit = {}
   ): Promise<Response> => {
-    console.log('Making authenticated request to:', url)
-    console.log('Request options:', options)
     
     // Agar POST/PUT/DELETE bo'lsa, CSRF token kerak
     const method = options.method?.toUpperCase();
     if (method && ['POST', 'PUT', 'DELETE', 'PATCH'].includes(method)) {
       let token = csrfToken || getCookie('csrftoken');
-      console.log('CSRF token from state:', csrfToken)
-      console.log('CSRF token from cookie:', getCookie('csrftoken'))
       
       // Agar token yo'q bo'lsa, yangi olish
       if (!token) {
-        console.log('No CSRF token found, fetching new one...')
         token = await getCSRFToken();
-        console.log('New CSRF token:', token)
       }
 
       // Headers-ga CSRF token qo'shish
@@ -105,15 +99,13 @@ export function useCSRF() {
         ...(token && { 'X-CSRFToken': token }),
         ...options.headers,
       };
-      console.log('Request headers:', headers)
-
+      
       const response = await fetch(url, {
         ...options,
         headers,
         credentials: 'include',
       });
-      console.log('Response status:', response.status)
-      console.log('Response headers:', Object.fromEntries(response.headers.entries()))
+      
       return response;
     }
 
@@ -122,7 +114,7 @@ export function useCSRF() {
       ...options,
       credentials: 'include',
     });
-    console.log('GET Response status:', response.status)
+    
     return response;
   };
 
@@ -151,7 +143,7 @@ function MyComponent() {
       );
       
       if (response.ok) {
-        console.log('Success!');
+        // Success
       }
     } catch (error) {
       console.error('Error:', error);
