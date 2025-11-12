@@ -165,7 +165,7 @@ export function MenuProvider({ children }: { children: React.ReactNode }) {
     } else if (!rawMenuItemsLoading && apiMenuItems === null) {
       setMenuItems([])
     }
-  }, [apiMenuItems, menuItemsLoading])
+  }, [apiMenuItems, rawMenuItemsLoading])
 
   // Force refresh on mount
   useEffect(() => {
