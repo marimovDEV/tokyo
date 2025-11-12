@@ -16,9 +16,6 @@ export function FeedbackTab() {
   const api = useApiClient()
   const [deletingFeedbackId, setDeletingFeedbackId] = useState<number | null>(null)
   
-  console.log('FeedbackTab rendered with feedbacks:', feedbacks)
-  console.log('Loading state:', loading)
-
   const handleDelete = async (id: number) => {
     if (confirm("Ushbu fikrni o'chirmoqchimisiz?")) {
       setDeletingFeedbackId(id)
@@ -36,7 +33,6 @@ export function FeedbackTab() {
         console.error('Error deleting feedback:', error)
         // If it's a 404 error, it means the feedback was already deleted
         if (error.message && error.message.includes('404')) {
-          console.log('Feedback already deleted (404), refreshing data...')
           toast.success("Fikr o'chirildi")
           await refreshFeedbacks()
         } else {

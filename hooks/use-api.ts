@@ -41,7 +41,6 @@ export function useApiClient() {
           return data;
         } catch (error) {
           lastError = error;
-          console.warn(`API request attempt ${attempt} failed:`, error);
           
           // Don't retry on client errors (4xx) or server errors (5xx)
           if (error.message && (error.message.includes('400') || error.message.includes('401') || 
@@ -420,7 +419,6 @@ export function useMenuItems() {
     // Prevent excessive API calls - only fetch if more than 5 seconds have passed or forced
     const now = Date.now();
     if (!force && now - lastFetchTime < 5000) {
-      console.log('useMenuItems: Skipping fetch - too recent');
       return;
     }
 
@@ -428,7 +426,6 @@ export function useMenuItems() {
       setLoading(true);
       setError(null);
       const apiUrl = 'https://api.tokyokafe.uz/api';
-      console.log('useMenuItems: Fetching from API URL:', apiUrl);
       
       // Add cache-busting to always get fresh data
       const timestamp = new Date().getTime();
@@ -446,12 +443,11 @@ export function useMenuItems() {
       }
       
       const data = await response.json();
-      console.log('useMenuItems: API Response:', data);
-      console.log('useMenuItems: Menu items count:', data.results?.length || 0);
-      setMenuItems(data.results || []);
+      // Handle both paginated (results) and non-paginated (array) responses
+      const items = Array.isArray(data) ? data : (data.results || []);
+      setMenuItems(items);
       setLastFetchTime(now);
     } catch (err) {
-      console.error('useMenuItems: Error fetching menu items:', err);
       setError(err as Error);
     } finally {
       setLoading(false);
@@ -463,7 +459,66 @@ export function useMenuItems() {
   }, []); // Empty dependency array to prevent infinite loops
 
   const refetch = useCallback(() => {
-    console.log('useMenuItems: Force refetch called');
+    fetchMenuItems(true); // Force refetch
+  }, [fetchMenuItems]);
+
+  return { menuItems, loading, error, refetch };
+}
+
+// Admin panel uchun alohida hook - barcha menu itemlarni olish (pagination yo'q)
+export function useAdminMenuItems() {
+  const [menuItems, setMenuItems] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
+  const [lastFetchTime, setLastFetchTime] = useState(0);
+
+  const fetchMenuItems = useCallback(async (force = false) => {
+    // Prevent excessive API calls - only fetch if more than 5 seconds have passed or forced
+    const now = Date.now();
+    if (!force && now - lastFetchTime < 5000) {
+      return;
+    }
+
+    try {
+      setLoading(true);
+      setError(null);
+      const apiUrl = 'https://api.tokyokafe.uz/api';
+      
+      // Add cache-busting and show_all=true to get all items without pagination
+      const timestamp = new Date().getTime();
+      const random = Math.random().toString(36).substring(7);
+      const random2 = Math.random().toString(36).substring(7);
+      const random3 = Math.random().toString(36).substring(7);
+      const response = await fetch(`${apiUrl}/menu-items/?show_all=true&t=${timestamp}&r=${random}&r2=${random2}&r3=${random3}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        cache: 'no-cache',
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+      
+      const data = await response.json();
+      // When show_all=true, response is a direct array, not paginated
+      const items = Array.isArray(data) ? data : (data.results || []);
+      setMenuItems(items);
+      setLastFetchTime(now);
+    } catch (err) {
+      setError(err as Error);
+    } finally {
+      setLoading(false);
+    }
+  }, [lastFetchTime]);
+
+  useEffect(() => {
+    fetchMenuItems(true); // Force initial fetch
+  }, []); // Empty dependency array to prevent infinite loops
+
+  const refetch = useCallback(() => {
     fetchMenuItems(true); // Force refetch
   }, [fetchMenuItems]);
 

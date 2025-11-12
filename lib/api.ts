@@ -261,8 +261,6 @@ export class ApiClient {
     const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
     
     try {
-      console.log('Making request to:', url);
-      
       const response = await fetch(url, {
         headers: {
           // Only set Content-Type for JSON requests, not for FormData
@@ -275,9 +273,6 @@ export class ApiClient {
         signal: controller.signal,
         ...options,
       });
-      
-      console.log('Response status:', response.status);
-      console.log('Response headers:', Object.fromEntries(response.headers.entries()));
       
       clearTimeout(timeoutId);
 

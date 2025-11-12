@@ -25,7 +25,6 @@ export function FeedbackProvider({ children }: { children: ReactNode }) {
   const fetchFeedbacks = async () => {
     try {
       setLoading(true)
-      console.log('Fetching feedbacks from API...')
       
       // Add cache-busting to force fresh data
       const timestamp = new Date().getTime()
@@ -43,7 +42,6 @@ export function FeedbackProvider({ children }: { children: ReactNode }) {
       }
       
       const data = await response.json()
-      console.log('Feedbacks received:', data.results || [])
       setFeedbacks(data.results || [])
     } catch (error) {
       console.error('Error fetching feedbacks:', error)
@@ -53,15 +51,12 @@ export function FeedbackProvider({ children }: { children: ReactNode }) {
   }
 
   useEffect(() => {
-    console.log('FeedbackProvider mounted, fetching feedbacks...')
     fetchFeedbacks()
   }, [])
 
   const addFeedback = async (feedback: Omit<Feedback, "id" | "created_at" | "updated_at">) => {
     try {
-      console.log('Creating feedback:', feedback)
       const newFeedback = await correctApiClient.createFeedback(feedback)
-      console.log('Feedback created successfully:', newFeedback)
       // Don't update local state, just refresh from API to ensure consistency
       await fetchFeedbacks()
     } catch (error) {

@@ -16,13 +16,13 @@ import { Switch } from "@/components/ui/switch"
 import { formatPrice, formatWeight } from "@/lib/api"
 import { useMenu } from "@/lib/menu-context"
 import { useApiClient } from "@/hooks/use-api"
-import { useMenuItems, useAdminCategories } from "@/hooks/use-api"
+import { useAdminMenuItems, useAdminCategories } from "@/hooks/use-api"
 import type { MenuItem } from "@/lib/types"
 import { toast } from "sonner"
 
 export function MenuItemsTab() {
   const { categories } = useMenu()
-  const { menuItems, refetch: refetchMenuItems, loading: menuItemsLoading } = useMenuItems()
+  const { menuItems, refetch: refetchMenuItems, loading: menuItemsLoading } = useAdminMenuItems()
   const { categories: adminCategories } = useAdminCategories()
   const api = useApiClient()
   const [isDialogOpen, setIsDialogOpen] = useState(false)
@@ -64,7 +64,6 @@ export function MenuItemsTab() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsSubmitting(true)
-    console.log('Form submitted with data:', formData)
 
     try {
       const formDataToSend = new FormData()
@@ -99,9 +98,7 @@ export function MenuItemsTab() {
       if (editingItem) {
         // Update existing item
         const itemId = parseInt(editingItem.id)
-        console.log('Updating menu item with ID:', itemId)
         const updatedItem = await api.patchFormData(`/menu-items/${itemId}/`, formDataToSend)
-        console.log('Updated item:', updatedItem)
         // Force refresh to ensure UI updates immediately
         await refetchMenuItems()
         // Single additional refresh for safety
@@ -109,10 +106,7 @@ export function MenuItemsTab() {
         toast.success("Taom yangilandi")
       } else {
         // Create new item
-        console.log('Creating new menu item...')
-        console.log('FormData contents:', Array.from(formDataToSend.entries()))
         const newItem = await api.postFormData('/menu-items/', formDataToSend)
-        console.log('New menu item created:', newItem)
         // Force refresh to ensure UI updates immediately
         await refetchMenuItems()
         // Single additional refresh for safety
@@ -169,7 +163,6 @@ export function MenuItemsTab() {
       try {
         // Ensure ID is treated as integer for backend
         const itemId = parseInt(itemToDelete.id)
-        console.log('Deleting menu item with ID:', itemId)
         
         // Check if item exists in current menu items
         const currentItem = menuItems.find(item => item.id === itemToDelete.id)
@@ -185,7 +178,6 @@ export function MenuItemsTab() {
         }
         
         await api.delete(`/menu-items/${itemId}/`)
-        console.log('Delete successful, refreshing menu items...')
         
         // Close dialog first for better UX
         setDeleteDialogOpen(false)
@@ -193,7 +185,6 @@ export function MenuItemsTab() {
         
         // Force refresh from API
         await refetchMenuItems()
-        console.log('Menu items refreshed after delete')
         
         // Force additional refresh to ensure UI updates
         setTimeout(() => {
@@ -205,7 +196,6 @@ export function MenuItemsTab() {
         console.error('Error deleting menu item:', error)
         // If it's a 404 error, it means the item was already deleted
         if (error.message && error.message.includes('404')) {
-          console.log('Menu item already deleted (404), refreshing data...')
           toast.success("Taom o'chirildi")
           await refetchMenuItems()
         } else {
