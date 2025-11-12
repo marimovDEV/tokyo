@@ -3,7 +3,7 @@
 import type React from "react"
 import { createContext, useContext, useState, useEffect } from "react"
 import type { Category, MenuItem, Promotion } from "./types"
-import { useCategories, useMenuItems, usePromotions } from "@/hooks/use-api"
+import { useCategories, useAdminMenuItems, usePromotions } from "@/hooks/use-api"
 
 interface MenuContextType {
   categories: Category[]
@@ -132,15 +132,20 @@ const samplePromotions: Promotion[] = [
 export function MenuProvider({ children }: { children: React.ReactNode }) {
   // API dan ma'lumot olish
   const { categories: apiCategories, loading: categoriesLoading, error: categoriesError, refetch: refetchCategories } = useCategories()
-  const { menuItems: apiMenuItems, loading: menuItemsLoading, error: menuItemsError, refetch: refetchMenuItems } = useMenuItems()
+  const {
+    menuItems: apiMenuItems,
+    loading: rawMenuItemsLoading,
+    error: rawMenuItemsError,
+    refetch: refetchMenuItems,
+  } = useAdminMenuItems()
   const { promotions: apiPromotions, loading: promotionsLoading, error: promotionsError, refetch: refetchPromotions } = usePromotions()
 
   const [categories, setCategories] = useState<Category[]>([])
   const [menuItems, setMenuItems] = useState<MenuItem[]>([])
   const [promotions, setPromotions] = useState<Promotion[]>([])
 
-  const loading = categoriesLoading || menuItemsLoading || promotionsLoading
-  const error = categoriesError || menuItemsError || promotionsError
+  const loading = categoriesLoading || rawMenuItemsLoading || promotionsLoading
+  const error = categoriesError || rawMenuItemsError || promotionsError
 
   // API dan kelgan ma'lumotlarni saqlash
   useEffect(() => {
@@ -153,8 +158,11 @@ export function MenuProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (apiMenuItems && Array.isArray(apiMenuItems)) {
-      setMenuItems(apiMenuItems as any)
-    } else if (!menuItemsLoading && apiMenuItems === null) {
+      const activeItems = (apiMenuItems as any).filter(
+        (item: MenuItem) => item?.is_active !== false && item?.category !== null,
+      )
+      setMenuItems(activeItems)
+    } else if (!rawMenuItemsLoading && apiMenuItems === null) {
       setMenuItems([])
     }
   }, [apiMenuItems, menuItemsLoading])
