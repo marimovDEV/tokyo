@@ -28,6 +28,7 @@ export default function MenuPage() {
 
     let items = menuItems
 
+    // Kategoriya bo'yicha filtrlash
     if (selectedCategory) {
       // Convert both to numbers for comparison to handle type mismatches
       const selectedCategoryId = parseInt(selectedCategory)
@@ -35,8 +36,92 @@ export default function MenuPage() {
         const itemCategoryId = parseInt(item.category.toString())
         return itemCategoryId === selectedCategoryId
       })
+      
+      // Agar kategoriya tanlangan bo'lsa, faqat o'sha kategoriya ichidagi tartib bo'yicha saralash
+      items = items.sort((a, b) => {
+        const orderA = a.category_order ?? 0
+        const orderB = b.category_order ?? 0
+        
+        // Agar order 0 yoki undefined bo'lsa, oxiriga qo'yish
+        if (orderA === 0 && orderB === 0) return 0
+        if (orderA === 0) return 1  // a oxiriga
+        if (orderB === 0) return -1  // b oxiriga
+        
+        return orderA - orderB
+      })
+    } else {
+      // "Hammasi" tanlangan bo'lsa - kategoriyalar tartibi bo'yicha guruhlash
+      if (!categories || !Array.isArray(categories) || categories.length === 0) {
+        // Agar kategoriyalar yo'q bo'lsa, oddiy tartiblash
+        return items.sort((a, b) => {
+          const orderA = a.category_order ?? 0
+          const orderB = b.category_order ?? 0
+          if (orderA === 0 && orderB === 0) return 0
+          if (orderA === 0) return 1
+          if (orderB === 0) return -1
+          return orderA - orderB
+        })
+      }
+
+      // Kategoriyalarni order bo'yicha tartiblash
+      const sortedCategories = [...categories]
+        .filter(cat => cat && cat.id) // Faqat to'g'ri kategoriyalarni olish
+        .sort((a, b) => {
+          const orderA = a.order ?? 0
+          const orderB = b.order ?? 0
+          return orderA - orderB
+        })
+
+      // Har bir kategoriya uchun mahsulotlarni to'plash va tartiblash
+      const groupedItems: typeof items = []
+      
+      for (const category of sortedCategories) {
+        // Kategoriya ID'ni turli formatlardan olish
+        const categoryId = typeof category.id === 'number' 
+          ? category.id 
+          : parseInt(String(category.id))
+        
+        // Bu kategoriyaga tegishli mahsulotlarni topish
+        const categoryItems = items.filter((item) => {
+          if (!item || !item.category) return false
+          
+          const itemCategoryId = typeof item.category === 'number'
+            ? item.category
+            : parseInt(String(item.category))
+          
+          return itemCategoryId === categoryId
+        })
+
+        // Agar bu kategoriyada mahsulotlar bo'lsa, tartiblash va qo'shish
+        if (categoryItems.length > 0) {
+          // Kategoriya ichidagi mahsulotlarni category_order bo'yicha tartiblash
+          const sortedCategoryItems = categoryItems.sort((a, b) => {
+            const orderA = a.category_order ?? 0
+            const orderB = b.category_order ?? 0
+            
+            // Agar order 0 yoki undefined bo'lsa, oxiriga qo'yish
+            if (orderA === 0 && orderB === 0) return 0
+            if (orderA === 0) return 1  // a oxiriga
+            if (orderB === 0) return -1  // b oxiriga
+            
+            return orderA - orderB
+          })
+
+          groupedItems.push(...sortedCategoryItems)
+        }
+      }
+
+      // Agar ba'zi mahsulotlar kategoriyaga bog'lanmagan bo'lsa, ularni oxiriga qo'shish
+      const usedItemIds = new Set(groupedItems.map(item => item.id))
+      const ungroupedItems = items.filter(item => !usedItemIds.has(item.id))
+      if (ungroupedItems.length > 0) {
+        groupedItems.push(...ungroupedItems)
+      }
+
+      items = groupedItems
     }
 
+    // Qidiruv bo'yicha filtrlash
     if (searchQuery) {
       items = items.filter(
         (item) =>
@@ -47,7 +132,7 @@ export default function MenuPage() {
     }
 
     return items
-  }, [menuItems, selectedCategory, searchQuery, loading])
+  }, [menuItems, selectedCategory, searchQuery, loading, categories])
 
   const totalCartItems = getTotalItems()
 
