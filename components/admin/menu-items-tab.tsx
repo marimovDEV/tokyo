@@ -623,9 +623,21 @@ export function MenuItemsTab() {
               <div className="flex justify-between items-start mb-2">
                 <div className="flex-1 min-w-0">
                   <h3 className="text-base sm:text-lg font-bold text-white truncate">{item.name_uz || item.name}</h3>
-                  <p className="text-xs sm:text-sm text-white/60">
+                  <p className="text-xs sm:text-sm text-white/60 mb-1">
                     {formatPrice(item.price || 0)} • {formatWeight(item.weight || 0)}
                   </p>
+                  {(() => {
+                    const categoryId = typeof item.category === 'number' ? item.category : parseInt(String(item.category))
+                    const category = adminCategories?.find((cat) => {
+                      const catId = typeof cat.id === 'number' ? cat.id : parseInt(String(cat.id))
+                      return catId === categoryId
+                    })
+                    return category ? (
+                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                        {category.name_uz || category.name}
+                      </span>
+                    ) : null
+                  })()}
                 </div>
                 <div className="flex gap-1 sm:gap-2 flex-shrink-0 ml-2">
                   <Button

@@ -16,7 +16,7 @@ import type { Category } from "@/lib/types"
 import { toast } from "sonner"
 
 export function CategoriesTab() {
-  const { categories, addCategory, updateCategory, deleteCategory } = useMenu()
+  const { categories, menuItems, addCategory, updateCategory, deleteCategory } = useMenu()
   const { refetch: refetchCategories, loading: categoriesLoading } = useAdminCategories()
   const api = useApiClient()
   const [isDialogOpen, setIsDialogOpen] = useState(false)
@@ -316,6 +316,17 @@ export function CategoriesTab() {
                   <h3 className="text-base sm:text-lg font-bold text-white truncate">{category.name_uz || category.name}</h3>
                   <p className="text-xs sm:text-sm text-white/60">
                     Tartib: {category.order || 0}
+                  </p>
+                  <p className="text-xs sm:text-sm text-white/60 mt-1">
+                    Mahsulotlar: {(() => {
+                      if (!menuItems || !Array.isArray(menuItems)) return 0
+                      const categoryId = typeof category.id === 'number' ? category.id : parseInt(String(category.id))
+                      return menuItems.filter((item) => {
+                        if (!item || !item.category) return false
+                        const itemCategoryId = typeof item.category === 'number' ? item.category : parseInt(String(item.category))
+                        return itemCategoryId === categoryId
+                      }).length
+                    })()}
                   </p>
                 </div>
                 <div className="flex gap-1 sm:gap-2 flex-shrink-0 ml-2">
