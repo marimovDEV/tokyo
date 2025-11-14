@@ -2,8 +2,8 @@
 
 import type React from "react"
 
-import { useState, useCallback, useEffect } from "react"
-import { Plus, Pencil, Trash2, AlertTriangle, Loader2 } from "lucide-react"
+import { useState, useCallback, useEffect, useMemo } from "react"
+import { Plus, Pencil, Trash2, AlertTriangle, Loader2, Search, Filter, ArrowUpDown } from "lucide-react"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
@@ -32,6 +32,10 @@ export function MenuItemsTab() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
   const [deletingItemId, setDeletingItemId] = useState<string | null>(null)
+  const [searchQuery, setSearchQuery] = useState("")
+  const [selectedCategoryFilter, setSelectedCategoryFilter] = useState<string>("all")
+  const [sortBy, setSortBy] = useState<"name" | "price" | "category" | "created">("name")
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc")
   const [formData, setFormData] = useState({
     name: "",
     name_uz: "",
@@ -237,6 +241,67 @@ export function MenuItemsTab() {
       is_active: true,
     })
   }
+
+  // Filtered and sorted menu items
+  const filteredAndSortedItems = useMemo(() => {
+    let filtered = [...menuItems]
+
+    // Search filter
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase().trim()
+      filtered = filtered.filter((item) => {
+        const nameMatch = 
+          item.name?.toLowerCase().includes(query) ||
+          item.name_uz?.toLowerCase().includes(query) ||
+          item.name_ru?.toLowerCase().includes(query)
+        
+        const descriptionMatch =
+          item.description?.toLowerCase().includes(query) ||
+          item.description_uz?.toLowerCase().includes(query) ||
+          item.description_ru?.toLowerCase().includes(query)
+        
+        return nameMatch || descriptionMatch
+      })
+    }
+
+    // Category filter
+    if (selectedCategoryFilter !== "all") {
+      const categoryId = parseInt(selectedCategoryFilter)
+      filtered = filtered.filter((item) => {
+        const itemCategoryId = typeof item.category === 'number' ? item.category : parseInt(String(item.category))
+        return itemCategoryId === categoryId
+      })
+    }
+
+    // Sort
+    filtered.sort((a, b) => {
+      let comparison = 0
+      
+      switch (sortBy) {
+        case "name":
+          const nameA = (a.name_uz || a.name || "").toLowerCase()
+          const nameB = (b.name_uz || b.name || "").toLowerCase()
+          comparison = nameA.localeCompare(nameB)
+          break
+        case "price":
+          comparison = (a.price || 0) - (b.price || 0)
+          break
+        case "category":
+          const catA = typeof a.category === 'number' ? a.category : parseInt(String(a.category))
+          const catB = typeof b.category === 'number' ? b.category : parseInt(String(b.category))
+          comparison = catA - catB
+          break
+        case "created":
+          // Assuming there's a created_at field, otherwise use id
+          comparison = parseInt(a.id) - parseInt(b.id)
+          break
+      }
+      
+      return sortOrder === "asc" ? comparison : -comparison
+    })
+
+    return filtered
+  }, [menuItems, searchQuery, selectedCategoryFilter, sortBy, sortOrder])
 
   return (
     <div>
@@ -598,18 +663,88 @@ export function MenuItemsTab() {
         </Dialog>
       </div>
 
+      {/* Search, Filter, and Sort Controls */}
+      <div className="mb-6 space-y-4">
+        {/* Search Bar */}
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-white/60" />
+          <Input
+            placeholder="Taom qidirish..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-10 bg-white/10 border-white/20 text-white placeholder:text-white/60"
+          />
+        </div>
+
+        {/* Filter and Sort Controls */}
+        <div className="flex flex-wrap gap-3">
+          {/* Category Filter */}
+          <div className="flex items-center gap-2">
+            <Filter className="w-4 h-4 text-white/60" />
+            <Select value={selectedCategoryFilter} onValueChange={setSelectedCategoryFilter}>
+              <SelectTrigger className="w-[180px] bg-white/10 border-white/20 text-white">
+                <SelectValue placeholder="Kategoriya" />
+              </SelectTrigger>
+              <SelectContent className="bg-slate-900 border-white/20">
+                <SelectItem value="all" className="text-white">Barcha kategoriyalar</SelectItem>
+                {adminCategories?.map((cat) => (
+                  <SelectItem key={cat.id} value={cat.id.toString()} className="text-white">
+                    {cat.name_uz || cat.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Sort By */}
+          <div className="flex items-center gap-2">
+            <ArrowUpDown className="w-4 h-4 text-white/60" />
+            <Select value={sortBy} onValueChange={(value: "name" | "price" | "category" | "created") => setSortBy(value)}>
+              <SelectTrigger className="w-[150px] bg-white/10 border-white/20 text-white">
+                <SelectValue placeholder="Tartiblash" />
+              </SelectTrigger>
+              <SelectContent className="bg-slate-900 border-white/20">
+                <SelectItem value="name" className="text-white">Nomi</SelectItem>
+                <SelectItem value="price" className="text-white">Narxi</SelectItem>
+                <SelectItem value="category" className="text-white">Kategoriya</SelectItem>
+                <SelectItem value="created" className="text-white">Yaratilgan</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Sort Order */}
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}
+            className="bg-white/10 border-white/20 text-white hover:bg-white/20"
+          >
+            {sortOrder === "asc" ? "↑" : "↓"}
+          </Button>
+
+          {/* Results Count */}
+          <div className="ml-auto flex items-center text-white/60 text-sm">
+            {filteredAndSortedItems.length} ta taom
+          </div>
+        </div>
+      </div>
+
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
         {menuItemsLoading ? (
           <div className="col-span-full flex justify-center items-center py-8">
             <Loader2 className="w-6 h-6 animate-spin text-white" />
             <span className="ml-2 text-white">Yuklanmoqda...</span>
           </div>
-        ) : menuItems.length === 0 ? (
+        ) : filteredAndSortedItems.length === 0 ? (
           <div className="col-span-full text-center py-8">
-            <p className="text-white/60">Hozircha taomlar yo'q</p>
+            <p className="text-white/60">
+              {searchQuery || selectedCategoryFilter !== "all" 
+                ? "Qidiruv natijasi topilmadi" 
+                : "Hozircha taomlar yo'q"}
+            </p>
           </div>
         ) : (
-          menuItems.map((item) => (
+          filteredAndSortedItems.map((item) => (
           <div
             key={item.id}
             className={`bg-white/10 backdrop-blur-xl rounded-2xl overflow-hidden border border-white/20 shadow-xl transition-opacity ${
@@ -641,20 +776,24 @@ export function MenuItemsTab() {
                 </div>
                 <div className="flex gap-1 sm:gap-2 flex-shrink-0 ml-2">
                   <Button
-                    size="icon"
+                    size="sm"
                     variant="ghost"
                     onClick={() => handleEdit(item)}
-                    className="text-blue-400 hover:text-blue-300 hover:bg-blue-500/20 rounded-full h-7 w-7 sm:h-8 sm:w-8"
+                    className="text-blue-400 hover:text-blue-300 hover:bg-blue-500/20 rounded-full h-7 sm:h-8 px-2 sm:px-3"
+                    title="Tahrirlash"
                   >
-                    <Pencil className="w-3 h-3 sm:w-4 sm:h-4" />
+                    <Pencil className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                    <span className="hidden sm:inline text-xs">Tahrirlash</span>
                   </Button>
                   <Button
-                    size="icon"
+                    size="sm"
                     variant="ghost"
                     onClick={() => handleDeleteClick(item)}
-                    className="text-red-400 hover:text-red-300 hover:bg-red-500/20 rounded-full h-7 w-7 sm:h-8 sm:w-8"
+                    className="text-red-400 hover:text-red-300 hover:bg-red-500/20 rounded-full h-7 sm:h-8 px-2 sm:px-3"
+                    title="O'chirish"
                   >
-                    <Trash2 className="w-3 h-3 sm:w-4 sm:h-4" />
+                    <Trash2 className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                    <span className="hidden sm:inline text-xs">O'chirish</span>
                   </Button>
                 </div>
               </div>

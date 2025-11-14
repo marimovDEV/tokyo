@@ -121,14 +121,34 @@ export default function MenuPage() {
       items = groupedItems
     }
 
-    // Qidiruv bo'yicha filtrlash
+    // Qidiruv bo'yicha filtrlash - name, description, ingredients bo'yicha
     if (searchQuery) {
-      items = items.filter(
-        (item) =>
-          item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          item.name_uz.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          item.name_ru.toLowerCase().includes(searchQuery.toLowerCase()),
-      )
+      const query = searchQuery.toLowerCase().trim()
+      items = items.filter((item) => {
+        // Name bo'yicha qidirish
+        const nameMatch = 
+          item.name?.toLowerCase().includes(query) ||
+          item.name_uz?.toLowerCase().includes(query) ||
+          item.name_ru?.toLowerCase().includes(query)
+        
+        // Description bo'yicha qidirish
+        const descriptionMatch =
+          item.description?.toLowerCase().includes(query) ||
+          item.description_uz?.toLowerCase().includes(query) ||
+          item.description_ru?.toLowerCase().includes(query)
+        
+        // Ingredients bo'yicha qidirish
+        const ingredients = Array.isArray(item.ingredients) ? item.ingredients : []
+        const ingredientsUz = Array.isArray(item.ingredients_uz) ? item.ingredients_uz : []
+        const ingredientsRu = Array.isArray(item.ingredients_ru) ? item.ingredients_ru : []
+        
+        const ingredientsMatch = 
+          ingredients.some(ing => ing?.toLowerCase().includes(query)) ||
+          ingredientsUz.some(ing => ing?.toLowerCase().includes(query)) ||
+          ingredientsRu.some(ing => ing?.toLowerCase().includes(query))
+        
+        return nameMatch || descriptionMatch || ingredientsMatch
+      })
     }
 
     return items
