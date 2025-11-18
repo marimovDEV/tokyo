@@ -30,7 +30,6 @@ export function CategoriesTab() {
   const [searchQuery, setSearchQuery] = useState("")
   const [sortBy, setSortBy] = useState<"name" | "order" | "products">("order")
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc")
-  const { menuItems } = useMenu()
   const [formData, setFormData] = useState({
     name: "",
     name_uz: "",
