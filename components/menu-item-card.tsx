@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react"
 import { Star, Plus, Minus, Check, Loader2 } from "lucide-react"
+import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { ProductModal } from "@/components/product-modal"
 import type { MenuItem } from "@/lib/types"
