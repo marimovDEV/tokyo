@@ -3,7 +3,6 @@
 import { Header } from "@/components/layout/header"
 import { HeroEnhanced } from "@/components/home/hero-enhanced"
 import { TrustSection } from "@/components/home/trust-section"
-import { PopularDishesSection } from "@/components/home/popular-dishes"
 import { PromotionDishesSection } from "@/components/home/promotion-dishes"
 import { RecommendedDishesSection } from "@/components/home/recommended-dishes"
 import { FloatingButtons } from "@/components/layout/floating-buttons"
@@ -22,13 +21,10 @@ export default function Home() {
 
       <TrustSection />
 
-      {/* 1. Mashhur taomlar */}
-      <PopularDishesSection />
-
-      {/* 2. Aksiyadagi taomlar */}
+      {/* 1. Aksiyadagi taomlar */}
       <PromotionDishesSection />
 
-      {/* 3. Tavsiya etiladi */}
+      {/* 2. Tavsiya etiladi */}
       <RecommendedDishesSection />
 
       {/* Extra CTA for Menu */}
