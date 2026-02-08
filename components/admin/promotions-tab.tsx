@@ -3,7 +3,7 @@
 import type React from "react"
 
 import { useState, useEffect } from "react"
-import { Plus, Pencil, Trash2 } from "lucide-react"
+import { Plus, Pencil, Trash2, Check, ChevronsUpDown, Image as ImageIcon, ExternalLink, Calendar, Percent, DollarSign, AlertCircle } from "lucide-react"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
@@ -13,24 +13,35 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Switch } from "@/components/ui/switch"
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { formatPrice } from "@/lib/api"
 import { useMenu } from "@/lib/menu-context"
 import { useApiClient } from "@/hooks/use-api"
 import { usePromotions, useAdminCategories, useMenuItems } from "@/hooks/use-api"
 import type { Promotion } from "@/lib/types"
 import { toast } from "sonner"
+import { cn } from "@/lib/utils"
 
 export function PromotionsTab() {
-  const { promotions, addPromotion, updatePromotion, deletePromotion } = useMenu()
+  const { promotions } = useMenu()
   const { refetch: refetchPromotions, loading: promotionsLoading } = usePromotions()
   const { categories } = useAdminCategories()
   const { menuItems } = useMenuItems()
   const api = useApiClient()
+
+  // UI States
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [editingPromotion, setEditingPromotion] = useState<Promotion | null>(null)
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [promotionToDelete, setPromotionToDelete] = useState<Promotion | null>(null)
   const [deletingPromotionId, setDeletingPromotionId] = useState<string | null>(null)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+
+  // Combobox State
+  const [openCombobox, setOpenCombobox] = useState(false)
+
+  // Form Data
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -47,6 +58,11 @@ export function PromotionsTab() {
     ingredients: "",
   })
 
+  // UX Logic States
+  const [discountType, setDiscountType] = useState<"percentage" | "amount" | "none">("none")
+  const [imageError, setImageError] = useState<string | null>(null)
+  const [pricePreview, setPricePreview] = useState<number | null>(null)
+
   // Language selection for multilingual fields
   const [currentLang, setCurrentLang] = useState<'uz' | 'ru' | 'en'>('uz')
   const [multilingualData, setMultilingualData] = useState({
@@ -60,7 +76,6 @@ export function PromotionsTab() {
 
   // Refresh promotions data when component mounts
   useEffect(() => {
-    // Force refresh with cache busting
     const refreshPromotions = async () => {
       try {
         await refetchPromotions()
@@ -69,11 +84,49 @@ export function PromotionsTab() {
       }
     }
     refreshPromotions()
-  }, []) // Empty dependency array to run only once
+  }, [])
+
+  // Calculate price preview when discount or linked dish changes
+  useEffect(() => {
+    if (formData.linked_dish && formData.linked_dish !== 'none') {
+      const dish = menuItems.find(item => item.id.toString() === formData.linked_dish)
+      if (dish) {
+        let finalPrice = dish.price
+
+        if (discountType === 'percentage' && formData.discount_percentage > 0) {
+          finalPrice = dish.price * (1 - formData.discount_percentage / 100)
+        } else if (discountType === 'amount' && formData.discount_amount > 0) {
+          finalPrice = Math.max(0, dish.price - formData.discount_amount)
+        }
+
+        // Auto-fill price if it's 0 or user hasn't manually set a weird price
+        if (formData.price === 0) {
+          setFormData(prev => ({ ...prev, price: Math.round(finalPrice) }))
+        }
+        setPricePreview(Math.round(finalPrice))
+      }
+    } else {
+      setPricePreview(null)
+    }
+  }, [formData.linked_dish, formData.discount_percentage, formData.discount_amount, discountType, menuItems])
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
+    setImageError(null)
+
     if (file) {
+      // Validate file size (max 2MB)
+      if (file.size > 2 * 1024 * 1024) {
+        setImageError("Rasm hajmi 2MB dan oshmasligi kerak")
+        return
+      }
+
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        setImageError("Faqat rasm fayllari yuklanishi mumkin")
+        return
+      }
+
       const reader = new FileReader()
       reader.onloadend = () => {
         setFormData({ ...formData, image: reader.result as string, imageFile: file })
@@ -82,73 +135,100 @@ export function PromotionsTab() {
     }
   }
 
+  const handleDiscountTypeChange = (type: "percentage" | "amount" | "none") => {
+    setDiscountType(type)
+    // Clear the other value logic
+    if (type === 'percentage') {
+      setFormData(prev => ({ ...prev, discount_amount: 0 }))
+    } else if (type === 'amount') {
+      setFormData(prev => ({ ...prev, discount_percentage: 0 }))
+    } else {
+      setFormData(prev => ({ ...prev, discount_percentage: 0, discount_amount: 0 }))
+    }
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    setIsSubmitting(true)
+
+    // Client-side Validation
+    if (discountType === 'percentage' && (formData.discount_percentage <= 0 || formData.discount_percentage > 100)) {
+      toast.error("Chegirma foizi 0 va 100 orasida bo'lishi kerak")
+      setIsSubmitting(false)
+      return
+    }
+
+    if (formData.start_date && formData.end_date && new Date(formData.end_date) < new Date(formData.start_date)) {
+      toast.error("Tugash sanasi boshlanish sanasidan oldin bo'lishi mumkin emas")
+      setIsSubmitting(false)
+      return
+    }
+
+    if (formData.price < 0) {
+      toast.error("Narx manfiy bo'lishi mumkin emas")
+      setIsSubmitting(false)
+      return
+    }
 
     try {
-        // Create FormData for image upload
-        const formDataToSend = new FormData()
-        formDataToSend.append('title', formData.title)
-        formDataToSend.append('title_uz', multilingualData.title_uz)
-        formDataToSend.append('title_ru', multilingualData.title_ru)
-        formDataToSend.append('description', formData.description)
-        formDataToSend.append('description_uz', multilingualData.description_uz)
-        formDataToSend.append('description_ru', multilingualData.description_ru)
-        formDataToSend.append('discount_percentage', (formData.discount_percentage || 0).toString())
-        formDataToSend.append('discount_amount', (formData.discount_amount || 0).toString())
-        formDataToSend.append('is_active', formData.is_active.toString())
-        formDataToSend.append('start_date', formData.start_date)
-        formDataToSend.append('end_date', formData.end_date)
-        formDataToSend.append('price', (formData.price || 0).toString())
-        
-        // Convert comma-separated strings to JSON arrays
-        const ingredientsArray = formData.ingredients ? formData.ingredients.split(',').map(item => item.trim()).filter(item => item) : []
-        const ingredientsUzArray = multilingualData.ingredients_uz ? multilingualData.ingredients_uz.split(',').map(item => item.trim()).filter(item => item) : []
-        const ingredientsRuArray = multilingualData.ingredients_ru ? multilingualData.ingredients_ru.split(',').map(item => item.trim()).filter(item => item) : []
-        
-        formDataToSend.append('ingredients', JSON.stringify(ingredientsArray))
-        formDataToSend.append('ingredients_uz', JSON.stringify(ingredientsUzArray))
-        formDataToSend.append('ingredients_ru', JSON.stringify(ingredientsRuArray))
-        
-        if (formData.category && formData.category !== 'none') formDataToSend.append('category', formData.category)
-        if (formData.linked_dish && formData.linked_dish !== 'none') formDataToSend.append('linked_dish', formData.linked_dish)
-      
+      const formDataToSend = new FormData()
+      formDataToSend.append('title', formData.title)
+      formDataToSend.append('title_uz', multilingualData.title_uz)
+      formDataToSend.append('title_ru', multilingualData.title_ru)
+      formDataToSend.append('description', formData.description)
+      formDataToSend.append('description_uz', multilingualData.description_uz)
+      formDataToSend.append('description_ru', multilingualData.description_ru)
+      formDataToSend.append('discount_percentage', (formData.discount_percentage || 0).toString())
+      formDataToSend.append('discount_amount', (formData.discount_amount || 0).toString())
+      formDataToSend.append('is_active', formData.is_active.toString())
+      formDataToSend.append('start_date', formData.start_date)
+      formDataToSend.append('end_date', formData.end_date)
+      formDataToSend.append('price', (formData.price || 0).toString())
+
+      // Convert comma-separated strings to JSON arrays
+      const ingredientsArray = formData.ingredients ? formData.ingredients.split(',').map(item => item.trim()).filter(item => item) : []
+      const ingredientsUzArray = multilingualData.ingredients_uz ? multilingualData.ingredients_uz.split(',').map(item => item.trim()).filter(item => item) : []
+      const ingredientsRuArray = multilingualData.ingredients_ru ? multilingualData.ingredients_ru.split(',').map(item => item.trim()).filter(item => item) : []
+
+      formDataToSend.append('ingredients', JSON.stringify(ingredientsArray))
+      formDataToSend.append('ingredients_uz', JSON.stringify(ingredientsUzArray))
+      formDataToSend.append('ingredients_ru', JSON.stringify(ingredientsRuArray))
+
+      if (formData.category && formData.category !== 'none') formDataToSend.append('category', formData.category)
+      if (formData.linked_dish && formData.linked_dish !== 'none') formDataToSend.append('linked_dish', formData.linked_dish)
+
       if (formData.imageFile) {
         formDataToSend.append('image', formData.imageFile)
       }
 
       if (editingPromotion) {
         const promotionId = parseInt(editingPromotion.id)
-        const updatedPromotion = await api.patchFormData(`/promotions/${promotionId}/`, formDataToSend)
-        // Don't use updatePromotion to avoid double updating, just refetch
-        toast.success("Aksiya yangilandi")
+        await api.patchFormData(`/promotions/${promotionId}/`, formDataToSend)
+        toast.success("Aksiya muvaffaqiyatli yangilandi")
       } else {
-        const newPromotion = await api.postFormData('/promotions/', formDataToSend)
-        // Don't use addPromotion to avoid double adding, just refetch
-        toast.success("Aksiya qo'shildi")
+        await api.postFormData('/promotions/', formDataToSend)
+        toast.success("Yangi aksiya muvaffaqiyatli qo'shildi")
       }
-      
-      // Force refresh to ensure UI updates immediately
-      await refetchPromotions() // Refetch to ensure data is updated
-      // Single additional refresh for safety
+
+      await refetchPromotions()
       setTimeout(() => refetchPromotions(), 200)
       setIsDialogOpen(false)
       resetForm()
     } catch (error) {
       console.error('Error saving promotion:', error)
-      toast.error("Xatolik yuz berdi. Qaytadan urinib ko'ring.")
+      toast.error("Saqlashda xatolik yuz berdi. Iltimos qaytadan urinib ko'ring.")
+    } finally {
+      setIsSubmitting(false)
     }
   }
 
   const handleEdit = (promotion: Promotion) => {
     setEditingPromotion(promotion)
-    
-    // Sana format'ini tuzatish - ISO format'dan datetime-local format'iga
+
     const formatDateForInput = (dateString: string) => {
       if (!dateString) return ""
       try {
         const date = new Date(dateString)
-        // Timezone offset'ni olib tashlash va YYYY-MM-DDTHH:MM format'iga o'tkazish
         const year = date.getFullYear()
         const month = String(date.getMonth() + 1).padStart(2, '0')
         const day = String(date.getDate()).padStart(2, '0')
@@ -159,7 +239,14 @@ export function PromotionsTab() {
         return ""
       }
     }
-    
+
+    // Determine initial discount type
+    let initialDiscountType: "percentage" | "amount" | "none" = "none"
+    if (promotion.discount_percentage > 0) initialDiscountType = "percentage"
+    else if (promotion.discount_amount > 0) initialDiscountType = "amount"
+
+    setDiscountType(initialDiscountType)
+
     setFormData({
       title: promotion.title,
       description: promotion.description,
@@ -197,48 +284,18 @@ export function PromotionsTab() {
       setDeletingPromotionId(promotionToDelete.id)
       try {
         const promotionId = parseInt(promotionToDelete.id)
-        console.log('Deleting promotion with ID:', promotionId, 'Original ID:', promotionToDelete.id)
-        
-        // Check if promotion exists in current promotions
-        const currentPromotion = promotions.find(promo => promo.id === promotionToDelete.id)
-        if (!currentPromotion) {
-          console.warn('Promotion not found in current promotions, closing dialog...')
-          toast.error("Bu aksiya allaqachon o'chirilgan yoki mavjud emas.")
-          setDeleteDialogOpen(false)
-          setPromotionToDelete(null)
-          setDeletingPromotionId(null)
-          // Refresh data without trying to delete
-          await refetchPromotions()
-          return
-        }
-        
+
         await api.delete(`/promotions/${promotionId}/`)
-        console.log('Delete successful, refreshing promotions...')
-        
-        // Close dialog first for better UX
+
         setDeleteDialogOpen(false)
         setPromotionToDelete(null)
-        
-        // Then refetch data
-        await refetchPromotions() // Wait for refetch to complete
-        console.log('Promotions refreshed after delete')
-        
-        // Force additional refresh to ensure UI updates
-        setTimeout(() => {
-          refetchPromotions()
-        }, 100)
-        
+        await refetchPromotions()
+        setTimeout(() => refetchPromotions(), 100)
+
         toast.success("Aksiya o'chirildi")
       } catch (error) {
         console.error('Error deleting promotion:', error)
-        // If it's a 404 error, it means the promotion was already deleted
-        if (error.message && error.message.includes('404')) {
-          console.log('Promotion already deleted (404), refreshing data...')
-          toast.success("Aksiya o'chirildi")
-          await refetchPromotions()
-        } else {
-          toast.error(`Xatolik yuz berdi: ${error.message || 'Noma\'lum xato'}`)
-        }
+        toast.error("O'chirishda xatolik yuz berdi")
       } finally {
         setDeletingPromotionId(null)
       }
@@ -252,6 +309,9 @@ export function PromotionsTab() {
 
   const resetForm = () => {
     setEditingPromotion(null)
+    setDiscountType("none")
+    setImageError(null)
+    setPricePreview(null)
     setFormData({
       title: "",
       description: "",
@@ -278,6 +338,16 @@ export function PromotionsTab() {
     setCurrentLang('uz')
   }
 
+  // Helper for language label
+  const getLangLabel = (lang: string) => {
+    switch (lang) {
+      case 'uz': return "O'zbek";
+      case 'ru': return "Русский";
+      case 'en': return "English";
+      default: return lang.toUpperCase();
+    }
+  }
+
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
@@ -286,335 +356,391 @@ export function PromotionsTab() {
           <DialogTrigger asChild>
             <Button
               onClick={resetForm}
-              className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white rounded-full text-sm sm:text-base"
+              className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white rounded-full text-sm sm:text-base shadow-lg hover:shadow-amber-500/20 transition-all"
             >
-              <Plus className="w-4 h-4 mr-2" />
-              <span className="hidden sm:inline">Aksiya qo'shish</span>
+              <Plus className="w-5 h-5 mr-2" />
+              <span className="hidden sm:inline">Yangi Aksiya</span>
               <span className="sm:hidden">Qo'shish</span>
             </Button>
           </DialogTrigger>
-          <DialogContent className="bg-slate-900 border-white/20 text-white max-w-3xl max-h-[90vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle className="text-white">
-                {editingPromotion ? "Aksiyani tahrirlash" : "Yangi aksiya"}
+          <DialogContent className="bg-slate-900 border-white/10 text-white max-w-4xl max-h-[90vh] overflow-y-auto w-full p-0 gap-0">
+            <DialogHeader className="p-6 pb-2 border-b border-white/10 bg-slate-900/50 backdrop-blur sticky top-0 z-10">
+              <DialogTitle className="text-xl font-bold flex items-center gap-2">
+                {editingPromotion ? <Pencil className="w-5 h-5 text-amber-500" /> : <Plus className="w-5 h-5 text-amber-500" />}
+                {editingPromotion ? "Aksiyani tahrirlash" : "Yangi aksiya yaratish"}
               </DialogTitle>
               <DialogDescription className="text-white/60">
-                {editingPromotion ? "Mavjud aksiyani o'zgartiring" : "Yangi aksiya yarating va barcha maydonlarni to'ldiring"}
+                Quyidagi formani to'ldirish orqali {editingPromotion ? "aksiyani yangilang" : "yangi aksiya yarating"}.
               </DialogDescription>
             </DialogHeader>
-            <form onSubmit={handleSubmit} className="space-y-6">
-              {/* Title Field with Language Selection */}
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <Label className="text-white text-sm font-medium">Sarlavha</Label>
-                  <div className="flex gap-2">
-                    {(['uz', 'ru', 'en'] as const).map((lang) => (
-                      <button
-                        key={lang}
-                        type="button"
-                        onClick={() => setCurrentLang(lang)}
-                        className={`px-3 py-1 rounded-full text-xs font-medium transition-all ${
-                          currentLang === lang
-                            ? "bg-amber-500 text-white"
-                            : "bg-white/10 text-white/60 hover:bg-white/20"
-                        }`}
-                      >
-                        {lang === "uz" ? "UZ" : lang === "ru" ? "RU" : "EN"}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-                <Input
-                  value={currentLang === 'uz' ? multilingualData.title_uz : 
-                         currentLang === 'ru' ? multilingualData.title_ru : formData.title}
-                  onChange={(e) => {
-                    if (currentLang === 'uz') {
-                      setMultilingualData({ ...multilingualData, title_uz: e.target.value })
-                    } else if (currentLang === 'ru') {
-                      setMultilingualData({ ...multilingualData, title_ru: e.target.value })
-                    } else {
-                      setFormData({ ...formData, title: e.target.value })
-                    }
-                  }}
-                  className="bg-white/10 border-white/20 text-white text-sm"
-                  placeholder={currentLang === 'uz' ? "O'zbekcha sarlavha" : 
-                             currentLang === 'ru' ? "Русский заголовок" : "English title"}
-                  required
-                />
-              </div>
 
-              {/* Description Field with Language Selection */}
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <Label className="text-white text-sm font-medium">Tavsif</Label>
-                  <div className="flex gap-2">
-                    {(['uz', 'ru', 'en'] as const).map((lang) => (
-                      <button
-                        key={lang}
-                        type="button"
-                        onClick={() => setCurrentLang(lang)}
-                        className={`px-3 py-1 rounded-full text-xs font-medium transition-all ${
-                          currentLang === lang
-                            ? "bg-amber-500 text-white"
-                            : "bg-white/10 text-white/60 hover:bg-white/20"
-                        }`}
-                      >
-                        {lang === "uz" ? "UZ" : lang === "ru" ? "RU" : "EN"}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-                <Textarea
-                  value={currentLang === 'uz' ? multilingualData.description_uz : 
-                         currentLang === 'ru' ? multilingualData.description_ru : formData.description}
-                  onChange={(e) => {
-                    if (currentLang === 'uz') {
-                      setMultilingualData({ ...multilingualData, description_uz: e.target.value })
-                    } else if (currentLang === 'ru') {
-                      setMultilingualData({ ...multilingualData, description_ru: e.target.value })
-                    } else {
-                      setFormData({ ...formData, description: e.target.value })
-                    }
-                  }}
-                  className="bg-white/10 border-white/20 text-white text-sm min-h-[100px]"
-                  placeholder={currentLang === 'uz' ? "O'zbekcha tavsif" : 
-                             currentLang === 'ru' ? "Русское описание" : "English description"}
-                  required
-                />
-              </div>
+            <form onSubmit={handleSubmit} className="p-6 space-y-8">
 
-              {/* Image Upload */}
-              <div>
-                <Label htmlFor="image" className="text-white text-sm font-medium">
-                  Rasm
-                </Label>
-                <Input
-                  id="image"
-                  type="file"
-                  accept="image/*"
-                  onChange={handleImageUpload}
-                  className="bg-white/10 border-white/20 text-white text-sm file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-amber-500 file:text-white hover:file:bg-amber-600"
-                />
-                {formData.image && (
-                  <div className="relative w-full h-32 rounded-lg overflow-hidden mt-2">
-                    <Image src={formData.image || "/placeholder.svg"} alt="Preview" fill className="object-cover" />
-                  </div>
-                )}
-              </div>
-
-              {/* Discount Fields - Combined */}
+              {/* SECTION 1: BASIC INFO */}
               <div className="space-y-4">
-                {/* Warning Rules */}
-                <div className="bg-amber-500/10 border border-amber-500/30 rounded-lg p-4">
-                  <div className="flex items-start gap-3">
-                    <div className="w-5 h-5 rounded-full bg-amber-500/20 flex items-center justify-center flex-shrink-0 mt-0.5">
-                      <span className="text-amber-400 text-xs font-bold">!</span>
+                <div className="flex items-center gap-2 text-amber-500 font-semibold border-b border-white/10 pb-2">
+                  <ImageIcon className="w-5 h-5" />
+                  <h3>Asosiy Ma'lumotlar</h3>
+                </div>
+
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  {/* Left Column: Image & Category */}
+                  <div className="space-y-4">
+                    <div className="bg-white/5 rounded-xl p-4 border border-white/10 space-y-4">
+                      <Label className="text-white font-medium block mb-2">Aksiya Rasmi</Label>
+                      <div className="flex items-start gap-4">
+                        <div className="relative w-24 h-24 rounded-lg overflow-hidden bg-slate-800 border border-white/20 flex-shrink-0">
+                          {formData.image ? (
+                            <Image src={formData.image || "/placeholder.svg"} alt="Preview" fill className="object-cover" />
+                          ) : (
+                            <div className="flex items-center justify-center h-full text-white/20">
+                              <ImageIcon className="w-8 h-8" />
+                            </div>
+                          )}
+                        </div>
+                        <div className="flex-1 space-y-2">
+                          <Input
+                            id="image"
+                            type="file"
+                            accept="image/*"
+                            onChange={handleImageUpload}
+                            className="bg-slate-800 border-white/20 text-white text-xs file:mr-2 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-medium file:bg-amber-500 file:text-white hover:file:bg-amber-600"
+                          />
+                          {imageError ? (
+                            <p className="text-red-400 text-xs flex items-center gap-1">
+                              <AlertCircle className="w-3 h-3" /> {imageError}
+                            </p>
+                          ) : (
+                            <p className="text-white/40 text-xs">
+                              JPG, PNG. Max 2MB. Tavsiya: 1200x600px
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Discount & Price Group */}
+                    <div className="bg-white/5 rounded-xl p-4 border border-white/10 space-y-4">
+                      <Label className="text-white font-medium block">Chegirma va Narx</Label>
+
+                      {/* Discount Type Toggle */}
+                      <div className="grid grid-cols-3 gap-2 bg-slate-950/50 p-1 rounded-lg">
+                        <button
+                          type="button"
+                          onClick={() => handleDiscountTypeChange('none')}
+                          className={cn("text-xs py-2 rounded-md font-medium transition-all",
+                            discountType === 'none' ? "bg-slate-700 text-white shadow-sm" : "text-white/60 hover:text-white")}
+                        >
+                          Yo'q
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleDiscountTypeChange('percentage')}
+                          className={cn("text-xs py-2 rounded-md font-medium transition-all flex items-center justify-center gap-1",
+                            discountType === 'percentage' ? "bg-amber-600 text-white shadow-sm" : "text-white/60 hover:text-white")}
+                        >
+                          <Percent className="w-3 h-3" /> Foiz (%)
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleDiscountTypeChange('amount')}
+                          className={cn("text-xs py-2 rounded-md font-medium transition-all flex items-center justify-center gap-1",
+                            discountType === 'amount' ? "bg-green-600 text-white shadow-sm" : "text-white/60 hover:text-white")}
+                        >
+                          <DollarSign className="w-3 h-3" /> Summa
+                        </button>
+                      </div>
+
+                      {/* Conditional Inputs */}
+                      {discountType === 'percentage' && (
+                        <div className="space-y-2 animate-in fade-in slide-in-from-top-1">
+                          <Label className="text-xs text-amber-400">Chegirma Foizi (%)</Label>
+                          <div className="relative">
+                            <Input
+                              type="number"
+                              min="0"
+                              max="100"
+                              value={formData.discount_percentage || ""}
+                              onChange={(e) => setFormData({ ...formData, discount_percentage: Number.parseInt(e.target.value) || 0 })}
+                              className="bg-slate-900 border-amber-500/50 focus:border-amber-500 text-white pl-9"
+                              placeholder="20"
+                            />
+                            <Percent className="w-4 h-4 text-amber-500 absolute left-3 top-3" />
+                          </div>
+                        </div>
+                      )}
+
+                      {discountType === 'amount' && (
+                        <div className="space-y-2 animate-in fade-in slide-in-from-top-1">
+                          <Label className="text-xs text-green-400">Chegirma Summasi (so'm)</Label>
+                          <div className="relative">
+                            <Input
+                              type="number"
+                              min="0"
+                              value={formData.discount_amount || ""}
+                              onChange={(e) => setFormData({ ...formData, discount_amount: Number.parseInt(e.target.value) || 0 })}
+                              className="bg-slate-900 border-green-500/50 focus:border-green-500 text-white pl-9"
+                              placeholder="5000"
+                            />
+                            <span className="absolute left-3 top-2.5 text-green-500 font-bold text-sm">∑</span>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Final Price */}
+                      <div className="space-y-2 pt-2 border-t border-white/5">
+                        <Label className="text-sm text-white font-medium">
+                          Aksiya Narxi (Yakuniy) <span className="text-red-400">*</span>
+                        </Label>
+                        <Input
+                          type="number"
+                          min="0"
+                          value={formData.price || ""}
+                          onChange={(e) => setFormData({ ...formData, price: Number(e.target.value) || 0 })}
+                          className="bg-slate-900 border-white/20 text-white font-bold text-lg"
+                          placeholder="0"
+                          required
+                        />
+                        {pricePreview !== null && (
+                          <p className="text-xs text-green-400 bg-green-500/10 px-2 py-1 rounded inline-block">
+                            Hisoblangan narx: <strong>{formatPrice(pricePreview)}</strong>
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Right Column: Text Fields & Language */}
+                  <div className="bg-white/5 rounded-xl p-4 border border-white/10 flex flex-col h-full">
+                    {/* Language Tabs */}
+                    <div className="flex bg-slate-900 p-1 rounded-lg mb-4 self-start">
+                      {(['uz', 'ru', 'en'] as const).map((lang) => (
+                        <button
+                          key={lang}
+                          type="button"
+                          onClick={() => setCurrentLang(lang)}
+                          className={cn("px-4 py-1.5 rounded-md text-xs font-semibold transition-all uppercase",
+                            currentLang === lang ? "bg-amber-500 text-white shadow-md" : "text-white/50 hover:text-white hover:bg-white/5")}
+                        >
+                          {lang}
+                        </button>
+                      ))}
+                    </div>
+
+                    <div className="space-y-4 flex-1">
+                      <div className="space-y-1">
+                        <Label className="text-white text-xs">Sarlavha ({getLangLabel(currentLang)})</Label>
+                        <Input
+                          value={currentLang === 'uz' ? multilingualData.title_uz :
+                            currentLang === 'ru' ? multilingualData.title_ru : formData.title}
+                          onChange={(e) => {
+                            if (currentLang === 'uz') setMultilingualData({ ...multilingualData, title_uz: e.target.value });
+                            else if (currentLang === 'ru') setMultilingualData({ ...multilingualData, title_ru: e.target.value });
+                            else setFormData({ ...formData, title: e.target.value });
+                          }}
+                          className="bg-slate-900 border-white/20 text-white"
+                          placeholder={currentLang === 'uz' ? "Masalan: Super Aksiya" : "Example: Super Sale"}
+                          required
+                        />
+                      </div>
+
+                      <div className="space-y-1">
+                        <Label className="text-white text-xs">Tavsif ({getLangLabel(currentLang)})</Label>
+                        <Textarea
+                          value={currentLang === 'uz' ? multilingualData.description_uz :
+                            currentLang === 'ru' ? multilingualData.description_ru : formData.description}
+                          onChange={(e) => {
+                            if (currentLang === 'uz') setMultilingualData({ ...multilingualData, description_uz: e.target.value });
+                            else if (currentLang === 'ru') setMultilingualData({ ...multilingualData, description_ru: e.target.value });
+                            else setFormData({ ...formData, description: e.target.value });
+                          }}
+                          className="bg-slate-900 border-white/20 text-white min-h-[100px]"
+                          placeholder={currentLang === 'uz' ? "Aksiya haqida batafsil..." : "About promotion..."}
+                          required
+                        />
+                      </div>
+
+                      <div className="space-y-1">
+                        <Label className="text-white text-xs">Tarkibi / Ingredients</Label>
+                        <Input
+                          value={currentLang === 'uz' ? multilingualData.ingredients_uz :
+                            currentLang === 'ru' ? multilingualData.ingredients_ru : formData.ingredients}
+                          onChange={(e) => {
+                            if (currentLang === 'uz') setMultilingualData({ ...multilingualData, ingredients_uz: e.target.value });
+                            else if (currentLang === 'ru') setMultilingualData({ ...multilingualData, ingredients_ru: e.target.value });
+                            else setFormData({ ...formData, ingredients: e.target.value });
+                          }}
+                          className="bg-slate-900 border-white/20 text-white text-sm"
+                          placeholder="Comma separated: A, B, C"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* SECTION 2: LINKING & TIME */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4">
+
+                {/* Linking */}
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2 text-amber-500 font-semibold border-b border-white/10 pb-2">
+                    <ExternalLink className="w-5 h-5" />
+                    <h3>Bog'lash (Majburiy emas)</h3>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label className="text-white text-xs">Kategoriya</Label>
+                      <Select
+                        value={formData.category}
+                        onValueChange={(value) => setFormData({ ...formData, category: value })}
+                      >
+                        <SelectTrigger className="bg-white/10 border-white/20 text-white">
+                          <SelectValue placeholder="Tanlang..." />
+                        </SelectTrigger>
+                        <SelectContent className="bg-slate-900 border-white/20">
+                          <SelectItem value="none" className="text-white">Hech qanday</SelectItem>
+                          {categories.map((cat) => (
+                            <SelectItem key={cat.id} value={cat.id.toString()} className="text-white">
+                              {cat.name_uz || cat.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label className="text-white text-xs">Taom (Avto to'ldirish uchun)</Label>
+                      <Popover open={openCombobox} onOpenChange={setOpenCombobox}>
+                        <PopoverTrigger asChild>
+                          <Button
+                            variant="outline"
+                            role="combobox"
+                            aria-expanded={openCombobox}
+                            className="w-full justify-between bg-white/10 border-white/20 text-white hover:bg-white/20 hover:text-white overflow-hidden"
+                          >
+                            {formData.linked_dish && formData.linked_dish !== 'none'
+                              ? menuItems.find((item) => item.id.toString() === formData.linked_dish)?.name_uz || "Taom tanlandi"
+                              : "Taomni qidirish..."}
+                            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-[300px] p-0 bg-slate-900 border-white/20">
+                          <Command className="bg-slate-900 text-white">
+                            <CommandInput placeholder="Taom nomini yozing..." className="text-white" />
+                            <CommandList>
+                              <CommandEmpty className="py-2 text-center text-sm text-white/50">Taom topilmadi.</CommandEmpty>
+                              <CommandGroup className="text-white">
+                                <CommandItem
+                                  value="none"
+                                  onSelect={() => {
+                                    setFormData({ ...formData, linked_dish: 'none' })
+                                    setOpenCombobox(false)
+                                  }}
+                                  className="text-white hover:bg-white/10 cursor-pointer"
+                                >
+                                  <Check className={cn("mr-2 h-4 w-4 opacity-0")} />
+                                  Hech qanday
+                                </CommandItem>
+                                {menuItems.map((item) => (
+                                  <CommandItem
+                                    key={item.id}
+                                    value={item.id.toString() + " " + item.name_uz + " " + item.name} // Hack for search
+                                    onSelect={() => {
+                                      setFormData({ ...formData, linked_dish: item.id.toString() })
+                                      setOpenCombobox(false)
+                                    }}
+                                    className="text-white hover:bg-white/10 cursor-pointer"
+                                  >
+                                    <Check
+                                      className={cn(
+                                        "mr-2 h-4 w-4",
+                                        formData.linked_dish === item.id.toString() ? "opacity-100" : "opacity-0"
+                                      )}
+                                    />
+                                    {item.name_uz || item.name}
+                                  </CommandItem>
+                                ))}
+                              </CommandGroup>
+                            </CommandList>
+                          </Command>
+                        </PopoverContent>
+                      </Popover>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Time */}
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2 text-amber-500 font-semibold border-b border-white/10 pb-2">
+                    <Calendar className="w-5 h-5" />
+                    <h3>Vaqt va Holat</h3>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label className="text-white text-xs">Boshlanish</Label>
+                      <Input
+                        type="datetime-local"
+                        value={formData.start_date}
+                        onChange={(e) => setFormData({ ...formData, start_date: e.target.value })}
+                        className="bg-white/10 border-white/20 text-white text-sm"
+                      />
                     </div>
                     <div className="space-y-2">
-                      <h4 className="text-amber-400 font-semibold text-sm">Chegirma qoidalari:</h4>
-                      <ul className="text-white/80 text-xs space-y-1">
-                        <li>• <strong>Chegirma foizi</strong> va <strong>chegirma miqdori</strong>ni bir vaqtda ishlatmang</li>
-                        <li>• Faqat bitta turda chegirma kiriting: yoki foiz (20%) yoki miqdor (5000 so'm)</li>
-                        <li>• <strong>Aksiya narxi</strong> har doim kiritilishi kerak (yakuniy narx)</li>
-                        <li>• Agar chegirma foizi = 20% va asl narx = 30000 so'm, aksiya narxi = 24000 so'm bo'ladi</li>
-                      </ul>
+                      <Label className="text-white text-xs">Tugash</Label>
+                      <Input
+                        type="datetime-local"
+                        min={formData.start_date} // Date safety
+                        value={formData.end_date}
+                        onChange={(e) => setFormData({ ...formData, end_date: e.target.value })}
+                        className="bg-white/10 border-white/20 text-white text-sm"
+                      />
                     </div>
                   </div>
-                </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="discount_percentage" className="text-white text-sm font-medium">
-                      Chegirma (%)
-                    </Label>
-                    <Input
-                      id="discount_percentage"
-                      type="number"
-                      min="0"
-                      max="100"
-                      value={formData.discount_percentage || ""}
-                      onChange={(e) => setFormData({ ...formData, discount_percentage: Number.parseInt(e.target.value) || 0 })}
-                      className="bg-white/10 border-white/20 text-white text-sm"
-                      placeholder="20"
+                  <div className="bg-white/5 rounded-lg p-3 flex items-center justify-between border border-white/10">
+                    <div className="space-y-1">
+                      <Label className="text-white font-medium">Saytda ko'rsatiladi</Label>
+                      <p className="text-[10px] text-white/50">Yoqilsa, aksiya foydalanuvchilar ilovasida darhol ko'rinadi.</p>
+                    </div>
+                    <Switch
+                      checked={formData.is_active}
+                      onCheckedChange={(checked) => setFormData({ ...formData, is_active: checked })}
                     />
-                    <p className="text-white/60 text-xs mt-1">0-100% orasida kiriting</p>
-                  </div>
-                  <div>
-                    <Label htmlFor="discount_amount" className="text-white text-sm font-medium">
-                      Chegirma Miqdori (so'm)
-                    </Label>
-                    <Input
-                      id="discount_amount"
-                      type="number"
-                      min="0"
-                      value={formData.discount_amount || ""}
-                      onChange={(e) => setFormData({ ...formData, discount_amount: Number.parseInt(e.target.value) || 0 })}
-                      className="bg-white/10 border-white/20 text-white text-sm"
-                      placeholder="5000"
-                    />
-                    <p className="text-white/60 text-xs mt-1">Belgilangan miqdordagi chegirma</p>
                   </div>
                 </div>
               </div>
 
-              {/* Price Field */}
-              <div>
-                <Label htmlFor="price" className="text-white text-sm font-medium">
-                  Aksiya Narxi (so'm)
-                </Label>
-                <Input
-                  id="price"
-                  type="number"
-                  min="0"
-                  value={formData.price || ""}
-                  onChange={(e) => setFormData({ ...formData, price: Number(e.target.value) || 0 })}
-                  className="bg-white/10 border-white/20 text-white text-sm"
-                  placeholder="50000"
-                  required
-                />
-                <p className="text-white/60 text-xs mt-1">
-                  <strong>Yakuniy narx</strong> - chegirma qo'llanganidan keyingi narx (majburiy)
-                </p>
+              {/* Actions */}
+              <div className="pt-4 border-t border-white/10 flex gap-4">
+                <DialogTrigger asChild>
+                  <Button type="button" variant="outline" className="flex-1 bg-transparent border-white/20 text-white hover:bg-white/10">
+                    Bekor qilish
+                  </Button>
+                </DialogTrigger>
+                <Button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="flex-1 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white disabled:opacity-70"
+                >
+                  {isSubmitting ? (
+                    <div className="flex items-center gap-2">
+                      <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                      Saqlanmoqda...
+                    </div>
+                  ) : (
+                    editingPromotion ? "Aksiyani Yangilash" : "Aksiya Yaratish"
+                  )}
+                </Button>
               </div>
-
-              {/* Category and Linked Dish */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="category" className="text-white text-sm font-medium">
-                    Kategoriya
-                  </Label>
-                  <Select
-                    value={formData.category}
-                    onValueChange={(value) => setFormData({ ...formData, category: value })}
-                  >
-                    <SelectTrigger className="bg-white/10 border-white/20 text-white">
-                      <SelectValue placeholder="Kategoriyani tanlang" />
-                    </SelectTrigger>
-                    <SelectContent className="bg-slate-900 border-white/20">
-                      <SelectItem value="none" className="text-white">Kategoriya yo'q</SelectItem>
-                      {categories.map((cat) => (
-                        <SelectItem key={cat.id} value={cat.id.toString()} className="text-white">
-                          {cat.name_uz || cat.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                
-                <div>
-                  <Label htmlFor="linked_dish" className="text-white text-sm font-medium">
-                    Bog'langan Taom
-                  </Label>
-                  <Select
-                    value={formData.linked_dish}
-                    onValueChange={(value) => setFormData({ ...formData, linked_dish: value })}
-                  >
-                    <SelectTrigger className="bg-white/10 border-white/20 text-white">
-                      <SelectValue placeholder="Taomni tanlang" />
-                    </SelectTrigger>
-                    <SelectContent className="bg-slate-900 border-white/20">
-                      <SelectItem value="none" className="text-white">Taom yo'q</SelectItem>
-                      {menuItems.map((item) => (
-                        <SelectItem key={item.id} value={item.id.toString()} className="text-white">
-                          {item.name_uz || item.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-
-              {/* Ingredients Field with Language Selection */}
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <Label className="text-white text-sm font-medium">Tarkibi</Label>
-                  <div className="flex gap-2">
-                    {(['uz', 'ru', 'en'] as const).map((lang) => (
-                      <button
-                        key={lang}
-                        type="button"
-                        onClick={() => setCurrentLang(lang)}
-                        className={`px-3 py-1 rounded-full text-xs font-medium transition-all ${
-                          currentLang === lang
-                            ? "bg-amber-500 text-white"
-                            : "bg-white/10 text-white/60 hover:bg-white/20"
-                        }`}
-                      >
-                        {lang === "uz" ? "UZ" : lang === "ru" ? "RU" : "EN"}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-                <Input
-                  value={currentLang === 'uz' ? multilingualData.ingredients_uz : 
-                         currentLang === 'ru' ? multilingualData.ingredients_ru : formData.ingredients}
-                  onChange={(e) => {
-                    if (currentLang === 'uz') {
-                      setMultilingualData({ ...multilingualData, ingredients_uz: e.target.value })
-                    } else if (currentLang === 'ru') {
-                      setMultilingualData({ ...multilingualData, ingredients_ru: e.target.value })
-                    } else {
-                      setFormData({ ...formData, ingredients: e.target.value })
-                    }
-                  }}
-                  className="bg-white/10 border-white/20 text-white text-sm"
-                  placeholder={currentLang === 'uz' ? "Mahsulot1, Mahsulot2, Mahsulot3" : 
-                             currentLang === 'ru' ? "Ингредиент1, Ингредиент2, Ингредиент3" : 
-                             "Ingredient1, Ingredient2, Ingredient3"}
-                />
-              </div>
-
-              {/* Date Fields */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="start_date" className="text-white text-sm font-medium">
-                    Boshlanish Sanasi
-                  </Label>
-                  <Input
-                    id="start_date"
-                    type="datetime-local"
-                    value={formData.start_date}
-                    onChange={(e) => setFormData({ ...formData, start_date: e.target.value })}
-                    className="bg-white/10 border-white/20 text-white text-sm"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="end_date" className="text-white text-sm font-medium">
-                    Tugash Sanasi
-                  </Label>
-                  <Input
-                    id="end_date"
-                    type="datetime-local"
-                    value={formData.end_date}
-                    onChange={(e) => setFormData({ ...formData, end_date: e.target.value })}
-                    className="bg-white/10 border-white/20 text-white text-sm"
-                  />
-                </div>
-              </div>
-
-              {/* Active Status */}
-              <div className="flex items-center gap-3">
-                <Switch
-                  id="is_active"
-                  checked={formData.is_active}
-                  onCheckedChange={(checked) => setFormData({ ...formData, is_active: checked })}
-                />
-                <Label htmlFor="is_active" className="text-white text-sm font-medium">
-                  Ko'rinadi
-                </Label>
-              </div>
-
-              <Button
-                type="submit"
-                className="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white py-3 rounded-lg font-semibold"
-              >
-                {editingPromotion ? "Yangilash" : "Qo'shish"}
-              </Button>
             </form>
           </DialogContent>
         </Dialog>
       </div>
 
+      {/* Grid List - Kept Same */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {promotionsLoading ? (
           <div className="col-span-full flex justify-center items-center py-8">
@@ -627,64 +753,63 @@ export function PromotionsTab() {
           </div>
         ) : (
           promotions.map((promotion) => (
-          <div
-            key={promotion.id}
-            className={`bg-white/10 backdrop-blur-xl rounded-2xl overflow-hidden border border-white/20 shadow-xl transition-opacity ${
-              deletingPromotionId === promotion.id ? 'opacity-50' : ''
-            }`}
-          >
-            <div className="relative h-40">
-              <Image
-                src={promotion.image || "https://api.tokyokafe.uz/media/defaults/promo.jpg"}
-                alt={promotion.titleUz}
-                fill
-                className="object-cover"
-              />
-              {promotion.active && (
-                <div className="absolute top-3 right-3 bg-green-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
-                  Faol
-                </div>
-              )}
-            </div>
-            <div className="p-4">
-              <div className="flex justify-between items-start mb-2">
-                <div>
-                  <h3 className="text-lg font-bold text-white">{promotion.titleUz}</h3>
-                  <p className="text-sm text-white/60 mb-2">{promotion.descriptionUz}</p>
-              <div className="text-amber-400 font-bold text-lg">
-                {promotion.discount_percentage > 0 && (
-                  <p>{promotion.discount_percentage}% chegirma</p>
-                )}
-                {promotion.discount_percentage === 0 && promotion.discount_amount > 0 && (
-                  <p>{formatPrice(promotion.discount_amount)} chegirma</p>
-                )}
-                {promotion.price > 0 && (
-                  <p>Narx: {formatPrice(promotion.price)}</p>
+            <div
+              key={promotion.id}
+              className={`bg-white/10 backdrop-blur-xl rounded-2xl overflow-hidden border border-white/20 shadow-xl transition-opacity ${deletingPromotionId === promotion.id ? 'opacity-50' : ''
+                }`}
+            >
+              <div className="relative h-40">
+                <Image
+                  src={promotion.image || "https://api.tokyokafe.uz/media/defaults/promo.jpg"}
+                  alt={promotion.titleUz}
+                  fill
+                  className="object-cover"
+                />
+                {promotion.active && (
+                  <div className="absolute top-3 right-3 bg-green-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
+                    Faol
+                  </div>
                 )}
               </div>
-                </div>
-                <div className="flex gap-2">
-                  <Button
-                    size="icon"
-                    variant="ghost"
-                    onClick={() => handleEdit(promotion)}
-                    className="text-blue-400 hover:text-blue-300 hover:bg-blue-500/20 rounded-full h-8 w-8"
-                  >
-                    <Pencil className="w-4 h-4" />
-                  </Button>
-                  <Button
-                    size="icon"
-                    variant="ghost"
-                    onClick={() => handleDeleteClick(promotion)}
-                    className="text-red-400 hover:text-red-300 hover:bg-red-500/20 rounded-full h-8 w-8"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </Button>
+              <div className="p-4">
+                <div className="flex justify-between items-start mb-2">
+                  <div>
+                    <h3 className="text-lg font-bold text-white">{promotion.titleUz}</h3>
+                    <p className="text-sm text-white/60 mb-2">{promotion.descriptionUz}</p>
+                    <div className="text-amber-400 font-bold text-lg">
+                      {promotion.discount_percentage > 0 && (
+                        <p>{promotion.discount_percentage}% chegirma</p>
+                      )}
+                      {promotion.discount_percentage === 0 && promotion.discount_amount > 0 && (
+                        <p>{formatPrice(promotion.discount_amount)} chegirma</p>
+                      )}
+                      {promotion.price > 0 && (
+                        <p>Narx: {formatPrice(promotion.price)}</p>
+                      )}
+                    </div>
+                  </div>
+                  <div className="flex gap-2">
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      onClick={() => handleEdit(promotion)}
+                      className="text-blue-400 hover:text-blue-300 hover:bg-blue-500/20 rounded-full h-8 w-8"
+                    >
+                      <Pencil className="w-4 h-4" />
+                    </Button>
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      onClick={() => handleDeleteClick(promotion)}
+                      className="text-red-400 hover:text-red-300 hover:bg-red-500/20 rounded-full h-8 w-8"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        ))
+          ))
         )}
       </div>
 
@@ -702,13 +827,13 @@ export function PromotionsTab() {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="flex gap-2">
-            <AlertDialogCancel 
+            <AlertDialogCancel
               onClick={handleDeleteCancel}
               className="bg-gray-600 hover:bg-gray-700 text-white border-gray-600"
             >
               Bekor qilish
             </AlertDialogCancel>
-            <AlertDialogAction 
+            <AlertDialogAction
               onClick={handleDeleteConfirm}
               className="bg-red-600 hover:bg-red-700 text-white"
             >
