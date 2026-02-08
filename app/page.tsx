@@ -42,7 +42,12 @@ export default function Home() {
 
       {/* Extra CTA for Menu */}
       <section className="py-20 bg-amber-500 relative overflow-hidden">
-        <div className="absolute inset-0 bg-[url('/tokyo-pattern.png')] opacity-10" />
+        <div className="absolute inset-0 opacity-10"
+          style={{
+            backgroundImage: "radial-gradient(#000 1px, transparent 1px)",
+            backgroundSize: "20px 20px"
+          }}
+        />
         <div className="container mx-auto px-4 text-center relative z-10">
           <h2 className="text-3xl md:text-5xl font-bold text-white mb-6">
             {language === 'uz' ? "Qorni och qoldingizmi?" : language === 'ru' ? "Проголодались?" : "Hungry?"}

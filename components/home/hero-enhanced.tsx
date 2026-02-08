@@ -50,7 +50,7 @@ export function HeroEnhanced() {
                         <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
                         <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
                     </span>
-                    09:00 - 23:00
+                    09:00 - 02:00
                 </div>
 
                 <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight drop-shadow-xl text-balance">

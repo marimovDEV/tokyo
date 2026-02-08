@@ -31,13 +31,40 @@ export function PopularDishesSection() {
     const t = translations[language]
 
     // Strategy: 
-    // 1. Filter active & available items
-    // 2. Sort by rating (desc)
-    // 3. Take top 6
-    const popularItems = menuItems
-        ?.filter(item => item.is_active && item.available)
-        .sort((a, b) => (b.rating || 0) - (a.rating || 0))
-        .slice(0, 6) || []
+    // 1. Group active & available items by category
+    // 2. Pick the highest rated item from each category to ensure diversity
+    // 3. Flatten and slice to take top 6
+    const popularItems = (() => {
+        if (!menuItems) return []
+
+        // Group by category
+        const itemsByCategory: Record<string, typeof menuItems> = {}
+
+        menuItems.forEach(item => {
+            if (item.is_active && item.available) {
+                const catId = String(item.category)
+                if (!itemsByCategory[catId]) {
+                    itemsByCategory[catId] = []
+                }
+                itemsByCategory[catId].push(item)
+            }
+        })
+
+        // Pick top rated from each category
+        const selectedItems: typeof menuItems = []
+
+        Object.values(itemsByCategory).forEach(categoryItems => {
+            // Sort by rating desc
+            const sorted = categoryItems.sort((a, b) => (b.rating || 0) - (a.rating || 0))
+            if (sorted.length > 0) {
+                selectedItems.push(sorted[0])
+            }
+        })
+
+        // Sort the final selection by global rating or just shuffle/slice
+        // Let's sort by rating to show the best of the best from different categories
+        return selectedItems.sort((a, b) => (b.rating || 0) - (a.rating || 0)).slice(0, 6)
+    })()
 
     if (loading) {
         return (
