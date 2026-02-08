@@ -94,8 +94,8 @@ export function MenuItemCard({ item, language }: MenuItemCardProps) {
           {/* Description and other details hidden to reduce noise */}
 
           {/* Price and Add Button - Bottom aligned */}
-          <div className="flex items-center justify-between gap-4 pt-4 border-t border-white/10 mt-auto">
-            <div className="text-xl min-[431px]:text-lg md:text-xl font-bold text-orange-400">
+          <div className="flex items-center justify-between gap-2 md:gap-4 pt-4 border-t border-white/10 mt-auto">
+            <div className="text-lg md:text-xl font-bold text-orange-400">
               {formatPrice(item.price)}
             </div>
 
@@ -104,7 +104,10 @@ export function MenuItemCard({ item, language }: MenuItemCardProps) {
                 onClick={handleAddToCart}
                 disabled={!item.available || isLoading}
                 className={`
-                bg-gradient-to-r hover:to-orange-700 text-white rounded-full h-11 min-[431px]:h-9 md:h-11 px-6 min-[431px]:px-4 md:px-6 text-base min-[431px]:text-sm md:text-base font-semibold shadow-lg transition-all duration-200 min-w-[100px] min-[431px]:min-w-[80px] md:min-w-[100px]
+                bg-gradient-to-r hover:to-orange-700 text-white rounded-full
+                h-9 px-4 text-sm min-w-[80px]
+                md:h-11 md:px-6 md:text-base md:min-w-[100px]
+                font-semibold shadow-lg transition-all duration-200
                 ${isSuccess
                     ? "from-green-500 to-green-600 hover:from-green-600 shadow-green-500/30"
                     : "from-orange-500 to-orange-600 hover:from-orange-600 shadow-orange-500/30 hover:shadow-orange-500/50"
