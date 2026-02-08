@@ -36,17 +36,17 @@ export default function MenuPage() {
         const itemCategoryId = parseInt(item.category.toString())
         return itemCategoryId === selectedCategoryId
       })
-      
+
       // Agar kategoriya tanlangan bo'lsa, faqat o'sha kategoriya ichidagi tartib bo'yicha saralash
       items = items.sort((a, b) => {
         const orderA = a.category_order ?? 0
         const orderB = b.category_order ?? 0
-        
+
         // Agar order 0 yoki undefined bo'lsa, oxiriga qo'yish
         if (orderA === 0 && orderB === 0) return 0
         if (orderA === 0) return 1  // a oxiriga
         if (orderB === 0) return -1  // b oxiriga
-        
+
         return orderA - orderB
       })
     } else {
@@ -74,21 +74,21 @@ export default function MenuPage() {
 
       // Har bir kategoriya uchun mahsulotlarni to'plash va tartiblash
       const groupedItems: typeof items = []
-      
+
       for (const category of sortedCategories) {
         // Kategoriya ID'ni turli formatlardan olish
-        const categoryId = typeof category.id === 'number' 
-          ? category.id 
+        const categoryId = typeof category.id === 'number'
+          ? category.id
           : parseInt(String(category.id))
-        
+
         // Bu kategoriyaga tegishli mahsulotlarni topish
         const categoryItems = items.filter((item) => {
           if (!item || !item.category) return false
-          
+
           const itemCategoryId = typeof item.category === 'number'
             ? item.category
             : parseInt(String(item.category))
-          
+
           return itemCategoryId === categoryId
         })
 
@@ -98,12 +98,12 @@ export default function MenuPage() {
           const sortedCategoryItems = categoryItems.sort((a, b) => {
             const orderA = a.category_order ?? 0
             const orderB = b.category_order ?? 0
-            
+
             // Agar order 0 yoki undefined bo'lsa, oxiriga qo'yish
             if (orderA === 0 && orderB === 0) return 0
             if (orderA === 0) return 1  // a oxiriga
             if (orderB === 0) return -1  // b oxiriga
-            
+
             return orderA - orderB
           })
 
@@ -126,27 +126,27 @@ export default function MenuPage() {
       const query = searchQuery.toLowerCase().trim()
       items = items.filter((item) => {
         // Name bo'yicha qidirish
-        const nameMatch = 
+        const nameMatch =
           item.name?.toLowerCase().includes(query) ||
           item.name_uz?.toLowerCase().includes(query) ||
           item.name_ru?.toLowerCase().includes(query)
-        
+
         // Description bo'yicha qidirish
         const descriptionMatch =
           item.description?.toLowerCase().includes(query) ||
           item.description_uz?.toLowerCase().includes(query) ||
           item.description_ru?.toLowerCase().includes(query)
-        
+
         // Ingredients bo'yicha qidirish
         const ingredients = Array.isArray(item.ingredients) ? item.ingredients : []
         const ingredientsUz = Array.isArray(item.ingredients_uz) ? item.ingredients_uz : []
         const ingredientsRu = Array.isArray(item.ingredients_ru) ? item.ingredients_ru : []
-        
-        const ingredientsMatch = 
+
+        const ingredientsMatch =
           ingredients.some(ing => ing?.toLowerCase().includes(query)) ||
           ingredientsUz.some(ing => ing?.toLowerCase().includes(query)) ||
           ingredientsRu.some(ing => ing?.toLowerCase().includes(query))
-        
+
         return nameMatch || descriptionMatch || ingredientsMatch
       })
     }
@@ -166,12 +166,12 @@ export default function MenuPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 pb-24">
+    <main className="min-h-screen bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 pb-24">
       <div className="fixed inset-0 bg-[url('/tokyo-restaurant-night.png')] bg-cover bg-center bg-fixed opacity-10 pointer-events-none" />
 
       <div className="relative z-10 container mx-auto px-3 md:px-4 py-4 md:py-8">
         {/* Header */}
-        <div className="flex items-center justify-between gap-2 md:gap-4 mb-6 md:mb-8">
+        <header className="flex items-center justify-between gap-2 md:gap-4 mb-6 md:mb-8">
           <div className="flex items-center gap-2 md:gap-4">
             <Link
               href="/"
@@ -187,15 +187,14 @@ export default function MenuPage() {
               <button
                 key={lang}
                 onClick={() => setLanguage(lang)}
-                className={`px-2 md:px-3 py-1 md:py-1.5 rounded-full text-xs md:text-sm font-medium transition-all ${
-                  language === lang ? "bg-white text-slate-900" : "text-white/70 hover:text-white"
-                }`}
+                className={`px-2 md:px-3 py-1 md:py-1.5 rounded-full text-xs md:text-sm font-medium transition-all ${language === lang ? "bg-white text-slate-900" : "text-white/70 hover:text-white"
+                  }`}
               >
                 {lang.toUpperCase()}
               </button>
-                ))}
-              </div>
-            </div>
+            ))}
+          </div>
+        </header>
 
         <PromotionsCarousel language={language} />
 
@@ -205,7 +204,7 @@ export default function MenuPage() {
             <Search className="absolute left-3 md:left-4 top-1/2 -translate-y-1/2 w-4 h-4 md:w-5 md:h-5 text-white/60" />
             <Input
               placeholder={
-                language === "uz" ? "Taom qidirish..." : language === "ru" ? "Поиск блюд..." : "Search dishes..."
+                language === "uz" ? "Mahsulot nomini yozing (masalan: Lavash)..." : language === "ru" ? "Введите название блюда (например: Лаваш)..." : "Type dish name (e.g. Lavash)..."
               }
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
@@ -215,65 +214,67 @@ export default function MenuPage() {
         </div>
 
         {/* Category Filter */}
-        <div className="mb-6 md:mb-8 flex gap-2 md:gap-3 overflow-x-auto pb-2 scrollbar-thin px-2 md:px-0">
-          <Button
-            onClick={() => setSelectedCategory(null)}
-            variant={selectedCategory === null ? "default" : "outline"}
-            className={`rounded-full whitespace-nowrap text-xs md:text-sm px-3 md:px-4 py-2 md:py-2.5 ${
-              selectedCategory === null
+        <div className="sticky top-0 z-40 bg-slate-900/95 backdrop-blur-md py-4 -mx-2 px-2 md:-mx-4 md:px-4 mb-6 md:mb-8 transition-all border-b border-white/5">
+          <nav className="flex gap-2 md:gap-3 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-amber-500/20 scrollbar-track-transparent">
+            <Button
+              onClick={() => setSelectedCategory(null)}
+              variant={selectedCategory === null ? "default" : "outline"}
+              className={`rounded-full whitespace-nowrap text-xs md:text-sm px-3 md:px-4 py-2 md:py-2.5 ${selectedCategory === null
                 ? "bg-gradient-to-r from-amber-500 to-amber-600 text-white"
                 : "bg-white/10 backdrop-blur-xl border-white/30 text-white hover:bg-white/20"
-            }`}
-          >
-            {language === "uz" ? "Hammasi" : language === "ru" ? "Все" : "All"}
-          </Button>
-          {categories && Array.isArray(categories) && categories
-            .sort((a, b) => (a.order || 0) - (b.order || 0))
-            .map((category) => (
-              <Button
-                key={category.id}
-                onClick={() => setSelectedCategory(category.id)}
-                variant={selectedCategory === category.id ? "default" : "outline"}
-                className={`rounded-full whitespace-nowrap text-xs md:text-sm px-3 md:px-4 py-2 md:py-2.5 ${
-                  selectedCategory === category.id
+                }`}
+            >
+              {language === "uz" ? "Hammasi" : language === "ru" ? "Все" : "All"}
+            </Button>
+            {categories && Array.isArray(categories) && categories
+              .sort((a, b) => (a.order || 0) - (b.order || 0))
+              .map((category) => (
+                <Button
+                  key={category.id}
+                  onClick={() => setSelectedCategory(category.id)}
+                  variant={selectedCategory === category.id ? "default" : "outline"}
+                  className={`rounded-full whitespace-nowrap text-xs md:text-sm px-3 md:px-4 py-2 md:py-2.5 ${selectedCategory === category.id
                     ? "bg-gradient-to-r from-amber-500 to-amber-600 text-white"
                     : "bg-white/10 backdrop-blur-xl border-white/30 text-white hover:bg-white/20"
-                }`}
-              >
-                {language === "uz" ? category.name_uz : language === "ru" ? category.name_ru : category.name}
-              </Button>
-            ))}
-          </div>
+                    }`}
+                >
+                  {language === "uz" ? category.name_uz : language === "ru" ? category.name_ru : category.name}
+                </Button>
+              ))}
+          </nav>
+        </div>
 
         {/* Menu Items Grid - Optimized for laptop screens */}
-        <div className="max-w-7xl mx-auto">
+        <section id="menu-grid" className="max-w-7xl mx-auto">
           <div className="grid grid-cols-2 sm:grid-cols-2 xl:grid-cols-3 gap-3 md:gap-6 lg:gap-8 px-2 md:px-0">
-              {filteredItems.map((item) => (
+            {filteredItems.map((item) => (
               <MenuItemCard key={item.id} item={item} language={language} />
             ))}
-                  </div>
-            </div>
+          </div>
+        </section>
 
-                {filteredItems.length === 0 && (
-                  <div className="text-center py-16">
+        {filteredItems.length === 0 && (
+          <div className="text-center py-16">
             <p className="text-white/60 text-lg">
               {language === "uz" ? "Hech narsa topilmadi" : language === "ru" ? "Ничего не найдено" : "No items found"}
             </p>
-                  </div>
+          </div>
         )}
       </div>
 
-      {totalCartItems > 0 && (
-        <Link href="/cart">
-          <Button className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white rounded-full h-16 px-8 shadow-2xl shadow-amber-500/50 flex items-center gap-3 text-lg font-semibold">
-            <ShoppingCart className="w-6 h-6" />
-            <span>{language === "uz" ? "Savat" : language === "ru" ? "Корзина" : "Cart"}</span>
-            <Badge className="bg-white text-amber-600 font-bold text-base h-8 w-8 flex items-center justify-center p-0 rounded-full">
-              {totalCartItems}
-            </Badge>
-          </Button>
-        </Link>
-      )}
-    </div>
+      {
+        totalCartItems > 0 && (
+          <Link href="/cart">
+            <Button className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white rounded-full h-16 px-8 shadow-2xl shadow-amber-500/50 flex items-center gap-3 text-lg font-semibold">
+              <ShoppingCart className="w-6 h-6" />
+              <span>{language === "uz" ? "Savat" : language === "ru" ? "Корзина" : "Cart"}</span>
+              <Badge className="bg-white text-amber-600 font-bold text-base h-8 w-8 flex items-center justify-center p-0 rounded-full">
+                {totalCartItems}
+              </Badge>
+            </Button>
+          </Link>
+        )
+      }
+    </main>
   )
 }
