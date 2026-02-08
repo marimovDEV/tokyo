@@ -94,9 +94,9 @@ export function PopularDishesSection() {
                     </p>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 mb-12">
+                <div className="flex overflow-x-auto gap-4 pb-8 snap-x snap-mandatory -mx-4 px-4 md:grid md:grid-cols-2 lg:grid-cols-3 md:gap-8 md:pb-0 md:mx-0 md:px-0 scrollbar-hide">
                     {popularItems.map((item, idx) => (
-                        <div key={item.id} className="animate-fade-in-up" style={{ animationDelay: `${idx * 100}ms` }}>
+                        <div key={item.id} className="min-w-[75vw] sm:min-w-[45vw] md:min-w-0 snap-center animate-fade-in-up" style={{ animationDelay: `${idx * 100}ms` }}>
                             <MenuItemCard item={item} language={language} />
                         </div>
                     ))}

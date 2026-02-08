@@ -68,34 +68,39 @@ export function MenuItemCard({ item, language }: MenuItemCardProps) {
       <div
         data-menu-item-id={item.id}
         onClick={openModal}
-        className="group bg-gradient-to-b from-white/10 to-white/5 backdrop-blur-xl rounded-3xl overflow-hidden border border-white/20 shadow-lg hover:shadow-2xl hover:shadow-orange-500/10 transition-all duration-300 hover:scale-[1.02] hover:border-orange-500/30 h-full flex flex-col cursor-pointer"
+        className="group bg-gradient-to-b from-white/10 to-white/5 backdrop-blur-xl rounded-2xl md:rounded-3xl overflow-hidden border border-white/20 shadow-lg hover:shadow-2xl hover:shadow-orange-500/10 transition-all duration-300 hover:scale-[1.02] hover:border-orange-500/30 h-full flex flex-col cursor-pointer"
       >
-        {/* Image Section - 1:1 Aspect Ratio */}
-        <div className="relative aspect-square w-full overflow-hidden">
+        {/* Image Section - 4:3 on mobile, 1:1 on desktop */}
+        <div className="relative aspect-[4/3] md:aspect-square w-full overflow-hidden">
           <Image
             src={item.image || "/placeholder.svg"}
             alt={getName()}
             fill
             className="object-cover group-hover:scale-105 transition-transform duration-500"
           />
-          <div className="absolute top-3 right-3 bg-black/70 backdrop-blur-md px-2.5 py-1.5 rounded-full flex items-center gap-1">
-            <Star className="w-4 h-4 fill-orange-400 text-orange-400" />
-            <span className="text-white font-semibold text-sm">{item.rating}</span>
+          <div className="absolute top-2 right-2 md:top-3 md:right-3 bg-black/70 backdrop-blur-md px-2 py-1 md:px-2.5 md:py-1.5 rounded-full flex items-center gap-1">
+            <Star className="w-3 h-3 md:w-4 md:h-4 fill-orange-400 text-orange-400" />
+            <span className="text-white font-semibold text-xs md:text-sm">{item.rating}</span>
           </div>
         </div>
 
         {/* Content Section */}
-        <div className="flex-1 flex flex-col p-5 min-[431px]:p-3 md:p-5">
+        <div className="flex-1 flex flex-col p-3 md:p-5">
           {/* Title */}
-          <h3 className="text-lg min-[431px]:text-base md:text-lg font-bold text-white mb-2 line-clamp-1 group-hover:text-orange-400 transition-colors">
+          <h3 className="text-sm md:text-lg font-bold text-white mb-2 line-clamp-2 md:line-clamp-1 group-hover:text-orange-400 transition-colors h-[40px] md:h-auto">
             {getName()}
           </h3>
 
-          {/* Description and other details hidden to reduce noise */}
+          {/* Description hidden on mobile */}
+          <div className="hidden md:block mb-4">
+            <p className="text-xs text-white/60 line-clamp-2">
+              {language === "uz" ? item.description_uz : language === "ru" ? item.description_ru : item.description}
+            </p>
+          </div>
 
           {/* Price and Add Button - Bottom aligned */}
-          <div className="flex items-center justify-between gap-2 md:gap-4 pt-4 border-t border-white/10 mt-auto">
-            <div className="text-lg md:text-xl font-bold text-orange-400">
+          <div className="flex items-center justify-between gap-2 md:gap-4 pt-2 md:pt-4 border-t border-white/10 mt-auto">
+            <div className="text-base md:text-xl font-bold text-orange-400">
               {formatPrice(item.price)}
             </div>
 
@@ -105,9 +110,9 @@ export function MenuItemCard({ item, language }: MenuItemCardProps) {
                 disabled={!item.available || isLoading}
                 className={`
                 bg-gradient-to-r hover:to-orange-700 text-white rounded-full
-                h-9 px-4 text-sm min-w-[80px]
-                md:h-11 md:px-6 md:text-base md:min-w-[100px]
+                h-8 px-0 w-8 md:w-auto md:h-11 md:px-6 
                 font-semibold shadow-lg transition-all duration-200
+                flex items-center justify-center
                 ${isSuccess
                     ? "from-green-500 to-green-600 hover:from-green-600 shadow-green-500/30"
                     : "from-orange-500 to-orange-600 hover:from-orange-600 shadow-orange-500/30 hover:shadow-orange-500/50"
@@ -115,31 +120,36 @@ export function MenuItemCard({ item, language }: MenuItemCardProps) {
               `}
               >
                 {isLoading ? (
-                  <Loader2 className="w-5 h-5 animate-spin" />
+                  <Loader2 className="w-4 h-4 md:w-5 md:h-5 animate-spin" />
                 ) : isSuccess ? (
-                  <Check className="w-5 h-5" />
+                  <Check className="w-4 h-4 md:w-5 md:h-5" />
                 ) : (
-                  language === "uz" ? "Qo'shish" : language === "ru" ? "Добавить" : "Add"
+                  <>
+                    <Plus className="w-5 h-5 md:hidden" />
+                    <span className="hidden md:inline">
+                      {language === "uz" ? "Qo'shish" : language === "ru" ? "Добавить" : "Add"}
+                    </span>
+                  </>
                 )}
               </Button>
             ) : (
-              <div className="flex items-center gap-2 bg-white/10 rounded-full p-1">
+              <div className="flex items-center gap-1 md:gap-2 bg-white/10 rounded-full p-0.5 md:p-1">
                 <Button
                   size="icon"
                   variant="ghost"
                   onClick={handleDecrement}
-                  className="h-9 w-9 rounded-full hover:bg-white/20 text-white transition-all duration-200"
+                  className="h-7 w-7 md:h-9 md:w-9 rounded-full hover:bg-white/20 text-white transition-all duration-200"
                 >
-                  <Minus className="w-4 h-4" />
+                  <Minus className="w-3 h-3 md:w-4 md:h-4" />
                 </Button>
-                <span className="text-white font-semibold w-8 text-center text-base">{quantity}</span>
+                <span className="text-white font-semibold w-5 md:w-8 text-center text-sm md:text-base">{quantity}</span>
                 <Button
                   size="icon"
                   variant="ghost"
                   onClick={handleIncrement}
-                  className="h-9 w-9 rounded-full hover:bg-white/20 text-white transition-all duration-200"
+                  className="h-7 w-7 md:h-9 md:w-9 rounded-full hover:bg-white/20 text-white transition-all duration-200"
                 >
-                  <Plus className="w-4 h-4" />
+                  <Plus className="w-3 h-3 md:w-4 md:h-4" />
                 </Button>
               </div>
             )}
