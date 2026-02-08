@@ -11,7 +11,9 @@ import { useCart } from "@/lib/cart-context"
 import { MenuItemCard } from "@/components/menu-item-card"
 import { useLanguage } from "@/lib/language-context"
 import type { Language } from "@/lib/types"
+
 import { PromotionsCarousel } from "@/components/promotions-carousel"
+import { CartSheet } from "@/components/cart-sheet"
 
 export default function MenuPage() {
   const { language, setLanguage } = useLanguage()
@@ -182,17 +184,30 @@ export default function MenuPage() {
             <h1 className="text-xl md:text-3xl lg:text-4xl font-bold text-white">Menu</h1>
           </div>
 
-          <div className="flex gap-1 md:gap-1 bg-white/10 backdrop-blur-xl rounded-full p-1 border border-white/20">
-            {(["uz", "ru", "en"] as Language[]).map((lang) => (
-              <button
-                key={lang}
-                onClick={() => setLanguage(lang)}
-                className={`px-2 md:px-3 py-1 md:py-1.5 rounded-full text-xs md:text-sm font-medium transition-all ${language === lang ? "bg-white text-slate-900" : "text-white/70 hover:text-white"
-                  }`}
-              >
-                {lang.toUpperCase()}
-              </button>
-            ))}
+          <div className="flex items-center gap-2 md:gap-4">
+            <div className="flex gap-1 md:gap-1 bg-white/10 backdrop-blur-xl rounded-full p-1 border border-white/20">
+              {(["uz", "ru", "en"] as Language[]).map((lang) => (
+                <button
+                  key={lang}
+                  onClick={() => setLanguage(lang)}
+                  className={`px-2 md:px-3 py-1 md:py-1.5 rounded-full text-xs md:text-sm font-medium transition-all ${language === lang ? "bg-white text-slate-900" : "text-white/70 hover:text-white"
+                    }`}
+                >
+                  {lang.toUpperCase()}
+                </button>
+              ))}
+            </div>
+
+            <CartSheet language={language}>
+              <Button variant="ghost" size="icon" className="text-white relative">
+                <ShoppingCart className="w-5 h-5 md:w-6 md:h-6" />
+                {totalCartItems > 0 && (
+                  <span className="absolute -top-1 -right-1 w-4 h-4 bg-orange-500 rounded-full text-[10px] font-bold flex items-center justify-center text-white">
+                    {totalCartItems}
+                  </span>
+                )}
+              </Button>
+            </CartSheet>
           </div>
         </header>
 
@@ -253,28 +268,30 @@ export default function MenuPage() {
           </div>
         </section>
 
-        {filteredItems.length === 0 && (
-          <div className="text-center py-16">
-            <p className="text-white/60 text-lg">
-              {language === "uz" ? "Hech narsa topilmadi" : language === "ru" ? "Ничего не найдено" : "No items found"}
-            </p>
-          </div>
-        )}
-      </div>
+        {
+          filteredItems.length === 0 && (
+            <div className="text-center py-16">
+              <p className="text-white/60 text-lg">
+                {language === "uz" ? "Hech narsa topilmadi" : language === "ru" ? "Ничего не найдено" : "No items found"}
+              </p>
+            </div>
+          )
+        }
+      </div >
 
-      {
-        totalCartItems > 0 && (
-          <Link href="/cart">
-            <Button className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white rounded-full h-16 px-8 shadow-2xl shadow-amber-500/50 flex items-center gap-3 text-lg font-semibold">
+      <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50">
+        {totalCartItems > 0 && (
+          <CartSheet language={language}>
+            <Button className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white rounded-full h-16 px-8 shadow-2xl shadow-amber-500/50 flex items-center gap-3 text-lg font-semibold transform hover:scale-105 transition-all">
               <ShoppingCart className="w-6 h-6" />
               <span>{language === "uz" ? "Savat" : language === "ru" ? "Корзина" : "Cart"}</span>
               <Badge className="bg-white text-amber-600 font-bold text-base h-8 w-8 flex items-center justify-center p-0 rounded-full">
                 {totalCartItems}
               </Badge>
             </Button>
-          </Link>
-        )
-      }
-    </main>
+          </CartSheet>
+        )}
+      </div>
+    </main >
   )
 }
