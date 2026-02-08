@@ -11,10 +11,10 @@ interface IngredientsDisplayProps {
   className?: string
 }
 
-export function IngredientsDisplay({ 
-  ingredients, 
-  maxVisible = 3, 
-  className = "" 
+export function IngredientsDisplay({
+  ingredients,
+  maxVisible = 3,
+  className = ""
 }: IngredientsDisplayProps) {
   const { language } = useLanguage()
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -46,7 +46,7 @@ export function IngredientsDisplay({
             {ingredient}
           </span>
         ))}
-        
+
         {/* +N tugmasi */}
         {hasMore && (
           <div className="relative">
@@ -54,16 +54,15 @@ export function IngredientsDisplay({
               onClick={openModal}
               onMouseEnter={() => setIsHovered(true)}
               onMouseLeave={() => setIsHovered(false)}
-              className="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-medium bg-gradient-to-r from-orange-500 to-orange-600 text-white border border-orange-400 hover:from-orange-600 hover:to-orange-700 transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-orange-500/30 focus:outline-none focus:ring-2 focus:ring-orange-500/50"
+              className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-700/50 text-gray-300 border border-gray-600 hover:bg-gray-700 hover:text-white transition-colors duration-200"
             >
               +{remainingCount}
             </button>
-            
+
             {/* Desktop tooltip */}
-            <div 
-              className={`absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 text-white text-sm rounded-lg shadow-xl border border-gray-700 z-50 transition-all duration-200 ${
-                isHovered ? 'opacity-100 visible' : 'opacity-0 invisible'
-              }`}
+            <div
+              className={`absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 text-white text-sm rounded-lg shadow-xl border border-gray-700 z-50 transition-all duration-200 ${isHovered ? 'opacity-100 visible' : 'opacity-0 invisible'
+                }`}
               style={{ pointerEvents: 'none' }}
             >
               <div className="flex flex-col gap-1">
@@ -84,11 +83,11 @@ export function IngredientsDisplay({
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 md:hidden">
           {/* Backdrop */}
-          <div 
+          <div
             className="absolute inset-0 bg-black/60 backdrop-blur-md"
             onClick={closeModal}
           />
-          
+
           {/* Modal Content */}
           <div className="relative bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900 rounded-2xl p-6 w-full max-w-sm mx-auto border border-gray-700 shadow-2xl animate-in fade-in-0 zoom-in-95 duration-300">
             {/* Close Button */}
@@ -98,7 +97,7 @@ export function IngredientsDisplay({
             >
               <X className="w-4 h-4 text-white" />
             </button>
-            
+
             {/* Header */}
             <div className="mb-6">
               <h3 className="text-xl font-bold text-white mb-2">
@@ -108,7 +107,7 @@ export function IngredientsDisplay({
                 {language === "uz" ? "Barcha ingredientlar ro'yxati" : language === "ru" ? "Список всех ингредиентов" : "List of all ingredients"}
               </p>
             </div>
-            
+
             {/* Ingredients List */}
             <div className="space-y-3">
               {ingredients.map((ingredient, index) => (
@@ -121,7 +120,7 @@ export function IngredientsDisplay({
                 </div>
               ))}
             </div>
-            
+
             {/* Footer */}
             <div className="mt-6 pt-4 border-t border-gray-700">
               <button
@@ -139,11 +138,11 @@ export function IngredientsDisplay({
       {isModalOpen && (
         <div className="hidden md:block fixed inset-0 z-50 flex items-center justify-center p-8">
           {/* Backdrop */}
-          <div 
+          <div
             className="absolute inset-0 bg-black/60 backdrop-blur-md"
             onClick={closeModal}
           />
-          
+
           {/* Modal Content */}
           <div className="relative bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900 rounded-3xl p-8 w-full max-w-md mx-auto border border-gray-700 shadow-2xl animate-in fade-in-0 zoom-in-95 duration-300">
             {/* Close Button */}
@@ -153,7 +152,7 @@ export function IngredientsDisplay({
             >
               <X className="w-5 h-5 text-white" />
             </button>
-            
+
             {/* Header */}
             <div className="mb-8">
               <h3 className="text-2xl font-bold text-white mb-3">
@@ -163,7 +162,7 @@ export function IngredientsDisplay({
                 {language === "uz" ? "Barcha ingredientlar ro'yxati" : language === "ru" ? "Список всех ингредиентов" : "List of all ingredients"}
               </p>
             </div>
-            
+
             {/* Ingredients Grid */}
             <div className="grid grid-cols-2 gap-3 mb-8">
               {ingredients.map((ingredient, index) => (
@@ -176,7 +175,7 @@ export function IngredientsDisplay({
                 </div>
               ))}
             </div>
-            
+
             {/* Footer */}
             <div className="pt-6 border-t border-gray-700">
               <button
