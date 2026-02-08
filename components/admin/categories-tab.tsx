@@ -3,7 +3,7 @@
 import type React from "react"
 
 import { useState, useMemo, useEffect } from "react"
-import { Plus, Pencil, Trash2, AlertTriangle, Loader2, Search, ArrowUpDown, Info, Check, X } from "lucide-react"
+import { Plus, Pencil, Trash2, AlertTriangle, Loader2, Search, ArrowUpDown, Info, Check, X, Minus } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog"
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog"
@@ -326,10 +326,10 @@ export function CategoriesTab() {
                           type="button"
                           variant="outline"
                           size="icon"
-                          className="h-10 w-10 border-white/20 text-white hover:bg-white/10"
+                          className="h-10 w-10 border-white/20 text-white bg-transparent hover:bg-white/10"
                           onClick={() => setFormData(p => ({ ...p, order: Math.max(1, p.order - 1) }))}
                         >
-                          -
+                          <Minus className="w-4 h-4" />
                         </Button>
                         <div className="flex-1 bg-white/5 border border-white/20 rounded h-10 flex items-center justify-center text-white font-mono font-bold">
                           {formData.order}
@@ -338,10 +338,10 @@ export function CategoriesTab() {
                           type="button"
                           variant="outline"
                           size="icon"
-                          className="h-10 w-10 border-white/20 text-white hover:bg-white/10"
+                          className="h-10 w-10 border-white/20 text-white bg-transparent hover:bg-white/10"
                           onClick={() => setFormData(p => ({ ...p, order: p.order + 1 }))}
                         >
-                          +
+                          <Plus className="w-4 h-4" />
                         </Button>
                       </div>
                       <p className="text-[10px] text-white/40 text-center">
