@@ -247,7 +247,7 @@ export default function MenuPage() {
 
         {/* Menu Items Grid - Optimized for laptop screens */}
         <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6 lg:gap-8 px-2 md:px-0">
+          <div className="grid grid-cols-2 sm:grid-cols-2 xl:grid-cols-3 gap-3 md:gap-6 lg:gap-8 px-2 md:px-0">
               {filteredItems.map((item) => (
               <MenuItemCard key={item.id} item={item} language={language} />
             ))}

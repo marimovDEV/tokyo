@@ -50,17 +50,17 @@ export function MenuItemCard({ item, language }: MenuItemCardProps) {
   }
 
   return (
-    <div 
+    <div
       data-menu-item-id={item.id}
       className="group bg-gradient-to-b from-white/10 to-white/5 backdrop-blur-xl rounded-[20px] overflow-hidden border border-white/20 shadow-lg hover:shadow-2xl hover:shadow-orange-500/10 transition-all duration-300 hover:scale-[1.02] hover:border-orange-500/30 h-full flex flex-col"
     >
       {/* Image Section - 1:1 Aspect Ratio */}
       <div className="relative aspect-square w-full overflow-hidden">
-        <Image 
-          src={item.image || "/placeholder.svg"} 
-          alt={getName()} 
-          fill 
-          className="object-cover group-hover:scale-105 transition-transform duration-300" 
+        <Image
+          src={item.image || "/placeholder.svg"}
+          alt={getName()}
+          fill
+          className="object-cover group-hover:scale-105 transition-transform duration-300"
         />
         <div className="absolute top-3 right-3 bg-black/70 backdrop-blur-md px-2.5 py-1.5 rounded-full flex items-center gap-1">
           <Star className="w-4 h-4 fill-orange-400 text-orange-400" />
@@ -69,9 +69,9 @@ export function MenuItemCard({ item, language }: MenuItemCardProps) {
       </div>
 
       {/* Content Section */}
-      <div className="flex-1 flex flex-col p-5">
+      <div className="flex-1 flex flex-col p-3 md:p-5">
         {/* Title */}
-        <h3 className="text-lg font-bold text-white mb-2 line-clamp-1 group-hover:text-orange-400 transition-colors">
+        <h3 className="text-base md:text-lg font-bold text-white mb-2 line-clamp-1 group-hover:text-orange-400 transition-colors">
           {getName()}
         </h3>
 
@@ -104,7 +104,7 @@ export function MenuItemCard({ item, language }: MenuItemCardProps) {
             <p className="text-xs text-gray-400 mb-2 font-medium">
               {language === "uz" ? "Tarkibi:" : language === "ru" ? "Состав:" : "Ingredients:"}
             </p>
-            <IngredientsDisplay 
+            <IngredientsDisplay
               ingredients={getIngredients()}
               maxVisible={3}
               className="text-xs"
@@ -114,7 +114,7 @@ export function MenuItemCard({ item, language }: MenuItemCardProps) {
 
         {/* Price and Add Button - Bottom aligned */}
         <div className="flex items-center justify-between gap-4 pt-4 border-t border-white/10 mt-auto">
-          <div className="text-xl font-bold text-orange-400">
+          <div className="text-lg md:text-xl font-bold text-orange-400">
             {formatPrice(item.price)}
           </div>
 
@@ -122,7 +122,7 @@ export function MenuItemCard({ item, language }: MenuItemCardProps) {
             <Button
               onClick={handleAddToCart}
               disabled={!item.available}
-              className="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white rounded-full h-11 px-6 text-base font-semibold shadow-lg shadow-orange-500/30 hover:shadow-orange-500/50 transition-all duration-200 min-w-[100px]"
+              className="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white rounded-full h-9 md:h-11 px-4 md:px-6 text-sm md:text-base font-semibold shadow-lg shadow-orange-500/30 hover:shadow-orange-500/50 transition-all duration-200 min-w-[80px] md:min-w-[100px]"
             >
               {language === "uz" ? "Qo'shish" : language === "ru" ? "Добавить" : "Add"}
             </Button>
