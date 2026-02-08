@@ -1,5 +1,7 @@
 "use client"
 
+import { useRef, useEffect } from "react"
+
 import { useMenu } from "@/lib/menu-context"
 import { useLanguage } from "@/lib/language-context"
 import { MenuItemCard } from "@/components/menu-item-card"
@@ -66,6 +68,34 @@ export function PopularDishesSection() {
         return selectedItems.sort((a, b) => (b.rating || 0) - (a.rating || 0)).slice(0, 6)
     })()
 
+    const scrollContainerRef = useRef<HTMLDivElement>(null)
+
+    // Auto-scroll logic for mobile/tablet
+    useEffect(() => {
+        const scrollContainer = scrollContainerRef.current
+        if (!scrollContainer) return
+
+        const interval = setInterval(() => {
+            // Only auto-scroll if it's in carousel mode (flex)
+            // We can check if display is flex or simply check window width
+            if (window.innerWidth >= 1024) return // lg breakpoint
+
+            if (scrollContainer) {
+                const { scrollLeft, scrollWidth, clientWidth } = scrollContainer
+
+                // If we are at the end (or close to it), loop back to start
+                if (scrollLeft + clientWidth >= scrollWidth - 10) {
+                    scrollContainer.scrollTo({ left: 0, behavior: "smooth" })
+                } else {
+                    // Scroll by one item width (approx 45vw or half container)
+                    scrollContainer.scrollBy({ left: clientWidth * 0.5, behavior: "smooth" })
+                }
+            }
+        }, 3000)
+
+        return () => clearInterval(interval)
+    }, [])
+
     if (loading) {
         return (
             <section className="py-16 bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 border-b border-white/5">
@@ -94,15 +124,27 @@ export function PopularDishesSection() {
                     </p>
                 </div>
 
-                <div className="flex overflow-x-auto gap-4 pb-8 snap-x snap-mandatory -mx-4 px-4 md:grid md:grid-cols-2 lg:grid-cols-3 md:gap-8 md:pb-0 md:mx-0 md:px-0 scrollbar-hide">
+                <div
+                    ref={scrollContainerRef}
+                    className="flex overflow-x-auto gap-4 pb-8 snap-x snap-mandatory -mx-4 px-4 lg:grid lg:grid-cols-3 lg:gap-8 lg:pb-0 lg:mx-0 lg:px-0 scrollbar-hide"
+                >
                     {popularItems.map((item, idx) => (
-                        <div key={item.id} className="min-w-[75vw] sm:min-w-[45vw] md:min-w-0 snap-center animate-fade-in-up" style={{ animationDelay: `${idx * 100}ms` }}>
+                        <div key={item.id} className="min-w-[75vw] sm:min-w-[45vw] lg:min-w-0 snap-center animate-fade-in-up" style={{ animationDelay: `${idx * 100}ms` }}>
                             <MenuItemCard item={item} language={language} />
                         </div>
                     ))}
                 </div>
 
-                <div className="text-center animate-fade-in-up delay-500">
+                <div className="text-center animate-fade-in-up delay-500 hidden lg:block">
+                    <Button asChild size="lg" className="rounded-full bg-white/10 hover:bg-white/20 text-white border border-white/20 backdrop-blur-sm px-8">
+                        <Link href="/menu">
+                            {t.viewAll} <ArrowRight className="w-4 h-4 ml-2" />
+                        </Link>
+                    </Button>
+                </div>
+
+                {/* Mobile View All Button - visible below carousel */}
+                <div className="text-center animate-fade-in-up delay-500 lg:hidden mt-4">
                     <Button asChild size="lg" className="rounded-full bg-white/10 hover:bg-white/20 text-white border border-white/20 backdrop-blur-sm px-8">
                         <Link href="/menu">
                             {t.viewAll} <ArrowRight className="w-4 h-4 ml-2" />
