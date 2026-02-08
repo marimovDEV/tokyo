@@ -10,9 +10,11 @@ import { formatPrice } from "@/lib/api"
 interface MenuItemCardProps {
   item: MenuItem
   language: "uz" | "ru" | "en"
+  discountBadge?: string
+  discountPrice?: number
 }
 
-export function MenuItemCard({ item, language }: MenuItemCardProps) {
+export function MenuItemCard({ item, language, discountBadge, discountPrice }: MenuItemCardProps) {
   const { cart, addToCart, updateQuantity } = useCart()
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
@@ -78,6 +80,14 @@ export function MenuItemCard({ item, language }: MenuItemCardProps) {
             fill
             className="object-cover group-hover:scale-105 transition-transform duration-500"
           />
+
+          {/* Discount Badge */}
+          {discountBadge && (
+            <div className="absolute top-2 left-2 bg-red-500 text-white px-2 py-1 rounded-lg text-[10px] md:text-xs font-bold shadow-lg z-10">
+              {discountBadge}
+            </div>
+          )}
+
           <div className="absolute top-2 right-2 md:top-3 md:right-3 bg-black/70 backdrop-blur-md px-2 py-1 md:px-2.5 md:py-1.5 rounded-full flex items-center gap-1">
             <Star className="w-3 h-3 md:w-4 md:h-4 fill-orange-400 text-orange-400" />
             <span className="text-white font-semibold text-xs md:text-sm">{item.rating}</span>
@@ -100,8 +110,21 @@ export function MenuItemCard({ item, language }: MenuItemCardProps) {
 
           {/* Price and Add Button - Bottom aligned */}
           <div className="flex items-center justify-between gap-2 md:gap-4 pt-2 md:pt-4 border-t border-white/10 mt-auto">
-            <div className="text-base md:text-xl font-bold text-orange-400">
-              {formatPrice(item.price)}
+            <div className="flex flex-col">
+              {discountPrice ? (
+                <>
+                  <span className="text-base md:text-xl font-bold text-orange-400">
+                    {formatPrice(discountPrice)}
+                  </span>
+                  <span className="text-[10px] md:text-xs text-white/40 line-through">
+                    {formatPrice(item.price)}
+                  </span>
+                </>
+              ) : (
+                <span className="text-base md:text-xl font-bold text-orange-400">
+                  {formatPrice(item.price)}
+                </span>
+              )}
             </div>
 
             {quantity === 0 ? (

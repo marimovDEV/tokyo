@@ -4,7 +4,8 @@ import { Header } from "@/components/layout/header"
 import { HeroEnhanced } from "@/components/home/hero-enhanced"
 import { TrustSection } from "@/components/home/trust-section"
 import { PopularDishesSection } from "@/components/home/popular-dishes"
-import { PromotionsCarousel } from "@/components/promotions-carousel"
+import { PromotionDishesSection } from "@/components/home/promotion-dishes"
+import { RecommendedDishesSection } from "@/components/home/recommended-dishes"
 import { FloatingButtons } from "@/components/layout/floating-buttons"
 import { MobileNav } from "@/components/layout/mobile-nav"
 import { useLanguage } from "@/lib/language-context"
@@ -21,24 +22,14 @@ export default function Home() {
 
       <TrustSection />
 
+      {/* 1. Mashhur taomlar */}
       <PopularDishesSection />
 
-      {/* Promotions Section - keeping reused component */}
-      <section className="py-16 bg-slate-900 relative">
-        <div className="container mx-auto px-4">
-          <div className="flex justify-between items-end mb-8">
-            <div>
-              <h2 className="text-3xl font-bold text-white mb-2">
-                {language === 'uz' ? "Aksiyalar" : language === 'ru' ? "Акции" : "Promotions"}
-              </h2>
-              <p className="text-white/60">
-                {language === 'uz' ? "Maxsus takliflarimiz" : language === 'ru' ? "Наши специальные предложения" : "Our special offers"}
-              </p>
-            </div>
-          </div>
-          <PromotionsCarousel language={language} />
-        </div>
-      </section>
+      {/* 2. Aksiyadagi taomlar */}
+      <PromotionDishesSection />
+
+      {/* 3. Tavsiya etiladi */}
+      <RecommendedDishesSection />
 
       {/* Extra CTA for Menu */}
       <section className="py-20 bg-amber-500 relative overflow-hidden">
