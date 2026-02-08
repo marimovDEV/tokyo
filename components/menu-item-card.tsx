@@ -67,7 +67,7 @@ export function MenuItemCard({ item, language }: MenuItemCardProps) {
       <div
         data-menu-item-id={item.id}
         onClick={openModal}
-        className="group bg-gradient-to-b from-white/10 to-white/5 backdrop-blur-xl rounded-[24px] overflow-hidden border border-white/20 shadow-lg hover:shadow-2xl hover:shadow-orange-500/10 transition-all duration-300 hover:scale-[1.02] hover:border-orange-500/30 h-full flex flex-col cursor-pointer"
+        className="group bg-gradient-to-b from-white/10 to-white/5 backdrop-blur-xl rounded-3xl overflow-hidden border border-white/20 shadow-lg hover:shadow-2xl hover:shadow-orange-500/10 transition-all duration-300 hover:scale-[1.02] hover:border-orange-500/30 h-full flex flex-col cursor-pointer"
       >
         {/* Image Section - 1:1 Aspect Ratio */}
         <div className="relative aspect-square w-full overflow-hidden">

@@ -14,6 +14,7 @@ import type { Language } from "@/lib/types"
 
 import { PromotionsCarousel } from "@/components/promotions-carousel"
 import { CartSheet } from "@/components/cart-sheet"
+import { MenuGridSkeleton } from "@/components/menu-skeleton"
 
 export default function MenuPage() {
   const { language, setLanguage } = useLanguage()
@@ -161,9 +162,14 @@ export default function MenuPage() {
   // Loading holati
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center">
-        <p className="text-white text-xl">Loading...</p>
-      </div>
+      <main className="min-h-screen bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 pb-24">
+        <div className="fixed inset-0 bg-[url('/tokyo-restaurant-night.png')] bg-cover bg-center bg-fixed opacity-10 pointer-events-none" />
+        <div className="relative z-10 container mx-auto px-3 md:px-4 py-4 md:py-8">
+          {/* Header Skeleton or simple spacing */}
+          <div className="h-20 mb-8" />
+          <MenuGridSkeleton />
+        </div>
+      </main>
     )
   }
 
