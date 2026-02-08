@@ -158,11 +158,7 @@ export function PromotionsTab() {
       return
     }
 
-    if (formData.start_date && formData.end_date && new Date(formData.end_date) < new Date(formData.start_date)) {
-      toast.error("Tugash sanasi boshlanish sanasidan oldin bo'lishi mumkin emas")
-      setIsSubmitting(false)
-      return
-    }
+
 
     if (formData.price < 0) {
       toast.error("Narx manfiy bo'lishi mumkin emas")
@@ -671,33 +667,11 @@ export function PromotionsTab() {
                   </div>
                 </div>
 
-                {/* Time */}
+                {/* Status Only - Date fields removed */}
                 <div className="space-y-4">
                   <div className="flex items-center gap-2 text-amber-500 font-semibold border-b border-white/10 pb-2">
                     <Calendar className="w-5 h-5" />
-                    <h3>Vaqt va Holat</h3>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label className="text-white text-xs">Boshlanish</Label>
-                      <Input
-                        type="datetime-local"
-                        value={formData.start_date}
-                        onChange={(e) => setFormData({ ...formData, start_date: e.target.value })}
-                        className="bg-white/10 border-white/20 text-white text-sm"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label className="text-white text-xs">Tugash</Label>
-                      <Input
-                        type="datetime-local"
-                        min={formData.start_date} // Date safety
-                        value={formData.end_date}
-                        onChange={(e) => setFormData({ ...formData, end_date: e.target.value })}
-                        className="bg-white/10 border-white/20 text-white text-sm"
-                      />
-                    </div>
+                    <h3>Holat</h3>
                   </div>
 
                   <div className="bg-white/5 rounded-lg p-3 flex items-center justify-between border border-white/10">
