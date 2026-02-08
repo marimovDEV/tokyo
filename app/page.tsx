@@ -1,57 +1,70 @@
 "use client"
 
-import { HeroSection } from "@/components/hero-section"
-import { PromotionsSection } from "@/components/promotions-section"
+import { Header } from "@/components/layout/header"
+import { HeroEnhanced } from "@/components/home/hero-enhanced"
+import { TrustSection } from "@/components/home/trust-section"
+import { PopularDishesSection } from "@/components/home/popular-dishes"
+import { PromotionsCarousel } from "@/components/promotions-carousel"
+import { FloatingButtons } from "@/components/layout/floating-buttons"
+import { MobileNav } from "@/components/layout/mobile-nav"
 import { useLanguage } from "@/lib/language-context"
 import Link from "next/link"
 
 export default function Home() {
   const { language } = useLanguage()
-  return (
-    <main className="min-h-screen">
-      <div
-        className="relative bg-cover md:bg-cover bg-center bg-no-repeat"
-        style={{
-          backgroundImage: "url(/tokyo-restaurant-night.png)",
-          backgroundPosition: "center 30%",
-          backgroundSize: "cover",
-        }}
-      >
-        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/50 to-black/70" />
 
-        <div className="relative z-10">
-          <HeroSection />
+  return (
+    <main className="min-h-screen bg-slate-900 pb-16 md:pb-0">
+      <Header />
+
+      <HeroEnhanced />
+
+      <TrustSection />
+
+      <PopularDishesSection />
+
+      {/* Promotions Section - keeping reused component */}
+      <section className="py-16 bg-slate-900 relative">
+        <div className="container mx-auto px-4">
+          <div className="flex justify-between items-end mb-8">
+            <div>
+              <h2 className="text-3xl font-bold text-white mb-2">
+                {language === 'uz' ? "Aksiyalar" : language === 'ru' ? "Акции" : "Promotions"}
+              </h2>
+              <p className="text-white/60">
+                {language === 'uz' ? "Maxsus takliflarimiz" : language === 'ru' ? "Наши специальные предложения" : "Our special offers"}
+              </p>
+            </div>
+          </div>
+          <PromotionsCarousel language={language} />
         </div>
-      </div>
-      <PromotionsSection />
-      
-      {/* Menu Section */}
-      <section id="menu-section" className="py-16 px-4 bg-gradient-to-b from-slate-800 to-slate-900">
-        <div className="container mx-auto max-w-6xl text-center">
-          <h2 className="text-3xl md:text-4xl font-bold text-white mb-8">
-            {language === "uz" ? "Bizning Menyu" : language === "ru" ? "Наше Меню" : "Our Menu"}
+      </section>
+
+      {/* Extra CTA for Menu */}
+      <section className="py-20 bg-amber-500 relative overflow-hidden">
+        <div className="absolute inset-0 bg-[url('/tokyo-pattern.png')] opacity-10" />
+        <div className="container mx-auto px-4 text-center relative z-10">
+          <h2 className="text-3xl md:text-5xl font-bold text-white mb-6">
+            {language === 'uz' ? "Qorni och qoldingizmi?" : language === 'ru' ? "Проголодались?" : "Hungry?"}
           </h2>
-          <p className="text-lg text-white/80 mb-8 max-w-2xl mx-auto">
-            {language === "uz" 
-              ? "Tokyo restoranining eng yaxshi taomlarini tatib ko'ring"
-              : language === "ru" 
-              ? "Попробуйте лучшие блюда ресторана Tokyo"
-              : "Try the best dishes from Tokyo restaurant"
-            }
+          <p className="text-white/90 text-xl mb-8 max-w-2xl mx-auto">
+            {language === 'uz'
+              ? "Hoziroq buyurtma bering va mazali taomlardan bahramand bo'ling"
+              : language === 'ru'
+                ? "Закажите сейчас и наслаждайтесь вкусной едой"
+                : "Order now and enjoy delicious food"}
           </p>
           <Link
             href="/menu"
-            className="inline-flex items-center gap-3 px-8 py-4 rounded-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white text-lg font-semibold shadow-lg shadow-amber-500/30 hover:shadow-amber-500/50 transition-all hover:scale-105"
+            className="inline-flex items-center gap-2 bg-white text-amber-600 px-8 py-4 rounded-full text-lg font-bold hover:bg-slate-100 transition-colors shadow-xl"
           >
-            <span>
-              {language === "uz" ? "Menyuni Ko'rish" : language === "ru" ? "Посмотреть Меню" : "View Menu"}
-            </span>
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-            </svg>
+            {language === 'uz' ? "Menyuga o'tish" : language === 'ru' ? "Перейти в меню" : "Go to Menu"}
           </Link>
         </div>
       </section>
+
+      <FloatingButtons />
+      <MobileNav />
     </main>
   )
 }
