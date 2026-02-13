@@ -7,7 +7,6 @@ import { Suspense } from "react"
 import { Toaster } from "@/components/ui/sonner"
 import { MenuProvider } from "@/lib/menu-context"
 import { CartProvider } from "@/lib/cart-context"
-import { FeedbackProvider } from "@/lib/feedback-context"
 import { LanguageProvider } from "@/lib/language-context"
 import "./globals.css"
 
@@ -96,11 +95,9 @@ export default function RootLayout({
         <LanguageProvider>
           <MenuProvider>
             <CartProvider>
-              <FeedbackProvider>
-                <Suspense fallback={null}>{children}</Suspense>
-                <Toaster />
-                <Analytics />
-              </FeedbackProvider>
+              <Suspense fallback={null}>{children}</Suspense>
+              <Toaster />
+              <Analytics />
             </CartProvider>
           </MenuProvider>
         </LanguageProvider>
